@@ -153,7 +153,8 @@ measurement_dict = {
     "position_mm": position_input_mm,
     "t_s": times,
     "measurements_mw": measurements_mW,
-    "distances_mm": distances_mm
+    "distances_mm": distances_mm,
+    "speed_mms": speed
     }
 
 with open('measurements_2/{}/{}/{}.pkl'.format(distance_to_mirror_center, distance_to_plane, position_input_mm), 'wb') as f:

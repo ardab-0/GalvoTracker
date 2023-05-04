@@ -178,13 +178,12 @@ class MotorAndPowerMeterController:
 
         distances_mm = times * speed
 
-        maximum_pos_mm = distances_mm[np.argmax(measurements_mW)]
+        
 
         measurement_dict = {            
             "t_s": times,
             "measurements_mw": measurements_mW,
             "distances_mm": distances_mm,
-            "maximum_pos_mm": maximum_pos_mm,
             "speed_mms": speed}
         
         return measurement_dict
