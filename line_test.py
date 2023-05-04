@@ -48,15 +48,18 @@ si_1 = mre2.Mirror.Channel_1.StaticInput
 
 # Display a pattern
 
-x_t = np.zeros(11)
-y_t = np.linspace(-5, 0, 6) 
+# x_t = np.zeros(11)
+# y_t = np.linspace(-50, 0, 6) 
+x_t = np.array([0])
+y_t = np.array([1])
+
 
 # y_t = np.zeros(11)
 # x_t = np.linspace(0, 100, 11) 
 
 
 
-coordinate_transform = CoordinateTransform(d=0, D=440, rotation_degree=45)
+coordinate_transform = CoordinateTransform(d=0, D=410, rotation_degree=45)
 
 x_m, y_m = coordinate_transform.target_to_mirror(x_t, y_t)
 print("x_m", x_m)

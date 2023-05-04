@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Apr 12 09:40:39 2023
-
+    From optotune documentation
 @author: ki52soho
 """
 

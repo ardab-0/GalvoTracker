@@ -134,7 +134,12 @@ class MotorAndPowerMeterController:
                     is_move_completed = True
             time.sleep(0.1)
 
-    def moveMotorAndMeasure(self, port, unpacker, distance_mm):
+    def moveMotorAndMeasure(self, port, unpacker, distance_mm, T=0.1, N=5):
+        """
+            
+        """
+
+
         # set pm400 to power measurement mode
         self.instrument.write("MEASure:POWer")
 
@@ -175,12 +180,13 @@ class MotorAndPowerMeterController:
 
         maximum_pos_mm = distances_mm[np.argmax(measurements_mW)]
 
-        measurement_dict = {
-            "position_mm": distance_mm,
+        measurement_dict = {            
             "t_s": times,
             "measurements_mw": measurements_mW,
             "distances_mm": distances_mm,
-            "maximum_pos_mm": maximum_pos_mm}
+            "maximum_pos_mm": maximum_pos_mm,
+            "speed_mms": speed}
+        
         return measurement_dict
 
 

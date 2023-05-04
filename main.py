@@ -35,5 +35,6 @@ times = np.array(times, dtype='float64')
 measurements = np.array(measurements, dtype='float64')
 measurements_mW = measurements * 1000
 
+print(times)
 plt.plot(times, measurements_mW)
 plt.show()
