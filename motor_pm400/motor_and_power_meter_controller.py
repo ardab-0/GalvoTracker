@@ -38,6 +38,13 @@ class MotorAndPowerMeterController:
         # from endpoint enums in thorlabs_apt_device library
 
 
+        self.portX = None
+        self.unpackerX = None
+
+        self.portY = None
+        self.unpackerY = None
+
+
     def initializeMotor(self, com_port):
         port = serial.Serial(com_port, 115200, rtscts=True, timeout=0.1)
         port.rts = True
@@ -59,18 +66,8 @@ class MotorAndPowerMeterController:
 
             time.sleep(0.1)
 
-        return (port, unpacker)
-    
-    def initializePM400(self):
-        device_list = usbtmc.list_devices()
-        print(device_list)
-
-        self.instrument = usbtmc.Instrument(device_list[0])
-
-        print(self.instrument)
-
-    def closePM400(self):
-        self.instrument.close()
+        self.portX = port
+        self.unpackerX = unpacker
 
 
     def initializeMotors(self, com_port_x, com_port_y):
@@ -92,34 +89,64 @@ class MotorAndPowerMeterController:
         portY.rts = False
         portY.write(apt.mot_move_home(source=self.HOST, dest=self.BAY0 ,chan_ident=self.CHANNEL))
         unpackerY = apt.Unpacker(portY)
-        
 
+        self.portX = portX
+        self.unpackerX = unpackerX
+        self.portY = portY
+        self.unpackerY = unpackerY
 
-
-
-        # port.write(apt.mot_move_absolute(source=1, dest=0x21, chan_ident=1, position=50000))
         is_homed_x = False
         is_homed_y = False
         while(not (is_homed_x and is_homed_y)):    
             if keyboard.is_pressed('q'):
                 break
             
-            for msg in unpackerX:
+            for msg in self.unpackerX:
                 print(msg[0])
                 if msg[0].find("mot_move_homed") >= 0:
                     is_homed_x = True
 
-            for msg in unpackerY:
+            for msg in self.unpackerY:
                 print(msg[0])
                 if msg[0].find("mot_move_homed") >= 0:
                     is_homed_y = True
             time.sleep(0.1)
 
-        return (portX, unpackerX, portY, unpackerY) 
+
+    def close_motors(self):
+        self.portX.close()
+        self.portY.close()
     
+    def initializePM400(self):
+        device_list = usbtmc.list_devices()
+        print(device_list)
+
+        self.instrument = usbtmc.Instrument(device_list[0])
+
+        print(self.instrument)
+
+    def closePM400(self):
+        self.instrument.close()
+        # port.write(apt.mot_move_absolute(source=1, dest=0x21, chan_ident=1, position=50000))
+        
 
 
-    def moveMotor(self, port, unpacker, distance_mm):
+    def moveMotorAbsolute(self, distance_mm, motor_id):
+        """
+        distance_mm: absolute distance in mm
+        motor_id: motor axis ("x" or "y")
+        """
+        if motor_id == "x":
+            port = self.portX
+            unpacker = self.unpackerX
+        elif motor_id == "y":
+            port = self.portY
+            unpacker = self.unpackerY
+        else:
+            print("Wrong motor_id")
+            return
+        
+
         is_move_completed = False
 
         port.write(apt.mot_move_absolute(source=self.HOST, dest=self.BAY0, chan_ident=self.CHANNEL, position=int(distance_mm*self.MM_TO_ENCODER)))
@@ -134,16 +161,26 @@ class MotorAndPowerMeterController:
                     is_move_completed = True
             time.sleep(0.1)
 
-    def moveMotorAndMeasure(self, port, unpacker, distance_mm, T=0.1, N=5):
+    def moveMotorRelativeAndMeasure(self, distance_mm, motor_id):
         """
-            
+        distance_mm: relative distance in mm
+        motor_id: motor axis ("x" or "y")
         """
+        if motor_id == "x":
+            port = self.portX
+            unpacker = self.unpackerX
+        elif motor_id == "y":
+            port = self.portY
+            unpacker = self.unpackerY
+        else:
+            print("Wrong motor_id")
+            return
 
 
         # set pm400 to power measurement mode
         self.instrument.write("MEASure:POWer")
 
-        port.write(apt.mot_move_absolute(source=self.HOST, dest=self.BAY0, chan_ident=self.CHANNEL, position=int(distance_mm*self.MM_TO_ENCODER) ))
+        port.write(apt.mot_move_relative(source=self.HOST, dest=self.BAY0, chan_ident=self.CHANNEL, distance=int(distance_mm*self.MM_TO_ENCODER) ))
 
 
         is_move_completed = False
@@ -189,25 +226,25 @@ class MotorAndPowerMeterController:
         return measurement_dict
 
 
-    def moveMotors(self, portX, unpackerX, distance_mm_x, portY, unpackerY, distance_mm_y):
+    def moveMotorsAbsolute(self, distance_mm_x, distance_mm_y):
         """
             Motors are moved to absolute positions distance_mm_x and distance_mm_y
         """
         is_move_completed_x = False
         is_move_completed_y = False
 
-        portX.write(apt.mot_move_absolute(source=self.HOST, dest=self.BAY0, chan_ident=self.CHANNEL, position=int(distance_mm_x*self.MM_TO_ENCODER)))
-        portY.write(apt.mot_move_absolute(source=self.HOST, dest=self.BAY0, chan_ident=self.CHANNEL, position=int(distance_mm_y*self.MM_TO_ENCODER)))
+        self.portX.write(apt.mot_move_absolute(source=self.HOST, dest=self.BAY0, chan_ident=self.CHANNEL, position=int(distance_mm_x*self.MM_TO_ENCODER)))
+        self.portY.write(apt.mot_move_absolute(source=self.HOST, dest=self.BAY0, chan_ident=self.CHANNEL, position=int(distance_mm_y*self.MM_TO_ENCODER)))
 
         while(not (is_move_completed_x and is_move_completed_y)):    
             if keyboard.is_pressed('q'):
                 break
         
-            for msg in unpackerX: #in order to get the move completed message, homing should be performed before
+            for msg in self.unpackerX: #in order to get the move completed message, homing should be performed before
                 print(msg[0])
                 if msg[0].find("mot_move_completed") >= 0:
                     is_move_completed_x = True
-            for msg in unpackerY: #in order to get the move completed message, homing should be performed before
+            for msg in self.unpackerY: #in order to get the move completed message, homing should be performed before
                 print(msg[0])
                 if msg[0].find("mot_move_completed") >= 0:
                     is_move_completed_y = True
