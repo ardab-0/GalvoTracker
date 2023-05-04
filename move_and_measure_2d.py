@@ -1,15 +1,26 @@
 from motor_and_power_meter_controller import MotorAndPowerMeterController
-
+from utils import interpolate_and_lowpass
 
 
 controller = MotorAndPowerMeterController()
 
-(port, unpacker) = controller.initializeMotor("COM10")
+(port_x, unpacker_x, port_y, unpacker_y) = controller.initializeMotors("COM5", "COM3")
 controller.initializePM400()
-measurement_dictinary = controller.moveMotorAndMeasure(port, unpacker, 8)
-
-print(measurement_dictinary)
 
 
+# measure x axis
+measurement_dictinary = controller.moveMotorAndMeasure(port_x, unpacker_x, 8)
 
-controller.moveMotor(port, unpacker, measurement_dictinary["maximum_pos_mm"] )
+
+t_filtered, measurements_filtered_mw = interpolate_and_lowpass(measurement_dictinary["t_s"], measurement_dictinary["measurements_mw"])
+
+
+# go to peak power position to get y axis measurement
+controller.moveMotor(port_x, unpacker_x, measurement_dictinary["maximum_pos_mm"] )
+
+
+measurement_dictinary = controller.moveMotor(port_y, unpacker_y, 8)
+
+port_x.close()
+port_y.close()
+controller.closePM400()

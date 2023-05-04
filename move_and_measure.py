@@ -12,14 +12,17 @@ import usbtmc
 import matplotlib.pyplot as plt
 import numpy as np
 import pickle 
+import matplotlib.pyplot as plt
+from scipy import interpolate
+import numpy as np
 
 
-distance_mm = 23
-distance_to_plane = "440mm"
+distance_mm = 30
+distance_to_plane = "410mm"
 distance_to_mirror_center = "d0"
 
 
-COM_PORT = "COM10"
+COM_PORT = "COM5"
 MM_TO_ENCODER = 25000 # from Z606 motorized actuator documentation
 
 # from endpoint enums in thorlabs_apt_device library
@@ -90,22 +93,39 @@ measurements = []
 times = []
 start = time.time()
 
-while(not is_move_completed):    
-    if keyboard.is_pressed('q'):
-        break    
+# packer_check_count = 0 #packer checking operation slows down the measurement loop
+i = 0
+while(is_move_completed is False):    
+    
     
     instrument.write("READ?")
     reading = instrument.read()
     times.append(time.time() - start)
     measurements.append(reading)
     
-
-
-    for msg in unpacker: #in order to get the move completed message, homing should be performed before
+    
+    for msg in unpacker:      
         print(msg[0])
         if msg[0].find("mot_move_completed") >= 0:
-            is_move_completed = True
-    # time.sleep(0.1)
+            is_move_completed = True        
+   
+    
+    
+    
+def interpolate_and_lowpass(t, x, T, N):
+    """
+    t: irregular time vector
+    x: irregular measurement vector
+    T: interpolation period
+    N: moving average filter length
+    """
+    fcubic = interpolate.interp1d(t, x, kind='cubic')
+    tnew = np.arange(0.005, t[-1], T)
+    ycubic = fcubic(tnew)
+
+    smooth_x = np.convolve(ycubic, np.ones(N)/N, mode='same')
+    return tnew, smooth_x
+
 
 
 #close motor controller
@@ -114,6 +134,8 @@ port.close()
 #close pm400
 instrument.clear()
 instrument.close()
+
+
 
 times = np.array(times, dtype='float64')
 measurements = np.array(measurements, dtype='float64')
@@ -124,31 +146,57 @@ speed = distance_mm / total_time # mm/s
 
 distances_mm = times * speed
 
-maximum_pos_mm = distances_mm[np.argmax(measurements_mW)]
+
+
 
 measurement_dict = {
     "position_mm": position_input_mm,
     "t_s": times,
     "measurements_mw": measurements_mW,
-    "distances_mm": distances_mm,
-    "maximum_pos_mm": maximum_pos_mm}
+    "distances_mm": distances_mm
+    }
 
-with open('measurements/{}/{}/{}.pkl'.format(distance_to_mirror_center, distance_to_plane, position_input_mm), 'wb') as f:
+with open('measurements_2/{}/{}/{}.pkl'.format(distance_to_mirror_center, distance_to_plane, position_input_mm), 'wb') as f:
     pickle.dump(measurement_dict, f)
-        
-# with open('saved_dictionary.pkl', 'rb') as f:
-#     loaded_dict = pickle.load(f)
-
-plt.subplot(1, 2, 1)
-plt.plot(times, measurements_mW)
-plt.ylabel("Power (mW)")
-plt.xlabel("t (s)")
 
 
-plt.subplot(1, 2, 2)
-plt.plot(distances_mm, measurements_mW)
-plt.ylabel("Power (mW)")
-plt.xlabel("distance (mm)")
+# ##  Plotting
+
+# interpolation_period = 0.01
+
+# plt.subplot(2, 2, 1)
+# plt.plot(times, measurements_mW)
+# plt.ylabel("Power (mW)")
+# plt.xlabel("t (s)")
+# plt.title("Power-Time (Raw Sensor Data)")
 
 
-plt.show()
+# plt.subplot(2,2,2)
+# flinear = interpolate.interp1d(times, measurements_mW)
+# fcubic = interpolate.interp1d(times, measurements_mW, kind='cubic')
+
+# xnew = np.arange(0.005, total_time, 0.01)
+# ylinear = flinear(xnew)
+# ycubic = fcubic(xnew)
+# plt.plot(times, measurements_mW, 'X', xnew, ylinear, 'x', xnew, ycubic, 'o')
+# plt.title("Power-Time (Cubic Interpolation Period:{})".format(interpolation_period))
+
+
+# plt.subplot(2,2,3)
+# N=10
+# smooth_measurements_mW = np.convolve(ycubic, np.ones(N)/N, mode='same')
+# plt.plot(xnew, smooth_measurements_mW)
+# plt.ylabel("Power (mW)")
+# plt.xlabel("time (s)")
+# plt.title("Power-Time (Cubic Interpolation Smoothend Filter Length:{})".format(N))
+
+
+
+# plt.subplot(2, 2, 4)
+# plt.plot(distances_mm, measurements_mW)
+# plt.ylabel("Power (mW)")
+# plt.xlabel("distance (mm)")
+# plt.title("Power-Distance (Raw Sensor Data)")
+
+
+# plt.show()
