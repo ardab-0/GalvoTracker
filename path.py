@@ -2,7 +2,6 @@ import os
 import numpy as np
 import pickle
 
-
 D = 400
 d = 0
 measurement_foldername = "measurements_3"
