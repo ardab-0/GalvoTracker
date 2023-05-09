@@ -46,7 +46,7 @@ class MotorAndPowerMeterController:
 
 
     def initializeMotor(self, com_port):
-        port = serial.Serial(com_port, 115200, rtscts=True, timeout=0.1)
+        port = serial.Serial(com_port, 115200, rtscts=True, timeout=0.01)
         port.rts = True
         port.reset_input_buffer()
         port.reset_output_buffer()
@@ -74,7 +74,7 @@ class MotorAndPowerMeterController:
         """
             Ports are initialized and homing is performed for both motors synchronously
         """
-        portX = serial.Serial(com_port_x, 115200, rtscts=True, timeout=0.1)
+        portX = serial.Serial(com_port_x, 115200, rtscts=True, timeout=0.01)
         portX.rts = True
         portX.reset_input_buffer()
         portX.reset_output_buffer()
@@ -82,7 +82,7 @@ class MotorAndPowerMeterController:
         portX.write(apt.mot_move_home(source=self.HOST, dest=self.BAY0 ,chan_ident=self.CHANNEL))
         unpackerX = apt.Unpacker(portX)
 
-        portY = serial.Serial(com_port_y, 115200, rtscts=True, timeout=0.1)
+        portY = serial.Serial(com_port_y, 115200, rtscts=True, timeout=0.01)
         portY.rts = True
         portY.reset_input_buffer()
         portY.reset_output_buffer()
@@ -122,7 +122,8 @@ class MotorAndPowerMeterController:
         print(device_list)
 
         self.instrument = usbtmc.Instrument(device_list[0])
-
+        # set pm400 to power measurement mode
+        self.instrument.write("MEASure:POWer")
         print(self.instrument)
 
     def closePM400(self):
@@ -177,8 +178,7 @@ class MotorAndPowerMeterController:
             return
 
 
-        # set pm400 to power measurement mode
-        self.instrument.write("MEASure:POWer")
+        
 
         port.write(apt.mot_move_relative(source=self.HOST, dest=self.BAY0, chan_ident=self.CHANNEL, distance=int(distance_mm*self.MM_TO_ENCODER) ))
 
@@ -203,7 +203,7 @@ class MotorAndPowerMeterController:
                 if msg[0].find("mot_move_completed") >= 0:
                     is_move_completed = True
         
-        self.instrument.clear()
+        #self.instrument.clear()
 
 
         times = np.array(times, dtype='float64')
