@@ -5,15 +5,15 @@ import matplotlib.pyplot as plt
 
 D = 410
 d = 0
-measurement_foldername = "measurements_2"
+measurement_foldername = "measurements_3"
 T=0.01
 N=100
 
 
 distance_to_plane = "{}mm".format(D) 
 distance_to_mirror_center = "d{}".format(d)
-save_path = "{}/{}/{}/".format(measurement_foldername, distance_to_mirror_center, distance_to_plane)
-position_input_mm = "0x0_0"
+save_path = "{}/{}/{}/".format(measurement_foldername, distance_to_plane, distance_to_mirror_center)
+position_input_mm = "0.0x0"
 
 with open('{}{}.pkl'.format(save_path, position_input_mm), 'rb') as f:
             loaded_dict = pickle.load(f)
@@ -38,7 +38,7 @@ x_new_fft = np.fft.fft(x_new)
 f = np.fft.fftfreq(len(x_new), T)
 
 plt.subplot(3,3,3)
-plt.plot(f, x_new_fft)
+plt.plot(f, np.abs(x_new_fft))
 
 plt.title("FFT of Interpolated Signal")
 
@@ -57,7 +57,7 @@ x_new_ma_fft = np.fft.fft(x_new_ma)
 f = np.fft.fftfreq(len(x_new), T)
 
 plt.subplot(3,3,6)
-plt.plot(f, x_new_ma_fft)
+plt.plot(f, np.abs(x_new_ma_fft))
 
 plt.title("FFT of MA Filtered Cubic Interpolation Signal")
 
@@ -544,7 +544,7 @@ x_new_lp_fft = np.fft.fft(x_new_lp)
 f = np.fft.fftfreq(len(x_new), T)
 
 plt.subplot(3,3,9)
-plt.plot(f, x_new_lp_fft)
+plt.plot(f, np.abs(x_new_lp_fft))
 plt.xlabel("f(Hz)")
 plt.ylabel("power (mW)")
 plt.title("FFT LP Filtered Cubic Interpolation Signal")

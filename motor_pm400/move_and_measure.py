@@ -47,7 +47,7 @@ CHANNEL = 1 # first channel in controller (there is one channel in tdc001)
 
 
 # initilaze motor controller
-port = serial.Serial(COM_PORT, 115200, rtscts=True, timeout=0.1)
+port = serial.Serial(COM_PORT, 115200, rtscts=True, timeout=0.01)
 port.rts = True
 port.reset_input_buffer()
 port.reset_output_buffer()

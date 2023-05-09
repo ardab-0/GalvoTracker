@@ -20,7 +20,7 @@ def interpolate_and_lowpass(t, x, T, N):
 def interpolate_cubic(t, x, T):
 
 	fcubic = interpolate.interp1d(t, x, kind='cubic')
-	tnew = np.arange(0.005, t[-1], T)
+	tnew = np.arange(0.05, t[-1], T)
 	ycubic = fcubic(tnew)
 	return tnew, ycubic
 

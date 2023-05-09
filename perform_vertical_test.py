@@ -16,15 +16,18 @@ import os
 T=0.01 # interpolation period
 N=100 # moving average filter length
 d = 0 # distance from mirror surface to rotation center
-D = 410 # distance from target plane to mirror
+D = 210 # distance from target plane to mirror
 mirror_rotation_deg = 45 # mirror rotation degree
 
-initial_x_pos_mm = 20 # initial position of motor x
-initial_y_pos_mm = 9 # initial position of motor y
-scanline_x_mm =  10 # length of scan line in x direction
+initial_x_pos_mm = 23.6 # initial position of motor x
+initial_y_pos_mm = 4 # initial position of motor y
 scanline_y_mm =  10 # length of scan line in y direction
 
-measurement_foldername = "measurements_3"
+
+# position of current test x position in mm
+current_x_pos = 0
+
+measurement_foldername = "measurements_vertical"
 
 
 # Functions
@@ -74,7 +77,7 @@ def create_folder_structure(path):
 
 
 
-# create necessary folder structur if necessary
+# create necessary folder structure if necessary
 distance_to_plane = "{}mm".format(D) 
 distance_to_mirror_center = "d{}".format(d)
 save_path = "{}/{}/{}/".format(measurement_foldername, distance_to_plane, distance_to_mirror_center)
@@ -104,7 +107,7 @@ coordinate_transform = CoordinateTransform(d=d, D=D, rotation_degree=mirror_rota
 
 controller = MotorAndPowerMeterController()
 
-controller.initializeMotors("COM5", "COM4")
+controller.initializeMotors("COM4", "COM5")
 print("Motors initialized and homed.")
 controller.initializePM400()
 print("PM400 initialized.")
@@ -117,30 +120,38 @@ print("reached initial position.")
 
 
 # perform measurements for given target plane positions and save them
-# might need to change order
-x_t = np.array([-3, -2, -1, 0, 1, 2, 3])
-y_t = np.array([0])
-x_m, y_m = coordinate_transform.target_to_mirror(x_t, y_t)
+
+
+x_t = np.ones(13) * current_x_pos
+y_t = np.array([-3,-2.5, -2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3]) # y axis increases towards ground in target plane coordinates
+
+
+controller.moveMotorsAbsolute(initial_x_pos_mm + current_x_pos, initial_y_pos_mm)
+
+
+y_m, x_m = coordinate_transform.target_to_mirror(y_t, x_t) # order is changed in order to change x and y axis
+
+print("x_m", x_m)
+print("y_m", y_m)
 
 # Set mirror position
-for i in range(len(x_t)):
-    for j in range(len(y_t)):
+for i in range(len(x_m)):   
 
-        si_0.SetXY(x_m[i])        
-        si_1.SetXY(y_m[j])  
-        time.sleep(0.1)
+    si_0.SetXY(y_m[i])        
+    si_1.SetXY(x_m[i])  
+    time.sleep(0.1)
 
-        # measure x axis
-        measurement_dictionary = controller.moveMotorRelativeAndMeasure(scanline_x_mm, motor_id="x")
+    # measure x axis
+    measurement_dictionary = controller.moveMotorRelativeAndMeasure(scanline_y_mm, motor_id="y")
 
 
-        position_input_mm = "{}x{}".format(x_t[i], y_t[j])
+    position_input_mm = "{}x{}".format(x_t[i], y_t[i])
 
-        with open('{}{}.pkl'.format(save_path, position_input_mm), 'wb') as f:
-            pickle.dump(measurement_dictionary, f)
-        
-        # return to initial position for next measurement
-        controller.moveMotorAbsolute(initial_x_pos_mm , motor_id="x")
+    with open('{}{}.pkl'.format(save_path, position_input_mm), 'wb') as f:
+        pickle.dump(measurement_dictionary, f)
+    
+    # return to initial position for next measurement
+    controller.moveMotorAbsolute(initial_y_pos_mm , motor_id="y")
 
 
 
