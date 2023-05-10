@@ -1,11 +1,11 @@
 import numpy as np
 import pickle
-import motor_pm400.utils as utils
+import utils as utils
 import matplotlib.pyplot as plt
 
 D = 410
 d = 0
-measurement_foldername = "measurements_3"
+measurement_foldername = "power_measurements/measurements_horizontal"
 T=0.01
 N=100
 

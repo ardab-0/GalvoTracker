@@ -1,5 +1,5 @@
 from motor_pm400.motor_and_power_meter_controller import MotorAndPowerMeterController
-from motor_pm400.utils import interpolate_and_lowpass
+from utils import interpolate_and_lowpass
 import numpy as np
 import matplotlib.pyplot as plt
 import optoMDC
@@ -27,7 +27,7 @@ scanline_y_mm =  10 # length of scan line in y direction
 # position of current test x position in mm
 current_x_pos = 0
 
-measurement_foldername = "measurements_vertical"
+measurement_foldername = "power_measurements/measurements_vertical"
 
 
 # Functions
