@@ -16,16 +16,16 @@ import os
 T=0.01 # interpolation period
 N=100 # moving average filter length
 d = 0 # distance from mirror surface to rotation center
-D = 210 # distance from target plane to mirror
+D = 425 # distance from target plane to mirror
 mirror_rotation_deg = 45 # mirror rotation degree
 
 initial_x_pos_mm = 15 # initial position of motor x
 initial_y_pos_mm = 9 # initial position of motor y
-scanline_x_mm =  12 # length of scan line in x direction
+scanline_x_mm =  15 # length of scan line in x direction
 
 
 # position of current test y position in mm
-current_y_pos = -5
+current_y_pos = 5
 
 measurement_foldername = "power_measurements/measurements_horizontal"
 
@@ -123,7 +123,7 @@ print("reached initial position.")
 
 
 x_t = np.array([-3,-2.5, -2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3])
-y_t = np.ones(13) * current_y_pos # y axis increases towards ground in target plane coordinates
+y_t = np.ones(len(x_t)) * current_y_pos # y axis increases towards ground in target plane coordinates
 
 
 controller.moveMotorsAbsolute(initial_x_pos_mm, initial_y_pos_mm + current_y_pos)
