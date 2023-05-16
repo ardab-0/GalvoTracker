@@ -32,3 +32,55 @@ def moving_average(x, N):
 
 def apply_filter(x, h):
 	return np.convolve(x, h, "same")
+
+
+
+def optimal_rotation_and_translation(A, B):
+	"""
+		A: points (3xN)
+		B: points (3xN)
+
+		source: https://nghiaho.com/?page_id=671
+				https://en.wikipedia.org/wiki/Kabsch_algorithm
+	"""
+
+	centroidA = np.mean(A, axis=1)
+	centroidB = np.mean(B, axis=1)
+
+	H = (A - centroidA) @ (B - centroidB).T
+	U, S, V = np.linalg.svd(H)
+
+	R = V @ U.T
+
+	if np.linalg.det(R) < 0:
+		V[:, 2] *= -1
+		R = V @ U.T
+	
+	t = centroidB - R @ centroidA
+
+
+	return R , t
+
+
+
+
+A = np.array([	[1, 2, 3, 4],
+				[0, 0, 0, 0],
+				[0, 0, 0, 0] ])
+
+
+a = 90 / 180 * np.pi
+rot = np.array([[np.cos(a), -np.sin(a), 0],
+				[np.sin(a), np.cos(a), 0],
+				[0, 0, 1] ])
+
+
+B = rot @ A 
+
+# print(B)
+
+
+
+R , t = optimal_rotation_and_translation(A, B)
+
+print(R)

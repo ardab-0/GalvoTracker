@@ -48,20 +48,24 @@ si_1 = mre2.Mirror.Channel_1.StaticInput
 
 # Display a pattern
 
-# y_t = np.zeros(11)
-# x_t = np.linspace(-50, 0, 6) 
-x_t = np.array([0])
-y_t = np.array([0])
+y_t = np.zeros(11)
+x_t = np.linspace(0, 100, 11) 
+# x_t = np.array([0])
+# y_t = np.array([0])
 
 
-# y_t = np.zeros(11)
-# x_t = np.linspace(0, 100, 11) 
+# x_t = np.zeros(11)
+# y_t = np.linspace(0, 100, 11) 
 
 
 
-coordinate_transform = CoordinateTransform(d=0, D=210, rotation_degree=45)
+coordinate_transform = CoordinateTransform(d=0, D=200, rotation_degree=45)
 
-y_m, x_m = coordinate_transform.target_to_mirror(y_t, x_t)
+x_m, y_m = coordinate_transform.target_to_mirror(x_t, y_t)
+
+print("x_t", x_t)
+print("y_t", y_t)
+
 print("x_m", x_m)
 print("y_m", y_m)
 i=0
@@ -70,8 +74,8 @@ while True:
     try:
         if keyboard.is_pressed('q'):
             break
-        si_0.SetXY(y_m[i])        
-        si_1.SetXY(x_m[i])                      
+        si_0.SetXY(x_m[i])        
+        si_1.SetXY(y_m[i])                      
         #time.sleep(SLEEP_DURATION)
         
         i = (i + 1) % len(x_m)

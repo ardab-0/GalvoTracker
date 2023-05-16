@@ -43,7 +43,7 @@ y_t = np.array([5*MAX_XY, 5*MAX_XY, -MAX_XY, -MAX_XY])
 
 
 
-coordinate_transform = CoordinateTransform(d=1.3, D=440, rotation_degree=45)
+coordinate_transform = CoordinateTransform(d=1.3, D=250, rotation_degree=45)
 
 x_m, y_m = coordinate_transform.target_to_mirror(x_t, y_t)
 print("x_m", x_m)
