@@ -1,8 +1,12 @@
+"""
+https://github.com/ChristophRahn/red-circle-detection/blob/master/red-circle-detection.py
+"""
+
 import numpy as np
 import cv2
 
 
-    # Capture frame-by-frame
+
 im = cv2.imread("test_images/laser_im.jpg")
 
 # Convert BGR to HSV
@@ -16,9 +20,9 @@ upper_red = np.array([180,255,255])
 imgThreshHigh = cv2.inRange(hsv, lower_red, upper_red)
 thresh = imgThreshHigh.copy()
 
-captured_frame_lab_red = cv2.GaussianBlur(thresh, (5, 5), 2, 2)
+captured_frame_hsv_red = cv2.GaussianBlur(thresh, (5, 5), 2, 2)
 # Use the Hough transform to detect circles in the image
-circles = cv2.HoughCircles(captured_frame_lab_red, cv2.HOUGH_GRADIENT, 1, captured_frame_lab_red.shape[0] / 8, param1=100, param2=18, minRadius=5, maxRadius=60)
+circles = cv2.HoughCircles(captured_frame_hsv_red, cv2.HOUGH_GRADIENT, 1, captured_frame_hsv_red.shape[0] / 8, param1=100, param2=18, minRadius=5, maxRadius=60)
 
 # If we have extracted a circle, draw an outline
 # We only need to detect one circle here, since there will only be one reference object
