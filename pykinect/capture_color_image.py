@@ -16,6 +16,8 @@ if __name__ == "__main__":
 	device = pykinect.start_device(config=device_config)
 
 	cv2.namedWindow('Color Image',cv2.WINDOW_NORMAL)
+
+	image_index = 0
 	while True:
 
 		# Get capture
@@ -30,7 +32,8 @@ if __name__ == "__main__":
 		# Plot the imageq
 		cv2.imshow("Color Image",color_image)
 		if cv2.waitKey(1) == ord('s'):
-			cv2.imwrite('test_images/laser_im.jpg', color_image)
+			cv2.imwrite('test_images/laser_im{}.jpg'.format(image_index), color_image)
+			image_index += 1
 
 		# Press q key to stop
 		if cv2.waitKey(1) == ord('q'): 

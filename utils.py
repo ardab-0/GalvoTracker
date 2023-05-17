@@ -39,7 +39,8 @@ def optimal_rotation_and_translation(A, B):
 	"""
 		A: points (3xN)
 		B: points (3xN)
-
+		R: (3x3)
+		t = (3x1)
 		source: https://nghiaho.com/?page_id=671
 				https://en.wikipedia.org/wiki/Kabsch_algorithm
 	"""
