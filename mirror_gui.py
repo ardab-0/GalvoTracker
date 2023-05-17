@@ -49,9 +49,13 @@ w2 = tk.Scale(master, from_=-500, to=500,tickinterval=1, command=update_mirror)
 w2.set(0)
 w2.pack()
 w3 = tk.Scale(master, from_=20, to=1000,tickinterval=1,  command=update_mirror)
-w3.set(200)
+w3.set(300)
 w3.pack()
 
 tk.Button(master, text='Show', command=show_values).pack()
 
 master.mainloop()
+
+
+mre2.disconnect()
+print("done")

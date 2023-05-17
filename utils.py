@@ -70,26 +70,25 @@ def optimal_rotation_and_translation(A, B):
 	return R , t
 
 
+def test_optimal_rotation_and_translation():
+	A = np.array([	[1, 2, 3, 4],
+					[0, 0, 0, 0],
+					[0, 0, 0, 0] ])
 
 
-# A = np.array([	[1, 2, 3, 4],
-# 				[0, 0, 0, 0],
-# 				[0, 0, 0, 0] ])
+	a = 90 / 180 * np.pi
+	rot = np.array([[np.cos(a), -np.sin(a), 0],
+					[np.sin(a), np.cos(a), 0],
+					[0, 0, 1] ])
 
 
-# a = 90 / 180 * np.pi
-# rot = np.array([[np.cos(a), -np.sin(a), 0],
-# 				[np.sin(a), np.cos(a), 0],
-# 				[0, 0, 1] ])
+	B = rot @ A + np.array([10.2, 0.08, 5]).reshape((-1, 1))
 
-
-# B = rot @ A + np.array([10.2, 0.08, 5]).reshape((-1, 1))
-
-# print(B)
+	print(B)
 
 
 
-# R , t = optimal_rotation_and_translation(A, B)
+	R , t = optimal_rotation_and_translation(A, B)
 
-# print(R)
-# print(t)
+	print(R)
+	print(t)
