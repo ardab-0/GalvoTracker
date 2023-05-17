@@ -42,14 +42,14 @@ si_1 = mre2.Mirror.Channel_1.StaticInput
  
 
 master = tk.Tk()
-w1 = tk.Scale(master, from_=-500, to=500, tickinterval=10, command=update_mirror)
+w1 = tk.Scale(master, from_=-500, to=500, tickinterval=1, command=update_mirror)
 w1.set(0)
 w1.pack()
-w2 = tk.Scale(master, from_=-500, to=500,tickinterval=10, command=update_mirror)
+w2 = tk.Scale(master, from_=-500, to=500,tickinterval=1, command=update_mirror)
 w2.set(0)
 w2.pack()
-w3 = tk.Scale(master, from_=20, to=1000,tickinterval=10,  command=update_mirror)
-w3.set(425)
+w3 = tk.Scale(master, from_=20, to=1000,tickinterval=1,  command=update_mirror)
+w3.set(200)
 w3.pack()
 
 tk.Button(master, text='Show', command=show_values).pack()

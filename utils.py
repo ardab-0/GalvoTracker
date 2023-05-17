@@ -44,15 +44,23 @@ def optimal_rotation_and_translation(A, B):
 				https://en.wikipedia.org/wiki/Kabsch_algorithm
 	"""
 
-	centroidA = np.mean(A, axis=1)
-	centroidB = np.mean(B, axis=1)
-
+	centroidA = np.mean(A, axis=1).reshape((-1, 1))
+	centroidB = np.mean(B, axis=1).reshape((-1, 1))
+	# print(centroidA)
+	# print(centroidB)
 	H = (A - centroidA) @ (B - centroidB).T
-	U, S, V = np.linalg.svd(H)
+	
+	U, S, Vh = np.linalg.svd(H)
+
+	V = Vh.T
+	# print(U.shape)
+	# print(S.shape)
+	# print(V.shape)
 
 	R = V @ U.T
 
 	if np.linalg.det(R) < 0:
+		print("negative det")
 		V[:, 2] *= -1
 		R = V @ U.T
 	
@@ -64,23 +72,24 @@ def optimal_rotation_and_translation(A, B):
 
 
 
-A = np.array([	[1, 2, 3, 4],
-				[0, 0, 0, 0],
-				[0, 0, 0, 0] ])
+# A = np.array([	[1, 2, 3, 4],
+# 				[0, 0, 0, 0],
+# 				[0, 0, 0, 0] ])
 
 
-a = 90 / 180 * np.pi
-rot = np.array([[np.cos(a), -np.sin(a), 0],
-				[np.sin(a), np.cos(a), 0],
-				[0, 0, 1] ])
+# a = 90 / 180 * np.pi
+# rot = np.array([[np.cos(a), -np.sin(a), 0],
+# 				[np.sin(a), np.cos(a), 0],
+# 				[0, 0, 1] ])
 
 
-B = rot @ A 
+# B = rot @ A + np.array([10.2, 0.08, 5]).reshape((-1, 1))
 
 # print(B)
 
 
 
-R , t = optimal_rotation_and_translation(A, B)
+# R , t = optimal_rotation_and_translation(A, B)
 
-print(R)
+# print(R)
+# print(t)
