@@ -159,7 +159,7 @@ class CoordinateTransform():
         if self.d==0 and abs(np.dot(self.r_OP_0, self.n_0)/np.linalg.norm(self.r_OP_0) + 1) < 1e-9:
             # calculation is simple if d is 0 and incoming beam hits mirror in the center (origin)
             simpleMode = True
-            print("Using simple mode")
+            # print("Using simple mode")
         else:
             simpleMode = False
             n_m1, n_m2 = sy.symbols("n_m1 n_m2")
@@ -168,7 +168,7 @@ class CoordinateTransform():
             I_r_TP_2 = r_OP_2 - sy.matrices.Matrix(self.r_OT)
             T_r_TP_2 = np.dot(self.A_TI, I_r_TP_2)
             T_r_TP_2 = sy.simplify(T_r_TP_2)
-            print("Not using simple mode")
+            # print("Not using simple mode")
         
             
             

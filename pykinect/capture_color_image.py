@@ -32,7 +32,7 @@ if __name__ == "__main__":
 		# Plot the imageq
 		cv2.imshow("Color Image",color_image)
 		if cv2.waitKey(1) == ord('s'):
-			cv2.imwrite('test_images/laser_im{}.jpg'.format(image_index), color_image)
+			cv2.imwrite('test_images/target{}.jpg'.format(image_index), color_image)
 			image_index += 1
 
 		# Press q key to stop

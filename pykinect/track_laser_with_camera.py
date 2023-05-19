@@ -36,8 +36,11 @@ while True:
         continue
     
 
-    lower_red = np.array([160,20,150]) 
-    upper_red = np.array([170,255,255])
+    lower_red = np.array([150,0,230]) 
+    upper_red = np.array([170,100,255])
+
+
+
     circles = detect_circle_position(color_image, lower_range=lower_red, upper_range=upper_red)
 
     if circles is  None:

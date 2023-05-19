@@ -19,8 +19,11 @@ def detect_circle_position(image, lower_range, upper_range):
 
     imgThreshHigh = cv2.inRange(hsv, lower_range, upper_range)
     thresh = imgThreshHigh.copy()
+    
+    captured_frame_hsv_red = cv2.GaussianBlur(thresh, (15, 15), 4, 4)
 
-    captured_frame_hsv_red = cv2.GaussianBlur(thresh, (5, 5), 2, 2)
+    captured_frame_hsv_red[np.abs(captured_frame_hsv_red) > 20] += 100
+    # cv2.imshow('thresh', captured_frame_hsv_red)
     # Use the Hough transform to detect circles in the image
     circles = cv2.HoughCircles(captured_frame_hsv_red, cv2.HOUGH_GRADIENT, 1, captured_frame_hsv_red.shape[0] / 8, param1=100, param2=18, minRadius=5, maxRadius=60)
 
@@ -32,10 +35,10 @@ def detect_circle_position(image, lower_range, upper_range):
 
 def test_detect_circle_position():
     # define range of red color in HSV 
-    lower_red = np.array([160,20,150]) 
-    upper_red = np.array([170,255,255])
+    lower_red = np.array([150,0,230]) 
+    upper_red = np.array([170,100,255])
 
-    im = cv2.imread("test_images/laser_im.jpg")
+    im = cv2.imread("test_images/laser_im6.jpg")
     circles = detect_circle_position(im, lower_red, upper_red)
     print(circles)
     if circles is not None:
