@@ -76,33 +76,39 @@ def test_optimal_rotation_and_translation():
 	# 				[0, 6, 0, 8, 0, 1],
 	# 				[5, 0, 6, 0, 3, 0] ])
 
-	size = (3, 5)
-	r = 100
-	A = np.random.randint(-10, 10, size=size)
+	experiment_count = 100
+	size = (3, 50)
+	r = 1
 
-	A = np.repeat(A, r, axis=1)
+	average_mse = 0
+	for i in range(experiment_count):
+		A = np.random.randint(0, 10, size=size)
 
-	a = 280 / 180 * np.pi
-	rot = np.array([[np.cos(a), -np.sin(a), 0],
-					[np.sin(a), np.cos(a), 0],
-					[0, 0, 1] ])
+		A = np.repeat(A, r, axis=1)
 
-
-	B = rot @ A + np.array([10.2, 0.08, 5]).reshape((-1, 1))
-
-	
-	print(B)
-	B += np.random.randn(*A.shape)
+		a = 280 / 180 * np.pi
+		rot = np.array([[np.cos(a), -np.sin(a), 0],
+						[np.sin(a), np.cos(a), 0],
+						[0, 0, 1] ])
 
 
-	R , t = optimal_rotation_and_translation(A, B)
+		B = rot @ A + np.array([10.2, 0.08, 5]).reshape((-1, 1))
 
-	print(R)
-	print(t)
+		
+		# print(B)
+		B += np.random.randn(*A.shape)
 
 
-	B_p = R@A+t
-	print("Error: ", np.sqrt(np.mean(np.square(R - rot))))
+		R , t = optimal_rotation_and_translation(A, B)
+
+		# print(R)
+		# print(t)
+
+
+		B_p = R@A+t
+		error = np.sqrt(np.mean(np.square(R - rot)))
+		average_mse += error
+	print("Error: ", average_mse/experiment_count)
 
 
 
