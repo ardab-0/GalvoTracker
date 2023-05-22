@@ -12,14 +12,16 @@ import time
 
 # Constants 
 # target color range
-lower_red = np.array([50,100,30]) 
-upper_red = np.array([90,230,100])
+lower_range = np.array([50,100,30]) 
+upper_range = np.array([100,230,150])
 
 
 d = 0
 mirror_rotation_deg = 45
 
 save_path = "calibration_parameters"
+
+y_offset = 20
 
 with open('{}/parameters.pkl'.format(save_path), 'rb') as f:
     loaded_dict = pickle.load(f)
@@ -82,7 +84,7 @@ while True:
     if not ret_color or not ret_depth:
         continue  
 
-    circles = detect_circle_position(color_image, lower_range=lower_red, upper_range=upper_red)
+    circles = detect_circle_position(color_image, lower_range=lower_range, upper_range=upper_range)
 
     if circles is  None:
         print("Target is not detected")
@@ -111,7 +113,9 @@ while True:
     
     
 
-    camera_coordinates_in_laser_coordinates = camera_coordinates + np.array([130, 50, 70]).reshape((3, 1))  # should find parameters automatically
+    # camera_coordinates_in_laser_coordinates = camera_coordinates + np.array([130, 50, 70]).reshape((3, 1))  # should find parameters automatically
+
+    camera_coordinates_in_laser_coordinates =  R @ camera_coordinates + t
 
     print("camera_coordinates", camera_coordinates)
 
@@ -123,7 +127,7 @@ while True:
 
 
 
-    y_m, x_m = coordinate_transform.target_to_mirror(camera_coordinates_in_laser_coordinates[1], camera_coordinates_in_laser_coordinates[0]) # order is changed in order to change x and y axis
+    y_m, x_m = coordinate_transform.target_to_mirror(camera_coordinates_in_laser_coordinates[1]+y_offset, camera_coordinates_in_laser_coordinates[0]) # order is changed in order to change x and y axis
 
     if(len(y_m) > 0 and len(x_m) > 0):
         si_0.SetXY(y_m[0])        

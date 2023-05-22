@@ -112,4 +112,4 @@ def test_optimal_rotation_and_translation():
 
 
 
-test_optimal_rotation_and_translation()
+# test_optimal_rotation_and_translation()

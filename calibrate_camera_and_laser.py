@@ -24,6 +24,9 @@ upper_red = np.array([170,100,255])
 
 x_t = np.array([0, 25, 50, 75, 100, 0, 25, 50, 75, 100, 0, 25, 50, 75, 100, 0, 25, 50, 75, 100, 0, 25, 50, 75, 100])
 y_t = np.array([0, 0, 0, 0, 0, 25, 25, 25, 25, 25, 50, 50, 50, 50, 50, 75, 75, 75, 75, 75, 100, 100, 100, 100, 100])
+
+# x_t = np.array([0, 25, 50, 75, 100])
+# y_t = np.array([0, 0, 0, 0, 0])
 z_t = [ 500]
 
 laser_points = []
@@ -144,8 +147,8 @@ if len(laser_points) < 3:
     print("Not enough points")
 else:
 
-    laser_points_np = np.array(laser_points).reshape((3, -1))
-    camera_points_np = np.array(camera_points).reshape((3, -1))
+    laser_points_np = np.array(laser_points).T
+    camera_points_np = np.array(camera_points).T
 
     R, t = optimal_rotation_and_translation(camera_points_np, laser_points_np)
 
@@ -155,8 +158,13 @@ else:
     print("translation vector")
     print(t)
 
+    for i in range(len(laser_points_np[0])):
+        print("Laser Point: {} , Camera Point: {}".format(laser_points_np[:, i], camera_points_np[:, i]))
+
     calibration_dict = {"R": R,
-                        "t": t}
+                        "t": t,
+                        "laser_points": laser_points_np,
+                        "camera_points": camera_points_np}
 
     with open('{}/parameters.pkl'.format(save_path), 'wb') as f:
         pickle.dump(calibration_dict, f)
