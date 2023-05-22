@@ -25,7 +25,7 @@ def detect_circle_position(image, lower_range, upper_range):
     captured_frame_hsv_red[np.abs(captured_frame_hsv_red) > 20] += 100
     # cv2.imshow('thresh', captured_frame_hsv_red)
     # Use the Hough transform to detect circles in the image
-    circles = cv2.HoughCircles(captured_frame_hsv_red, cv2.HOUGH_GRADIENT, 1, captured_frame_hsv_red.shape[0] / 8, param1=100, param2=18, minRadius=5, maxRadius=60)
+    circles = cv2.HoughCircles(captured_frame_hsv_red, cv2.HOUGH_GRADIENT, 2, captured_frame_hsv_red.shape[0] / 2, param1=100, param2=18, minRadius=3, maxRadius=60)
 
     if circles is not None:        
         return circles

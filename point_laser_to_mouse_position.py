@@ -11,9 +11,7 @@ import time
 
 
 # Constants 
-# target color range
-lower_range = np.array([60,120,30]) 
-upper_range = np.array([100,230,150])
+
 
 
 d = 0
@@ -21,7 +19,7 @@ mirror_rotation_deg = 45
 
 save_path = "calibration_parameters"
 
-y_offset = 20
+y_offset = 0
 
 with open('{}/parameters.pkl'.format(save_path), 'rb') as f:
     loaded_dict = pickle.load(f)
@@ -36,6 +34,18 @@ with open('{}/parameters.pkl'.format(save_path), 'rb') as f:
 #                 [42.51038257],
 #                 [42.38330588]])
 
+mouse_x = 0
+mouse_y = 0
+
+def onMousemove(event, x, y, flags, param):
+	global mouse_x, mouse_y
+	if event == cv2.EVENT_MOUSEMOVE:
+		mouse_x = x
+		mouse_y = y
+
+
+
+             
 
 # initialize mirrors
 mre2 = optoMDC.connect()
@@ -62,17 +72,16 @@ pykinect.initialize_libraries()
 # Modify camera configuration
 device_config = pykinect.default_configuration
 device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_BGRA32
-device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_720P
-device_config.depth_mode = pykinect.K4A_DEPTH_MODE_WFOV_2X2BINNED
+# device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_1080P
+# device_config.depth_mode = pykinect.K4A_DEPTH_MODE_WFOV_2X2BINNED
 # print(device_config)
 
 # Start device
 device = pykinect.start_device(config=device_config)
 
 cv2.namedWindow('Laser Detector',cv2.WINDOW_NORMAL)
+cv2.setMouseCallback('Laser Detector', onMousemove)
 
-prev_coor = 0
-lmd = 0.05
 
 while True:
     start = time.time()
@@ -88,27 +97,15 @@ while True:
     if not ret_color or not ret_depth:
         continue  
 
-    circles = detect_circle_position(color_image, lower_range=lower_range, upper_range=upper_range)
-
-    if circles is  None:
-        print("Target is not detected")
-        continue
-
     
-    
-    circle = circles[0, 0, :]
-    circle = lmd * circle + (1-lmd) * prev_coor
-    prev_coor = circle
-    
-    circle = np.round(circle).astype("int")
 
-    cv2.circle(color_image, center=(circle[0], circle[1]), radius=circle[2], color=(0, 255, 0), thickness=2)
+    cv2.circle(color_image, center=(mouse_x, mouse_y), radius=10, color=(0, 255, 0), thickness=2)
     # Show detected target position
     cv2.imshow('Laser Detector',color_image)
 
 
-    pix_x = circle[0]
-    pix_y = circle[1]
+    pix_x = mouse_x
+    pix_y = mouse_y
     rgb_depth = transformed_depth_image[pix_y, pix_x]
 
     pixels = k4a_float2_t((pix_x, pix_y))
@@ -146,7 +143,7 @@ while True:
 
     y_m, x_m = coordinate_transform.target_to_mirror(camera_coordinates_in_laser_coordinates[1]+y_offset, camera_coordinates_in_laser_coordinates[0]) # order is changed in order to change x and y axis
 
-    del coordinate_transform
+    
     
     if(len(y_m) > 0 and len(x_m) > 0):
         si_0.SetXY(y_m[0])        

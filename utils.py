@@ -41,7 +41,8 @@ def optimal_rotation_and_translation(A, B):
 		B: points (3xN)
 		R: (3x3)
 		t = (3x1)
-		source: https://nghiaho.com/?page_id=671
+		source: https://simonensemble.github.io/posts/2018-10-27-orthogonal-procrustes/
+				https://nghiaho.com/?page_id=671
 				https://en.wikipedia.org/wiki/Kabsch_algorithm
 	"""
 
@@ -111,5 +112,5 @@ def test_optimal_rotation_and_translation():
 	print("Error: ", average_mse/experiment_count)
 
 
-
-# test_optimal_rotation_and_translation()
+if __name__ == "__main__":
+	test_optimal_rotation_and_translation()
