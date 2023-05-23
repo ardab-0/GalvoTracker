@@ -3,15 +3,20 @@ import cv2
 import pykinect_azure as pykinect
 from pykinect_azure import K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_DEPTH, k4a_float2_t
 import numpy as np
-from pykinect.circle_detector import detect_circle_position
+from image_processing.circle_detector import detect_circle_position
 import optoMDC
 from mirror.coordinate_transformation import CoordinateTransform
 import pickle
 import time
 
 
-# Constants 
+from pykinect_azure.k4a.transformation import Transformation
 
+
+
+
+
+# Constants 
 
 
 d = 0
@@ -79,6 +84,9 @@ device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_BGRA32
 # Start device
 device = pykinect.start_device(config=device_config)
 
+transformation = Transformation(device.get_calibration(device_config.depth_mode, device_config.color_resolution))
+
+
 cv2.namedWindow('Laser Detector',cv2.WINDOW_NORMAL)
 cv2.setMouseCallback('Laser Detector', onMousemove)
 
@@ -110,18 +118,21 @@ while True:
 
     pixels = k4a_float2_t((pix_x, pix_y))
 
+
+
     pos3d_color = device.calibration.convert_2d_to_3d(pixels, rgb_depth, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_COLOR)
     # pos3d_depth = device.calibration.convert_2d_to_3d(pixels, rgb_depth, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_DEPTH)
     # print(f"RGB depth: {rgb_depth}, RGB pos3D: {pos3d_color}, Depth pos3D: {pos3d_depth}")
 
     camera_coordinates = np.array([pos3d_color.xyz.x, pos3d_color.xyz.y, pos3d_color.xyz.z]).reshape((3, 1))
 
+   
+    # Test point cloud 
+    # point_cloud_image = transformation.depth_image_to_point_cloud(transformed_depth_image, K4A_CALIBRATION_TYPE_COLOR)
+    
+
+    
     # rotate and translate
-
-    
-    
-
-    # camera_coordinates_in_laser_coordinates = camera_coordinates + np.array([130, 50, 70]).reshape((3, 1))  # should find parameters automatically
 
     camera_coordinates_in_laser_coordinates =  R @ camera_coordinates + t
 
