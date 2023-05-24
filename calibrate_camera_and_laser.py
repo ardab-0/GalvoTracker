@@ -3,7 +3,7 @@ import cv2
 import pykinect_azure as pykinect
 from pykinect_azure import K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_DEPTH, k4a_float2_t
 import numpy as np
-from pykinect.circle_detector import detect_circle_position
+from image_processing.circle_detector import detect_circle_position
 import optoMDC
 from mirror.coordinate_transformation import CoordinateTransform
 import time
@@ -15,7 +15,7 @@ import pickle
 d = 0
 D = 500
 mirror_rotation_deg = 45
-num_iterations = 50
+num_iterations = 20
 save_path = "calibration_parameters"
 
 
@@ -24,6 +24,9 @@ upper_red = np.array([170,100,255])
 
 x_t = np.array([0, 25, 50, 75, 100, 0, 25, 50, 75, 100, 0, 25, 50, 75, 100, 0, 25, 50, 75, 100, 0, 25, 50, 75, 100])
 y_t = np.array([0, 0, 0, 0, 0, 25, 25, 25, 25, 25, 50, 50, 50, 50, 50, 75, 75, 75, 75, 75, 100, 100, 100, 100, 100])
+
+x_t = np.array([0, 20, 40, 60, 80, 100, 0, 20, 40, 60, 80, 100, 0, 20, 40, 60, 80, 100, 0, 20, 40, 60, 80, 100, 0, 20, 40, 60, 80, 100])
+y_t = np.array([0, 0, 0, 0, 0, 0, 20, 20, 20, 20, 20, 20, 40, 40, 40, 40, 40, 40, 60, 60, 60, 60, 60, 60, 80, 80, 80, 80, 80, 80, 100, 100, 100, 100, 100, 100])
 
 # x_t = np.array([0, 25, 50, 75, 100])
 # y_t = np.array([0, 0, 0, 0, 0])
@@ -73,9 +76,8 @@ for z in z_t:
 
     y_m, x_m = coordinate_transform.target_to_mirror(y_t, x_t) # order is changed in order to change x and y axis
 
-    print("x_m", x_m)
-    print("y_m", y_m)
-
+    
+    input(f"Press enter to start calibration in distance {z} from mirror.")
     # Set mirror position
     for i in range(len(x_m)):
 
@@ -101,17 +103,17 @@ for z in z_t:
             if not ret_color or not ret_depth:
                 continue
                 
-            circles = detect_circle_position(color_image, lower_range=lower_red, upper_range=upper_red)
+            circle = detect_circle_position(color_image, lower_range=lower_red, upper_range=upper_red)
 
-            if circles is  None:
+            if circle is  None:
                 print("Laser is not detected")                
                 continue
 
-            circles = np.round(circles[0, :]).astype("int")
-            cv2.circle(color_image, center=(circles[0, 0], circles[0, 1]), radius=circles[0, 2], color=(0, 255, 0), thickness=2)
+            circle = np.round(circle).astype("int")
+            cv2.circle(color_image, center=(circle[0], circle[1]), radius=circle[2], color=(0, 255, 0), thickness=2)
 
-            pix_x = circles[0, 0]
-            pix_y = circles[0, 1]
+            pix_x = circle[0]
+            pix_y = circle[1]
             rgb_depth = transformed_depth_image[pix_y, pix_x]
 
             pixels = k4a_float2_t((pix_x, pix_y))

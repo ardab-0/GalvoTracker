@@ -3,7 +3,7 @@ import cv2
 import pykinect_azure as pykinect
 from pykinect_azure import K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_DEPTH, k4a_float2_t
 import numpy as np
-from pykinect.circle_detector import detect_circle_position
+from image_processing.circle_detector import detect_circle_position
 import optoMDC
 from mirror.coordinate_transformation import CoordinateTransform
 import pickle

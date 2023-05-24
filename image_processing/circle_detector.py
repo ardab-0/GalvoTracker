@@ -28,8 +28,28 @@ def detect_circle_position(image, lower_range, upper_range):
     circles = cv2.HoughCircles(captured_frame_hsv_red, cv2.HOUGH_GRADIENT, 2, captured_frame_hsv_red.shape[0] / 2, param1=100, param2=18, minRadius=3, maxRadius=60)
 
     if circles is not None:        
-        return circles
+        return circles[0, 0, :]
 
+    return None
+
+
+def detect_circle_in_rectangle(image, lower_range, upper_range, rectangle):
+    """
+        rectangle : (centerx, centery, width, height)
+    """
+    xstart = int(np.max(rectangle[0]-rectangle[2]/2, 0))
+    xend = int(np.min(rectangle[0]+rectangle[2]/2, image.shape[0]))
+
+    ystart = int(np.max(rectangle[1]-rectangle[3]/2, 0))
+    yend = int(np.min(rectangle[1]+rectangle[3]/2, image.shape[1]))
+
+
+    cropped_image = image[xstart:xend, ystart:yend]
+
+    circle = detect_circle_position(cropped_image, lower_range, upper_range)
+
+    if circle is not None:        
+        return circle + np.array([xstart, ystart, 0])
     return None
 
 
