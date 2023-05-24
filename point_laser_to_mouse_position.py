@@ -17,28 +17,19 @@ from pykinect_azure.k4a.transformation import Transformation
 
 
 # Constants 
-
-
 d = 0
 mirror_rotation_deg = 45
-
 save_path = "calibration_parameters"
-
+# target coordinate offset (mm)
 y_offset = 0
+z_offset_factor = 1
 
 with open('{}/parameters.pkl'.format(save_path), 'rb') as f:
     loaded_dict = pickle.load(f)
     R = loaded_dict["R"]
     t = loaded_dict["t"]
 
-# R = np.array([[ 0.99950191, -0.02218147,  0.02244816],
-#                     [ 0.02269092,  0.99948479, -0.02269971],
-#                     [-0.02193308,  0.02319778,  0.99949027]])
-    
-# t = np.array([[42.32738624],
-#                 [42.51038257],
-#                 [42.38330588]])
-
+# initial mouse position
 mouse_x = 0
 mouse_y = 0
 
@@ -101,15 +92,14 @@ while True:
 
     # Get the colored depth
     ret_depth, transformed_depth_image = capture.get_transformed_depth_image()
+    
 
     if not ret_color or not ret_depth:
         continue  
 
     
 
-    cv2.circle(color_image, center=(mouse_x, mouse_y), radius=10, color=(0, 255, 0), thickness=2)
-    # Show detected target position
-    cv2.imshow('Laser Detector',color_image)
+   
 
 
     pix_x = mouse_x
@@ -152,7 +142,7 @@ while True:
 
 
 
-    y_m, x_m = coordinate_transform.target_to_mirror(camera_coordinates_in_laser_coordinates[1]+y_offset, camera_coordinates_in_laser_coordinates[0]) # order is changed in order to change x and y axis
+    y_m, x_m = coordinate_transform.target_to_mirror(camera_coordinates_in_laser_coordinates[1]+y_offset, camera_coordinates_in_laser_coordinates[0]*z_offset_factor) # order is changed in order to change x and y axis
 
     
     
@@ -161,7 +151,20 @@ while True:
         si_1.SetXY(x_m[0]) 
 
 
-    print("fps: ", 1 / (time.time() - start))
+    
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    cv2.putText(color_image, f"fps: {1 / (time.time() - start)}", (10, 20), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+
+    cv2.putText(color_image, f"Target Coordinates w.r.t. mirror center:", (10, 40), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+    cv2.putText(color_image, f"X: {camera_coordinates_in_laser_coordinates[0]}", (10, 60), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+    cv2.putText(color_image, f"Y: {camera_coordinates_in_laser_coordinates[1]}", (10, 80), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+    cv2.putText(color_image, f"Z: {camera_coordinates_in_laser_coordinates[2]}", (10, 100), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+
+
+      
+    cv2.circle(color_image, center=(mouse_x, mouse_y), radius=10, color=(0, 255, 0), thickness=2)
+    # Show detected target position
+    cv2.imshow('Laser Detector',color_image)
     # Press q key to stop
     if cv2.waitKey(1) == ord('q'):
         break
