@@ -9,7 +9,7 @@ if __name__ == "__main__":
 
 	# Modify camera configuration
 	device_config = pykinect.default_configuration
-	device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_1080P
+	device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_72P
 	# print(device_config)
 
 	# Start device

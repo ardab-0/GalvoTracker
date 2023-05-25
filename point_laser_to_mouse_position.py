@@ -98,10 +98,6 @@ while True:
         continue  
 
     
-
-   
-
-
     pix_x = mouse_x
     pix_y = mouse_y
     rgb_depth = transformed_depth_image[pix_y, pix_x]
@@ -126,10 +122,6 @@ while True:
 
     camera_coordinates_in_laser_coordinates =  R @ camera_coordinates + t
 
-
-
-
-   
 
     # camera_coordinates_in_laser_coordinates = np.floor(camera_coordinates_in_laser_coordinates)
 

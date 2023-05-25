@@ -13,28 +13,30 @@ import pickle
 
 # Constants 
 d = 0
-D = 500
 mirror_rotation_deg = 45
-num_iterations = 20
+num_iterations = 50
 save_path = "calibration_parameters"
 
 
-lower_red = np.array([150,0,240]) 
-upper_red = np.array([170,100,255])
+lower_red = np.array([150,   0, 215]) 
+upper_red = np.array([165, 30,256])
+
 
 # x_t = np.array([0, 25, 50, 75, 100, 0, 25, 50, 75, 100, 0, 25, 50, 75, 100, 0, 25, 50, 75, 100, 0, 25, 50, 75, 100])
 # y_t = np.array([0, 0, 0, 0, 0, 25, 25, 25, 25, 25, 50, 50, 50, 50, 50, 75, 75, 75, 75, 75, 100, 100, 100, 100, 100])
 
 # x_t = np.array([0, 20, 40, 60, 80, 100, 0, 20, 40, 60, 80, 100, 0, 20, 40, 60, 80, 100, 0, 20, 40, 60, 80, 100, 0, 20, 40, 60, 80, 100])
 # y_t = np.array([0, 0, 0, 0, 0, 0, 20, 20, 20, 20, 20, 20, 40, 40, 40, 40, 40, 40, 60, 60, 60, 60, 60, 60, 80, 80, 80, 80, 80, 80, 100, 100, 100, 100, 100, 100])
-a = np.linspace(0, 100, 11)
-x_t = np.tile(a, 11)
-y_t = np.repeat(a, 11)
+
+length = 6
+a = np.linspace(0, 100, length)
+x_t = np.tile(a, length)
+y_t = np.repeat(a, length)
 
 
 # x_t = np.array([0, 25, 50, 75, 100])
 # y_t = np.array([0, 0, 0, 0, 0])
-z_t = [ 500 ]
+z_t = [ 465 ]
 
 laser_points = []
 camera_points = []
