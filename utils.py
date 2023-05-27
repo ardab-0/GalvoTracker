@@ -112,5 +112,22 @@ def test_optimal_rotation_and_translation():
 	print("Error: ", average_mse/experiment_count)
 
 
+
+def remove_outliers(A, r):
+	"""
+		A: points (N x 3)
+		r: radius
+		removes points outside the given radius (r)
+	"""
+	mean = np.mean(A, axis=1)
+
+	squared_distance = np.sum(np.square(A - mean), axis=1)
+
+	#squared_distance[squ]
+
+
+
 if __name__ == "__main__":
+	
+	remove_outliers(np.ones((10, 3)), 3)
 	test_optimal_rotation_and_translation()

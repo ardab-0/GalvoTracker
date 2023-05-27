@@ -4,23 +4,17 @@ import cv2
 
 
 
-def click(event, x, y, flags, param):
-	
-	if event == cv2.EVENT_LBUTTONDOWN:
-		print(param[y, x])
-	
-
-
 
 image = cv2.imread("test_images/target0.jpg")
 image = cv2.resize(image, (1280, 720), interpolation=cv2.INTER_AREA)
-# Convert BGR to HSV
-image_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-
-
+iamge_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+iamge_gray = cv2.resize(iamge_gray, (1280, 720), interpolation=cv2.INTER_AREA)
+thresh = 220
+im_bw = cv2.threshold(iamge_gray, thresh, 255, cv2.THRESH_BINARY)[1]
+image[im_bw < 10 ] = 0
 
 cv2.namedWindow("image")
-cv2.setMouseCallback("image", click, image_hsv)
+
 
 while True:
 	
