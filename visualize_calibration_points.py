@@ -21,12 +21,13 @@ def main():
     cam_wrt_laser = R @ camera_points + t
 
 
-    ax.scatter3D(laser_points[0], laser_points[1], laser_points[2], color="red", cmap='Greens')
+    ax.scatter3D(laser_points[0], laser_points[1], laser_points[2], color="red")
 
-    ax.scatter3D(camera_points[0], camera_points[1], camera_points[2], color="green", cmap='Greens')
+    ax.scatter3D(camera_points[0], camera_points[1], camera_points[2], color="green")
 
-    ax.scatter3D(cam_wrt_laser[0], cam_wrt_laser[1], cam_wrt_laser[2], color="blue", cmap='Greens')
+    ax.scatter3D(cam_wrt_laser[0], cam_wrt_laser[1], cam_wrt_laser[2], color="blue")
 
+    plt.legend(("laser points", "camera points", "camera points after transform"))
     plt.show()
 
 
