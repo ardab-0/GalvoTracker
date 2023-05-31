@@ -28,15 +28,17 @@ upper_red = np.array([180, 130,256])
 # x_t = np.array([0, 20, 40, 60, 80, 100, 0, 20, 40, 60, 80, 100, 0, 20, 40, 60, 80, 100, 0, 20, 40, 60, 80, 100, 0, 20, 40, 60, 80, 100])
 # y_t = np.array([0, 0, 0, 0, 0, 0, 20, 20, 20, 20, 20, 20, 40, 40, 40, 40, 40, 40, 60, 60, 60, 60, 60, 60, 80, 80, 80, 80, 80, 80, 100, 100, 100, 100, 100, 100])
 
-length = 6
-a = np.linspace(-120, 80, length)
-x_t = np.tile(a, length)
-y_t = np.repeat(a, length)
+sample_x = 5
+sample_y = 3
+a = np.linspace(-150, 300, sample_x)
+b = np.linspace(-150, 100, sample_y)
+x_t = np.tile(a, sample_y)
+y_t = np.repeat(b, sample_x)
 
 
 # x_t = np.array([0, 25, 50, 75, 100])
 # y_t = np.array([0, 0, 0, 0, 0])
-z_t = [ 540 ]
+z_t = [ 560 ]
 
 laser_points = []
 camera_points = []
