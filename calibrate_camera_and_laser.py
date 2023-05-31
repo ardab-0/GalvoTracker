@@ -9,7 +9,7 @@ from mirror.coordinate_transformation import CoordinateTransform
 import time
 from utils import optimal_rotation_and_translation
 import pickle
-
+from image_processing.black_white import black_and_white_threshold
 
 # Constants 
 d = 0
@@ -18,8 +18,8 @@ num_iterations = 50
 save_path = "calibration_parameters"
 
 
-lower_red = np.array([150,   0, 215]) 
-upper_red = np.array([165, 30,256])
+lower_red = np.array([140,   10, 240]) 
+upper_red = np.array([180, 130,256])
 
 
 # x_t = np.array([0, 25, 50, 75, 100, 0, 25, 50, 75, 100, 0, 25, 50, 75, 100, 0, 25, 50, 75, 100, 0, 25, 50, 75, 100])
@@ -29,14 +29,14 @@ upper_red = np.array([165, 30,256])
 # y_t = np.array([0, 0, 0, 0, 0, 0, 20, 20, 20, 20, 20, 20, 40, 40, 40, 40, 40, 40, 60, 60, 60, 60, 60, 60, 80, 80, 80, 80, 80, 80, 100, 100, 100, 100, 100, 100])
 
 length = 6
-a = np.linspace(0, 100, length)
+a = np.linspace(-120, 80, length)
 x_t = np.tile(a, length)
 y_t = np.repeat(a, length)
 
 
 # x_t = np.array([0, 25, 50, 75, 100])
 # y_t = np.array([0, 0, 0, 0, 0])
-z_t = [ 465 ]
+z_t = [ 540 ]
 
 laser_points = []
 camera_points = []
@@ -108,7 +108,8 @@ for z in z_t:
 
             if not ret_color or not ret_depth:
                 continue
-                
+
+            #thresholded_image = black_and_white_threshold(color_image)    
             circle = detect_circle_position(color_image, lower_range=lower_red, upper_range=upper_red)
 
             if circle is  None:
