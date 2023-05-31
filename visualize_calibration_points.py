@@ -17,7 +17,7 @@ def main():
         laser_points = loaded_dict["laser_points"]
         camera_points = loaded_dict["camera_points"]
 
-    print(laser_points)
+    print(camera_points)
     cam_wrt_laser = R @ camera_points + t
 
 
