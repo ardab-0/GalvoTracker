@@ -154,7 +154,7 @@ while True:
 
 
       
-    cv2.circle(color_image, center=(mouse_x, mouse_y), radius=10, color=(0, 255, 0), thickness=2)
+    # cv2.circle(color_image, center=(mouse_x, mouse_y), radius=10, color=(0, 255, 0), thickness=2)
     # Show detected target position
     cv2.imshow('Laser Detector',color_image)
     # Press q key to stop
