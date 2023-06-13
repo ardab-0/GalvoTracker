@@ -79,10 +79,9 @@ while True:
     if not ret_color or not ret_depth:
         continue  
 
+    # returns 0, 0 if target is not detected
     new_circle = circle_detector.detect_np(color_image, prevCircle)
-    if new_circle is  None:
-        print("Target is not detected")
-        continue
+    
     prevCircle = new_circle
 
     color_image = cv2.circle(color_image, (int(new_circle.x), int(new_circle.y)), radius=10, color=(0, 255, 0), thickness=2)

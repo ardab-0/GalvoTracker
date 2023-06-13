@@ -1,4 +1,4 @@
-from build.circle_detector_module import *
+from build.Release.circle_detector_module import *
 import cv2
 import time
 
