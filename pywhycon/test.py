@@ -6,7 +6,6 @@ circle_detector = CircleDetectorClass(640, 480)
 prevCircle = CircleClass()
 print(prevCircle)
 
-im = cv2.imread("patterns/test_im.jpg")
 
 
 

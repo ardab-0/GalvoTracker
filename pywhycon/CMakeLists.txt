@@ -1,5 +1,5 @@
 # opencv install instructions: https://www.youtube.com/watch?v=MOOCpt4lDPw&list=LL&index=1&t=166s
-
+# opencv .dll files should be placed next to module file in Windows
 
 cmake_minimum_required(VERSION 3.4)
 project(circle-detector)
@@ -7,8 +7,10 @@ project(circle-detector)
 
 set(whycon_srcs circle_detector.cpp)
 
+# must set accordıng to system
+# set (PYTHON_EXECUTABLE "C:/Users/ardab/miniconda3/envs/pybind_demo/python.exe")
+set (PYTHON_EXECUTABLE "/home/arda/miniconda3/envs/pywhyconenv/bin/python")
 
-set (PYTHON_EXECUTABLE "C:/Users/ardab/miniconda3/envs/pybind_demo/python.exe")
 add_subdirectory(pybind11)
 
 ## Check dependencies
