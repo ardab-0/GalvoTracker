@@ -462,6 +462,8 @@ cv::CircleDetector::Circle::Circle(void)
   round = valid = false;
 }
 
+
+
 void cv::CircleDetector::Circle::draw(cv::Mat& image, const std::string& text, cv::Vec3b color, float thickness) const
 {
   //cv::circle(image, cv::Point(x, y), 1, color, 1, 4);

@@ -8,8 +8,8 @@ project(circle-detector)
 set(whycon_srcs circle_detector.cpp)
 
 # must set accordıng to system
-# set (PYTHON_EXECUTABLE "C:/Users/ardab/miniconda3/envs/pybind_demo/python.exe")
-set (PYTHON_EXECUTABLE "/home/arda/miniconda3/envs/pywhyconenv/bin/python")
+set (PYTHON_EXECUTABLE "C:/Users/ardab/miniconda3/envs/pybind_demo/python.exe")
+#set (PYTHON_EXECUTABLE "/home/arda/miniconda3/envs/pywhyconenv/bin/python")
 
 add_subdirectory(pybind11)
 
