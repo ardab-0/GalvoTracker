@@ -1,18 +1,19 @@
-from build.Release.circle_detector_module import *
+from build.circle_detector_module import *
 import cv2
 import time
-circle_detector = CircleDetectorClass(640, 480)
+
+
+
 
 prevCircle = CircleClass()
-print(prevCircle)
-
-
-
-
 
 # define a video capture object
 vid = cv2.VideoCapture(0)
-  
+width = int(vid.get(cv2.CAP_PROP_FRAME_WIDTH)) 
+height = int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+circle_detector = CircleDetectorClass(width, height)
+
 while(True):
       
     # Capture the video frame
