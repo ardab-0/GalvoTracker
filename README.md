@@ -1,3 +1,8 @@
+To install optomdc:
+pip install optoKummenberg-0.15.3755-py3-none-any.whl
+pip install optoMDC-1.1.3755-py3-none-any.whl
+
+
 To install dependencies run 
 conda create --name <env> --file requirements.txt
 
