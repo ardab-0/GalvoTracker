@@ -1,5 +1,4 @@
 import cv2
-
 import pykinect_azure as pykinect
 from pykinect_azure import K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_DEPTH, k4a_float2_t
 import numpy as np
@@ -8,11 +7,7 @@ import optoMDC
 from mirror.coordinate_transformation import CoordinateTransform
 import pickle
 import time
-
-
 from pykinect_azure.k4a.transformation import Transformation
-
-
 
 
 
@@ -66,8 +61,8 @@ def main():
 
     # Modify camera configuration
     device_config = pykinect.default_configuration
-    device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_BGRA32
-    # device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_1080P
+    device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_YUY2
+    device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_720P
     device_config.depth_mode = pykinect.K4A_DEPTH_MODE_WFOV_2X2BINNED
     # print(device_config)
 
@@ -133,7 +128,7 @@ def main():
 
 
 
-        y_m, x_m = coordinate_transform.target_to_mirror(camera_coordinates_in_laser_coordinates[1]+y_offset, camera_coordinates_in_laser_coordinates[0]*z_offset_factor) # order is changed in order to change x and y axis
+        y_m, x_m = coordinate_transform.target_to_mirror(camera_coordinates_in_laser_coordinates[1], camera_coordinates_in_laser_coordinates[0]) # order is changed in order to change x and y axis
 
         
         

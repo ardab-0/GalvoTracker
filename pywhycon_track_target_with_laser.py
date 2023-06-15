@@ -52,7 +52,7 @@ def main():
 
     # Modify camera configuration
     device_config = pykinect.default_configuration
-    device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_BGRA32
+    device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_YUY2
     device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_720P
     device_config.depth_mode = pykinect.K4A_DEPTH_MODE_WFOV_2X2BINNED
     # print(device_config)
@@ -64,10 +64,9 @@ def main():
     font = cv2.FONT_HERSHEY_SIMPLEX
 
 
-    # gives undefined warning but works
+    # gives undefined warning but works (pybind11 c++ module)
     prevCircle = CircleClass()
     circle_detector = CircleDetectorClass(1280, 720) # K4A_COLOR_RESOLUTION_720P
-
 
     while True:
         start = time.time()
@@ -80,11 +79,12 @@ def main():
         # Get the colored depth
         ret_depth, transformed_depth_image = capture.get_transformed_depth_image()
         
+        
         if not ret_color or not ret_depth:
             continue  
         
-
-        color_image_3channel = color_image[:, :, :3]
+        
+        #color_image_3channel = color_image[:, :, :3]
         # returns 0, 0 if target is not detected
         
         new_circle = circle_detector.detect_np(color_image_3channel, prevCircle)    
@@ -114,12 +114,12 @@ def main():
         
         if(len(y_m) > 0 and len(x_m) > 0):
             si_0.SetXY(y_m[0])        
-            si_1.SetXY(x_m[0]) 
+            si_1.SetXY(x_m[0])        
+
 
         end = time.time()
         print("elapsed time: ", (end - start))    
         cv2.putText(color_image, f"fps: {1 / (end - start)}", (10, 20), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-
         cv2.putText(color_image, f"Target Coordinates w.r.t. mirror center:", (10, 40), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
         cv2.putText(color_image, f"X: {camera_coordinates_in_laser_coordinates[0]}", (10, 60), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
         cv2.putText(color_image, f"Y: {camera_coordinates_in_laser_coordinates[1]}", (10, 80), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
@@ -131,6 +131,7 @@ def main():
         if cv2.waitKey(1) == ord('q'):
             break
 
+        
 
     mre2.disconnect()
     print("done")
