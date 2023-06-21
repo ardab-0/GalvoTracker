@@ -131,6 +131,7 @@ def main():
         now = time.time()
         dt = now - start
         
+        # update mouse position
         updatePos(dt)
 
         start = now
