@@ -64,7 +64,7 @@ def main():
     font = cv2.FONT_HERSHEY_SIMPLEX
 
 
-    # gives undefined warning but works (pybind11 c++ module)
+    # gives undefined warning but works (pybind11 c++ module) change import *
     prevCircle = CircleClass()
     circle_detector = CircleDetectorClass(1280, 720) # K4A_COLOR_RESOLUTION_720P
 
