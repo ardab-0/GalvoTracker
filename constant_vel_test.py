@@ -24,16 +24,22 @@ with open('{}/parameters.pkl'.format(save_path), 'rb') as f:
     t = loaded_dict["t"]
 
 # initial mouse position
-mouse_x = 0
-mouse_y = 0
+mouse_x = 500
+mouse_y = 300
 
 def onMousemove(event, x, y, flags, param):
-	global mouse_x, mouse_y
-	if event == cv2.EVENT_MOUSEMOVE:
-		mouse_x = x
-		mouse_y = y
-
-
+	pass
+	
+mul = 1
+def updatePos(dt):
+    global mouse_x, mouse_y, mul
+    
+    mouse_x = mouse_x + dt*400*mul
+    if mouse_x > 900:
+         mul = -1
+    elif mouse_x < 200:
+         mul = 1
+     #mouse_y = mouse_y + dt*5
 
 def main():            
 
@@ -76,8 +82,13 @@ def main():
     cv2.setMouseCallback('Laser Detector', onMousemove)
 
 
+    next_t = 0.085
+    prev_point = 0
+    prev_v = 0
+    start = time.time()
+
     while True:
-        start = time.time()
+        
         # Get capture
         capture = device.update()
 
@@ -92,8 +103,10 @@ def main():
             continue  
 
         
-        pix_x = mouse_x
-        pix_y = mouse_y
+        pix_x = int(mouse_x)
+        pix_y = int(mouse_y)
+        color_image = cv2.circle(color_image, (pix_x, pix_y), radius=10, color=(0, 255, 0), thickness=2)
+
         rgb_depth = transformed_depth_image[pix_y, pix_x]
 
         pixels = k4a_float2_t((pix_x, pix_y))
@@ -115,7 +128,18 @@ def main():
         # rotate and translate
 
         camera_coordinates_in_laser_coordinates =  R @ camera_coordinates + t
+        now = time.time()
+        dt = now - start
+        
+        updatePos(dt)
 
+        start = now
+        v = (camera_coordinates_in_laser_coordinates - prev_point) / dt
+        v_avg = 0.5*v + 0.5*prev_v
+        prev_v = v_avg
+        prev_point = camera_coordinates_in_laser_coordinates
+
+        prediction_coor = camera_coordinates_in_laser_coordinates + v_avg*next_t
 
         # camera_coordinates_in_laser_coordinates = np.floor(camera_coordinates_in_laser_coordinates)
 
@@ -124,11 +148,11 @@ def main():
         # print("camera_coordinates_in_laser_coordinates", camera_coordinates_in_laser_coordinates)
 
 
-        coordinate_transform = CoordinateTransform(d=d, D=camera_coordinates_in_laser_coordinates[2], rotation_degree=mirror_rotation_deg)
+        coordinate_transform = CoordinateTransform(d=d, D=prediction_coor[2], rotation_degree=mirror_rotation_deg)
 
 
 
-        y_m, x_m = coordinate_transform.target_to_mirror(camera_coordinates_in_laser_coordinates[1], camera_coordinates_in_laser_coordinates[0]) # order is changed in order to change x and y axis
+        y_m, x_m = coordinate_transform.target_to_mirror(prediction_coor[1], prediction_coor[0]) # order is changed in order to change x and y axis
 
         
         
@@ -138,13 +162,13 @@ def main():
 
 
         
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(color_image, f"fps: {1 / (time.time() - start)}", (10, 20), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+        # font = cv2.FONT_HERSHEY_SIMPLEX
+        # cv2.putText(color_image, f"fps: {1 / (time.time() - start)}", (10, 20), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
 
-        cv2.putText(color_image, f"Target Coordinates w.r.t. mirror center:", (10, 40), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        cv2.putText(color_image, f"X: {camera_coordinates_in_laser_coordinates[0]}", (10, 60), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        cv2.putText(color_image, f"Y: {camera_coordinates_in_laser_coordinates[1]}", (10, 80), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        cv2.putText(color_image, f"Z: {camera_coordinates_in_laser_coordinates[2]}", (10, 100), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+        # cv2.putText(color_image, f"Target Coordinates w.r.t. mirror center:", (10, 40), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+        # cv2.putText(color_image, f"X: {camera_coordinates_in_laser_coordinates[0]}", (10, 60), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+        # cv2.putText(color_image, f"Y: {camera_coordinates_in_laser_coordinates[1]}", (10, 80), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+        # cv2.putText(color_image, f"Z: {camera_coordinates_in_laser_coordinates[2]}", (10, 100), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
 
 
         
