@@ -10,14 +10,20 @@ import pickle
 import time
 import os
 from circle_detector_library.circle_detector_module import *
+from kalman_filter.track_3d import SecondOrderKF, FirstOrderKF
 
 
 # Constants 
 
 d = 0
 mirror_rotation_deg = 45
-
 save_path = "calibration_parameters"
+
+# filter coefficients 
+R_std = 0.1
+Q_std = 20
+P_std = 100
+next_t = 0.085 # seconds
 
 
 with open('{}/parameters.pkl'.format(save_path), 'rb') as f:
@@ -60,6 +66,9 @@ def main():
     # Start device
     device = pykinect.start_device(config=device_config)
 
+    # Initialize kalman filter 
+    tracker = SecondOrderKF(R_std=R_std, Q_std=Q_std, P_std=P_std)
+
     cv2.namedWindow('Laser Detector',cv2.WINDOW_NORMAL)
     font = cv2.FONT_HERSHEY_SIMPLEX
 
@@ -67,9 +76,8 @@ def main():
     # gives undefined warning but works (pybind11 c++ module) change import *
     prevCircle = CircleClass()
     circle_detector = CircleDetectorClass(1280, 720) # K4A_COLOR_RESOLUTION_720P
-
+    start = 0
     while True:
-        start = time.time()
         # Get capture
         capture = device.update()
 
@@ -106,25 +114,50 @@ def main():
 
         # rotate and translate  
         camera_coordinates_in_laser_coordinates =  R @ camera_coordinates + t
-    
 
-        coordinate_transform = CoordinateTransform(d=d, D=camera_coordinates_in_laser_coordinates[2], rotation_degree=mirror_rotation_deg)
-        y_m, x_m = coordinate_transform.target_to_mirror(camera_coordinates_in_laser_coordinates[1], camera_coordinates_in_laser_coordinates[0]) # order is changed in order to change x and y axis
+        now = time.time()
+        dt = now - start
+        start = now
+       
+        x, P = tracker.update(dt, camera_coordinates_in_laser_coordinates.reshape(-1))
+        x_pred = tracker.predict_position(x, next_t)
 
+
+        #second order
+        predicted_coordinates = np.array([x_pred[0, 0], x_pred[3, 0], x_pred[6, 0]]).reshape((3, 1))
+
+        #first order
+        #predicted_coordinates = np.array([x_pred[0, 0], x_pred[2, 0], x_pred[4, 0]]).reshape((3, 1))
+
+        coordinate_transform = CoordinateTransform(d=d, D=predicted_coordinates[2], rotation_degree=mirror_rotation_deg)
+
+
+
+        y_m, x_m = coordinate_transform.target_to_mirror(predicted_coordinates[1], predicted_coordinates[0]) # order is changed in order to change x and y axis
+
+        
         
         if(len(y_m) > 0 and len(x_m) > 0):
             si_0.SetXY(y_m[0])        
-            si_1.SetXY(x_m[0])        
+            si_1.SetXY(x_m[0]) 
 
 
-        end = time.time()
-        print("elapsed time: ", (end - start))    
-        cv2.putText(color_image, f"fps: {1 / (end - start)}", (10, 20), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+        
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        cv2.putText(color_image, f"fps: {1 / dt}", (10, 20), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+
         cv2.putText(color_image, f"Target Coordinates w.r.t. mirror center:", (10, 40), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
         cv2.putText(color_image, f"X: {camera_coordinates_in_laser_coordinates[0]}", (10, 60), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
         cv2.putText(color_image, f"Y: {camera_coordinates_in_laser_coordinates[1]}", (10, 80), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
         cv2.putText(color_image, f"Z: {camera_coordinates_in_laser_coordinates[2]}", (10, 100), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        color_image = cv2.circle(color_image, (int(new_circle.x), int(new_circle.y)), radius=10, color=(0, 255, 0), thickness=2)
+
+        cv2.putText(color_image, f"X: {predicted_coordinates[0]}", (10, 120), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+        cv2.putText(color_image, f"Y: {predicted_coordinates[1]}", (10, 140), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+        cv2.putText(color_image, f"Z: {predicted_coordinates[2]}", (10, 160), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+
+
+        
+        # cv2.circle(color_image, center=(mouse_x, mouse_y), radius=10, color=(0, 255, 0), thickness=2)
         # Show detected target position
         cv2.imshow('Laser Detector',color_image)
         # Press q key to stop

@@ -84,7 +84,48 @@ def print_history(state_hist, pos_hist, vel_hist, acc_hist, t):
         print("")
 
 
+class FirstOrderKF():
+    """Create second order Kalman filter.
+    Specify R and Q as floats."""
+    def __init__(self, R_std, Q_std, P_std=10):
+        self.R_std = R_std
+        self.Q_std = Q_std
+        self.P_std = P_std        
+        self.H = np.array([[1, 0, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 1, 0]])
+        self.R = np.eye(3) * R_std**2        
+        self.x = np.array([[0, 0, 0, 0, 0, 0]]).T
+        self.P = np.eye(6) * P_std**2
 
+    def predict_position(self, x, dt):
+        A = np.array(
+            [
+                [1, dt, 0, 0, 0, 0],
+                [0, 1, 0, 0, 0, 0],
+                [0, 0, 1, dt, 0, 0],
+                [0, 0, 0, 1, 0, 0],
+                [0, 0, 0, 0, 1, dt],
+                [0, 0, 0, 0, 0, 1]
+            ])
+        x_pred = A @ x
+        return x_pred
+
+    def update(self, dt, z):
+        self.F = np.array(
+            [
+                [1, dt, 0, 0, 0, 0],
+                [0, 1, 0, 0, 0, 0],
+                [0, 0, 1, dt, 0, 0],
+                [0, 0, 0, 1, 0, 0],
+                [0, 0, 0, 0, 1, dt],
+                [0, 0, 0, 0, 0, 1]
+            ]
+        )
+        q = Q_discrete_white_noise(dim=2, dt=dt, var=self.Q_std**2)
+        self.Q = block_diag(q, q, q)
+        self.x, self.P = predict(self.x, self.P, self.F, self.Q)
+        self.x, self.P = update(self.x, self.P, z, self.R, self.H)
+
+        return self.x, self.P
 
 class SecondOrderKF():
     """Create second order Kalman filter.
@@ -98,7 +139,23 @@ class SecondOrderKF():
         self.x = np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0]]).T
         self.P = np.eye(9) * P_std**2
 
-
+    def predict_position(self, x, dt):
+        A =np.array(
+            [
+                [1, dt, 0.5 * dt * dt, 0, 0, 0, 0, 0, 0],
+                [0, 1, dt, 0, 0, 0, 0, 0, 0],
+                [0, 0, 1, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 1, dt, 0.5 * dt * dt, 0, 0, 0],
+                [0, 0, 0, 0, 1, dt, 0, 0, 0],
+                [0, 0, 0, 0, 0, 1, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 1, dt, 0.5 * dt * dt],
+                [0, 0, 0, 0, 0, 0, 0, 1, dt],
+                [0, 0, 0, 0, 0, 0, 0, 0, 1]
+            ]
+        )
+        x_pred = A @ x
+        return x_pred
+    
     def update(self, dt, z):
         self.F = np.array(
             [
@@ -113,7 +170,7 @@ class SecondOrderKF():
                 [0, 0, 0, 0, 0, 0, 0, 0, 1]
             ]
         )
-        q = Q_discrete_white_noise(dim=3, dt=dt, var=Q_std**2)
+        q = Q_discrete_white_noise(dim=3, dt=dt, var=self.Q_std**2)
         self.Q = block_diag(q, q, q)
         self.x, self.P = predict(self.x, self.P, self.F, self.Q)
         self.x, self.P = update(self.x, self.P, z, self.R, self.H)
@@ -121,49 +178,52 @@ class SecondOrderKF():
         return self.x, self.P
 
 
+def main():
+    R_std = 0.5
+    Q_std = 2
+    dt_mean = 0.033 # 33ms
+    dt_std = 0.001 # 1ms
+    next_t = 3 * dt_mean
 
-R_std = 0.5
-Q_std = 2
-dt_mean = 0.033 # 33ms
-dt_std = 0.001 # 1ms
-next_t = 3 * dt_mean
+    # simulate target movement
+    N = 300
+    sensor = Sensor((0, 0, 0), (0, 0, 0), acc_noise=(10, 10, 10), dt_mean=dt_mean, dt_std=dt_std)
+    tracker = SecondOrderKF(R_std=R_std, Q_std=Q_std, P_std=10)
 
-# simulate target movement
-N = 300
-sensor = Sensor((0, 0, 0), (0, 0, 0), acc_noise=(10, 10, 10), dt_mean=dt_mean, dt_std=dt_std)
-tracker = SecondOrderKF(R_std=R_std, Q_std=Q_std, P_std=10)
+    zs = []
+    vels = []
+    accs = []
+    mu = []
+    dts = []
 
-zs = []
-vels = []
-accs = []
-mu = []
-dts = []
-
-for i in range(N):
-    dt = sensor.update()
-    dts.append(dt)
-    zs.append(sensor.read_pos())
-    vels.append(sensor.read_vel())
-    accs.append(sensor.read_acc())
+    for i in range(N):
+        dt = sensor.update()
+        dts.append(dt)
+        zs.append(sensor.read_pos())
+        vels.append(sensor.read_vel())
+        accs.append(sensor.read_acc())
 
 
-    x, P = tracker.update(dt, sensor.read_pos())
-    cov = np.array([[P[0, 0], P[3, 0]], [P[0, 3], P[3, 3]]])
-    mean = (x[0, 0], x[3, 0])
-    x_pred = predict_position(x, next_t)
-    plt.plot(x_pred[0, 0], x_pred[3, 0], marker="v", color="red")
-    plot_covariance_ellipse(mean, cov=cov, fc="g", std=3, alpha=0.5)
-    mu.append(x)
+        x, P = tracker.update(dt, sensor.read_pos())
+        cov = np.array([[P[0, 0], P[3, 0]], [P[0, 3], P[3, 3]]])
+        mean = (x[0, 0], x[3, 0])
+        x_pred = predict_position(x, next_t)
+        plt.plot(x_pred[0, 0], x_pred[3, 0], marker="v", color="red")
+        plot_covariance_ellipse(mean, cov=cov, fc="g", std=3, alpha=0.5)
+        mu.append(x)
 
-zs = np.array(zs)
-vels = np.array(vels)
-accs = np.array(accs)
-mu = np.array(mu)
+    zs = np.array(zs)
+    vels = np.array(vels)
+    accs = np.array(accs)
+    mu = np.array(mu)
 
-print_history(mu, pos_hist=zs, vel_hist=vels, acc_hist=accs, t=dts)
+    print_history(mu, pos_hist=zs, vel_hist=vels, acc_hist=accs, t=dts)
 
-# plot results
-plt.plot(mu[:, 0], mu[:, 3])
-plt.plot(zs[:, 0], zs[:, 1])
-plt.legend(loc=2)
-plt.show()
+    # plot results
+    plt.plot(mu[:, 0], mu[:, 3])
+    plt.plot(zs[:, 0], zs[:, 1])
+    plt.legend(loc=2)
+    plt.show()
+
+if __name__ == "__main__":
+    main()
