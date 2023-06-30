@@ -9,12 +9,13 @@ import pickle
 import time
 from pykinect_azure.k4a.transformation import Transformation
 from kalman_filter.track_3d import SecondOrderKF, FirstOrderKF
-
+import datetime
 
 # Constants 
 d = 0
 mirror_rotation_deg = 45
 save_path = "calibration_parameters"
+track_save_folder = "track_measurements/"
 # target coordinate offset (mm)
 
 # filter coefficients 
@@ -87,8 +88,7 @@ def main():
 
     start = 0
     zs = []
-    vels = []
-    accs = []
+    Ps = []
     mu = []
     dts = []
     while True:        
@@ -170,7 +170,10 @@ def main():
 
 
         # save measurements
-
+        dts.append(dt)
+        zs.append(camera_coordinates_in_laser_coordinates.reshape(-1))
+        mu.append(x)
+        Ps.append(P)
         
         # cv2.circle(color_image, center=(mouse_x, mouse_y), radius=10, color=(0, 255, 0), thickness=2)
         # Show detected target position
@@ -180,6 +183,14 @@ def main():
             break
 
 
+    sensor_data = {"dts": dts,
+                   "zs": zs,
+                   "mu": mu,
+                   "Ps": Ps}
+    
+    with open('{}{}.pkl'.format(track_save_folder, datetime.datetime.now().strftime("%d-%m-%Y, %H:%M:%S")), 'wb') as f:
+        pickle.dump(sensor_data, f)
+    
     mre2.disconnect()
     print("done")
 

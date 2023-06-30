@@ -155,7 +155,7 @@ def main():
         cv2.putText(color_image, f"Y: {predicted_coordinates[1]}", (10, 140), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
         cv2.putText(color_image, f"Z: {predicted_coordinates[2]}", (10, 160), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
 
-
+    
         
         # cv2.circle(color_image, center=(mouse_x, mouse_y), radius=10, color=(0, 255, 0), thickness=2)
         # Show detected target position
