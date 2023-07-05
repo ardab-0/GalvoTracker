@@ -1,5 +1,5 @@
 import cv2
-
+import numpy as np
 
 
 
@@ -10,17 +10,16 @@ def click(event, x, y, flags, param):
 		print(param[y, x])
 	
 
+i = 5
 
+image = np.load(f"image_processing/sphere_ims/depth_image_{i}.npy")
+image = image / np.max(image)
 
-image = cv2.imread("test_images/target0.jpg")
-image = cv2.resize(image, (1280, 720), interpolation=cv2.INTER_AREA)
-# Convert BGR to HSV
-image_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-
+image = cv2.imread(f"image_processing/sphere_ims/colored_depth_image_{i}.png")
 
 
 cv2.namedWindow("image")
-cv2.setMouseCallback("image", click, image_hsv)
+cv2.setMouseCallback("image", click, image)
 
 while True:
 	
