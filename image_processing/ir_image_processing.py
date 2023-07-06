@@ -55,7 +55,7 @@ while True:
 
 
 
-    transformation.depth_image_to_color_camera_custom(depth_image=depth_img_obj, custom_image=ir_image_obj)
+    transformed_custom_image = transformation.depth_image_to_color_camera_custom(depth_image=depth_img_obj, custom_image=ir_image_obj)
     
 
     if not ret_color or not ret_depth:
