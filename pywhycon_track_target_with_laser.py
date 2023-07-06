@@ -72,23 +72,32 @@ def main():
         start = time.time()
         # Get capture
         capture = device.update()
+        print("Time until capture (s): ", time.time() - start)
 
         # Get the color image from the capture
         ret_color, color_image = capture.get_color_image()
-        
+        print("Time until color image (s): ", time.time() - start)
+
+        if not ret_color:
+            continue
+
+        new_circle = circle_detector.detect_np(color_image, prevCircle)    
+        prevCircle = new_circle
+        print("Time until circle detection (s): ", time.time() - start)
+
         # Get the colored depth
         ret_depth, transformed_depth_image = capture.get_transformed_depth_image()
+        print("Time until depth image (s): ", time.time() - start)
+
         
-        
-        if not ret_color or not ret_depth:
+        if not ret_depth:
             continue  
         
         
         #color_image_3channel = color_image[:, :, :3]
         # returns 0, 0 if target is not detected
         
-        new_circle = circle_detector.detect_np(color_image, prevCircle)    
-        prevCircle = new_circle
+       
 
     
         
@@ -110,6 +119,7 @@ def main():
 
         coordinate_transform = CoordinateTransform(d=d, D=camera_coordinates_in_laser_coordinates[2], rotation_degree=mirror_rotation_deg)
         y_m, x_m = coordinate_transform.target_to_mirror(camera_coordinates_in_laser_coordinates[1], camera_coordinates_in_laser_coordinates[0]) # order is changed in order to change x and y axis
+        print("Time until completing calculations (s): ", time.time() - start)
 
         
         if(len(y_m) > 0 and len(x_m) > 0):
