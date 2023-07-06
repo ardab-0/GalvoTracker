@@ -90,8 +90,9 @@ while True:
     
     transformed_ir_image = transformed_ir_image[::DOWNSAMPLE, ::DOWNSAMPLE]
     transformed_ir_image[transformed_ir_image>5000] = 5000
-    transformed_ir_image = transformed_ir_image * 0.051
+    transformed_ir_image = transformed_ir_image / 5000 * 255
     transformed_ir_image = transformed_ir_image.astype("uint8")
+    transformed_ir_image = cv2.cvtColor(transformed_ir_image,cv2.COLOR_GRAY2RGB)
     print("Time until transformed ir image (s): ", time.time() - start)
 
     new_circle = circle_detector.detect_np(transformed_ir_image, prevCircle)    
