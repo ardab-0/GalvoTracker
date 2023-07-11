@@ -1,4 +1,8 @@
 {
     "cmake.configureOnOpen": false,
-    "cmake.sourceDirectory": "C:/Users/ardab/OneDrive/Masaüstü/2022-2023/Major Project/GalvoTracker/pywhycon"
+    "cmake.sourceDirectory": "C:/Users/ardab/OneDrive/Masaüstü/2022-2023/Major Project/GalvoTracker/pywhycon",
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "python.formatting.provider": "none"
 }
