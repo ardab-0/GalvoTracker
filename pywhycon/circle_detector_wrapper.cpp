@@ -33,6 +33,18 @@ PYBIND11_MODULE(circle_detector_module, module_handle)
     .def_property_readonly("y", [](cv::CircleDetector::Circle &self)  
     {
         return self.y;
+    }).def_property_readonly("v0", [](cv::CircleDetector::Circle &self)  
+    {
+        return self.v0;
+    }).def_property_readonly("v1", [](cv::CircleDetector::Circle &self)  
+    {
+        return self.v1;
+    }).def_property_readonly("m0", [](cv::CircleDetector::Circle &self)  
+    {
+        return self.m0;
+    }).def_property_readonly("m1", [](cv::CircleDetector::Circle &self)  
+    {
+        return self.m1;
     });
 		
 }
