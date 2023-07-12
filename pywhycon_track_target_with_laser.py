@@ -65,6 +65,9 @@ def main():
     font = cv2.FONT_HERSHEY_SIMPLEX
 
 
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    out = cv2.VideoWriter('output.avi', fourcc, 30.0, (1280,720))
+
     # gives undefined warning but works (pybind11 c++ module) change import *
     prevCircle = CircleClass()
     circle_detector = CircleDetectorClass(1280, 720) # K4A_COLOR_RESOLUTION_720P
@@ -151,6 +154,7 @@ def main():
         cv2.putText(color_image, f"VZ (mm/s): {speed[2]}", (10, 160), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
 
         color_image = cv2.circle(color_image, (int(new_circle.x), int(new_circle.y)), radius=10, color=(0, 255, 0), thickness=2)
+        out.write(color_image)
         # Show detected target position
         cv2.imshow('Laser Detector',color_image)
         # Press q key to stop
@@ -158,7 +162,7 @@ def main():
             break
 
         
-
+    out.release()
     mre2.disconnect()
     print("done")
 
