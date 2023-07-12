@@ -16,8 +16,8 @@ from circle_detector_library.circle_detector_module import *
 
 d = 0
 mirror_rotation_deg = 45
-
 save_path = "calibration_parameters"
+save_video = False
 
 
 with open('{}/parameters.pkl'.format(save_path), 'rb') as f:
@@ -154,7 +154,10 @@ def main():
         cv2.putText(color_image, f"VZ (mm/s): {speed[2]}", (10, 160), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
 
         color_image = cv2.circle(color_image, (int(new_circle.x), int(new_circle.y)), radius=10, color=(0, 255, 0), thickness=2)
-        out.write(color_image)
+
+        if save_video:
+            out.write(color_image)
+            
         # Show detected target position
         cv2.imshow('Laser Detector',color_image)
         # Press q key to stop
