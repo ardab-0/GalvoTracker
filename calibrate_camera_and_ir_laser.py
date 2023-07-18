@@ -197,27 +197,109 @@ def test_detect_multiple_circles():
         if cv2.waitKey(1) == ord('q'):
             break
 
+# not working
+# def find_distances(points_1_mm, points_2_mm, distances_mm):
+
+#     A = np.zeros((len(points_1_mm), 3))
+#     y = np.array(distances_mm)
+#     y = np.square(y)
+#     y = y.reshape((-1, 1))
+
+#     for i in range(len(points_1_mm)):
+#         a = (points_1_mm[i][0] / points_1_mm[i][2])**2 + (points_1_mm[i][1] / points_1_mm[i][2])**2 + (points_1_mm[i][2] / points_1_mm[i][2])**2
+
+#         b = -(points_1_mm[i][0] * points_2_mm[i][0]) / points_1_mm[i][2]**2 -(points_1_mm[i][1] * points_2_mm[i][1]) / points_1_mm[i][2]**2 -(points_1_mm[i][2] * points_2_mm[i][2]) / points_1_mm[i][2]**2
+
+#         c = (points_2_mm[i][0] / points_1_mm[i][2])**2 + (points_2_mm[i][1] / points_1_mm[i][2])**2 + (points_2_mm[i][2] / points_1_mm[i][2])**2
+
+
+#         A[i, 0] = a
+#         A[i, 1] = b
+#         A[i, 2] = c
+
+
+#     x = np.linalg.pinv(A) @ b
+
+#     z1 = np.sqrt(x[0])
+#     z2 = np.sqrt(x[2])
+
+#     return z1, z2
+
+
+def find_distances(point_1_mm, point_2_mm, point_3_mm, distances_mm, eps=0.01 ):
+    p1 = np.array(point_1_mm)
+    p2 = np.array(point_2_mm)
+    p3 = np.array(point_3_mm)
+
+    z2 = distances_mm[2] * point_1_mm[2] / (np.linalg.norm(p1-p3))
+    z0 = point_1_mm[2]
+
+    g = p1 * z2 / z0
+
+    # for points p1, p2
+    a = (p2[0] / z0)**2 + (p2[1] / z0)**2 + (p2[2] / z0)**2
+    b = -2*g[0]*p2[0]/z0 -2*g[1]*p2[1]/z0 -2*g[2]*p2[2]/z0
+    c = g[0]**2 + g[1]**2 + g[2]**2 - distances_mm[0]**2
+    x1_f, x2_f = quadratic_solver(a, b, c)
+
+    print("p1-p2")
+    print(x1_f)
+    print(x2_f)
+
+    g = p3 * z2 / z0
+    # for points p2, p3
+    a = (p2[0] / z0)**2 + (p2[1] / z0)**2 + (p2[2] / z0)**2
+    b = -2*g[0]*p2[0]/z0 -2*g[1]*p2[1]/z0 -2*g[2]*p2[2]/z0
+    c = g[0]**2 + g[1]**2 + g[2]**2 - distances_mm[1]**2
+    x1_s, x2_s = quadratic_solver(a, b, c)
+
+    print("p2-p3")
+    print(x1_s)
+    print(x2_s)
+    
+    if abs(x1_f - x1_s) <= eps:
+        z3 = x1_f
+    elif abs(x1_f - x2_s) <= eps:
+        z3 = x1_f
+    elif abs(x2_f - x1_s) <= eps:
+        z3 = x2_f
+    elif abs(x2_f - x2_s) <= eps:
+        z3 = x2_f
+    else:
+        print(f"Obtained distances are not within {eps}")
+
+    return z2, z3
+
+def quadratic_solver(a, b, c):
+    x1 = (-b + np.sqrt(b**2 - 4 * a * c)) / (2*a)
+    x2 = (-b - np.sqrt(b**2 - 4 * a * c)) / (2*a)
+
+    return x1, x2
 
 
 
-def test_search_laser_positon():
-    sensor_data, (width_range, height_range), max_pos = search_for_laser_position(initial_position_mm=[0, -20, 500], width_mm=50, height_mm=50, delta_mm=2)
+
+print(find_distances(point_1_mm=[20, 20, 10], point_2_mm=[30, 30, 10], point_3_mm=[20, 30, 10], distances_mm=[170.88, 135.65, 60]))
 
 
-    print(max_pos)
-
-    plt.imshow(sensor_data, extent=[width_range[0], width_range[-1], height_range[-1], height_range[0]])
-    plt.show()
+# def test_search_laser_positon():
+#     sensor_data, (width_range, height_range), max_pos = search_for_laser_position(initial_position_mm=[0, -20, 500], width_mm=50, height_mm=50, delta_mm=2)
 
 
+#     print(max_pos)
 
-    sensor_data, (width_range, height_range), max_pos = search_for_laser_position(initial_position_mm=max_pos, width_mm=10, height_mm=10, delta_mm=0.2)
-    print(max_pos)
-
-    plt.imshow(sensor_data, extent=[width_range[0], width_range[-1], height_range[-1], height_range[0]])
-    plt.show()
+#     plt.imshow(sensor_data, extent=[width_range[0], width_range[-1], height_range[-1], height_range[0]])
+#     plt.show()
 
 
 
+#     sensor_data, (width_range, height_range), max_pos = search_for_laser_position(initial_position_mm=max_pos, width_mm=10, height_mm=10, delta_mm=0.2)
+#     print(max_pos)
 
-test_detect_multiple_circles()
+#     plt.imshow(sensor_data, extent=[width_range[0], width_range[-1], height_range[-1], height_range[0]])
+#     plt.show()
+
+
+
+
+# test_detect_multiple_circles()
