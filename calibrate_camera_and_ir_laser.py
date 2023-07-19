@@ -267,7 +267,18 @@ class Multiple_Circle_Detector:
 #     return z1, z2
 
 
-def find_distances(point_1_mm, point_2_mm, point_3_mm, distances_mm, eps=0.01 ):
+def find_distances_from_mirror_center(point_1_mm, point_2_mm, point_3_mm, distances_mm, eps=0.01 ):
+    """
+    point 1 and point 3 must have same x distance on the target plate, target plate must be perpendicular to ground, laser must be parallel to ground
+
+    point_1_mm: list, 3d measured coordinate of laser
+    point_2_mm: list, 3d measured coordinate of laser
+    point_3_mm: list, 3d measured coordinate of laser
+    distances_mm: distances between points [ |p1-p2|, |p2-p3|, |p1-p3| ]
+    eps: distance(mm) between points to be counted as same
+
+    return: distances of each point in mm
+    """
     p1 = np.array(point_1_mm)
     p2 = np.array(point_2_mm)
     p3 = np.array(point_3_mm)
@@ -309,7 +320,7 @@ def find_distances(point_1_mm, point_2_mm, point_3_mm, distances_mm, eps=0.01 ):
     else:
         print(f"Obtained distances are not within {eps}")
 
-    return z2, z3
+    return (z2, z3, z2)
 
 def quadratic_solver(a, b, c):
     x1 = (-b + np.sqrt(b**2 - 4 * a * c)) / (2*a)
@@ -318,6 +329,12 @@ def quadratic_solver(a, b, c):
     return x1, x2
 
 
+def calibrate():
+    coarse_laser_pos = get_coarse_laser_positions(initial_position_mm=[0, 0, 500], width_mm=500, height_mm=500, delta_mm=2)
+
+    fine_laser_coords = get_fine_laser_positions(coarse_laser_pos)
+
+    find_distances_from_mirror_center()
 
 ################################################### TESTS ############################################
 
@@ -361,6 +378,6 @@ def test_get_coarse_laser_positions():
 
 
 
-print(find_distances(point_1_mm=[20, 20, 10], point_2_mm=[30, 30, 10], point_3_mm=[20, 30, 10], distances_mm=[170.88, 135.65, 60]))
+print(find_distances_from_mirror_center(point_1_mm=[20, 20, 10], point_2_mm=[30, 30, 10], point_3_mm=[20, 30, 10], distances_mm=[170.88, 135.65, 60]))
 
 # test_detect_multiple_circles()
