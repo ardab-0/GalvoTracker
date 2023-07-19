@@ -15,7 +15,7 @@ from utils import optimal_rotation_and_translation
 import pickle
 import sys
 import matplotlib.pyplot as plt
-
+from image_processing.local_maxima_finding import find_local_maxima
 
 # Constants
 d = 0
@@ -61,9 +61,12 @@ s = serial.Serial(port="COM6", parity=serial.PARITY_EVEN, stopbits=serial.STOPBI
 
 
 
-def get_sensor_reading(sensor_id):    
+def get_sensor_reading(sensor_id): 
+    """
+    sensor_id: int
+    """   
     s.flush()
-    s.write("pd\n".encode())
+    s.write(f"pd_{sensor_id}\n".encode())
     mes = s.read_until()
     return float(mes.decode().strip("\r\n"))
 
@@ -100,13 +103,64 @@ def search_for_laser_position(initial_position_mm, width_mm, height_mm, delta_mm
         si_0.SetXY(y_m[i])
         si_1.SetXY(x_m[i])
 
-        time.sleep(0.005)
+        time.sleep(0.002)
         sensor_readings.append(get_sensor_reading(0))
 
     sensor_readings = np.array(sensor_readings)
     max_idx = np.argmax(sensor_readings)
 
-    return np.reshape(sensor_readings, (sample_y, sample_x)), (w+initial_position_mm[0], h+initial_position_mm[1]), (x_t[max_idx], y_t[max_idx], z_t)
+    sensor_data = np.reshape(sensor_readings, (sample_y, sample_x))
+    coordinate_axes = (w+initial_position_mm[0], h+initial_position_mm[1])
+    max_position_mm = (x_t[max_idx], y_t[max_idx], z_t)
+    target_coordinates = (x_t, y_t, z_t) # z_t is not ndarray
+
+
+    return sensor_data, coordinate_axes, max_position_mm, target_coordinates
+
+
+def get_coarse_laser_positions(initial_position_mm, width_mm, height_mm, delta_mm):
+    """
+    
+    """
+    def convert_coord_to_idx(coord, col):
+        return coord[1] * col + coord[0] 
+
+
+    sensor_data, (width_range, height_range), max_pos, target_coordinates = search_for_laser_position(initial_position_mm, width_mm, height_mm, delta_mm)
+    x_t, y_t, z_t = target_coordinates
+
+
+    # normalize sensor_data
+    sensor_data = sensor_data / np.max(sensor_data)
+
+    image_coords = find_local_maxima(sensor_data, number_of_maxima=3)
+    coords_3d = []
+
+    for im_coord in image_coords:
+        idx = convert_coord_to_idx( im_coord, col=len(sensor_data[0]) )
+        x = x_t[idx]
+        y = y_t[idx]
+        z = z_t
+        coords_3d.append([x, y, z]) 
+
+    return coords_3d
+
+
+def get_fine_laser_positions(rough_laser_coords):
+    """
+        rough_laser_coords: list
+    """
+
+    fine_coords_3d = []
+    for coord in rough_laser_coords: 
+        sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=coord, width_mm=10, height_mm=10, delta_mm=0.2)
+        fine_coords_3d.append(max_pos)
+
+    # plt.imshow(sensor_data, extent=[width_range[0], width_range[-1], height_range[-1], height_range[0]])
+    # plt.show()
+
+    return fine_coords_3d
+    
 
 class Multiple_Circle_Detector:
     def __init__(self, max_detection_count=5):
@@ -182,20 +236,7 @@ class Multiple_Circle_Detector:
         self.previous_circles = detected_circle_objects
         return detected_circles, img
 
-def test_detect_multiple_circles():
-    ret_color = False
-    multiple_circle_detector = Multiple_Circle_Detector()
-    while True:
-        capture = device.update()
-        ret_color, color_image = capture.get_color_image() 
-        if not ret_color:
-            continue
-        # color_image = cv2.imread("circle-medium.png")
-        circle_coordinates, marked_image = multiple_circle_detector.detect_multiple_circles(color_image)   
-        print(circle_coordinates)
-        cv2.imshow("image", marked_image)
-        if cv2.waitKey(1) == ord('q'):
-            break
+
 
 # not working
 # def find_distances(points_1_mm, points_2_mm, distances_mm):
@@ -278,28 +319,48 @@ def quadratic_solver(a, b, c):
 
 
 
+################################################### TESTS ############################################
+
+
+def test_search_laser_positon():
+    sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=[0, -20, 500], width_mm=50, height_mm=50, delta_mm=2)
+
+
+    print(max_pos)
+
+    plt.imshow(sensor_data, extent=[width_range[0], width_range[-1], height_range[-1], height_range[0]])
+    plt.show()
+
+
+
+    sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=max_pos, width_mm=10, height_mm=10, delta_mm=0.2)
+    print(max_pos)
+
+    plt.imshow(sensor_data, extent=[width_range[0], width_range[-1], height_range[-1], height_range[0]])
+    plt.show()
+
+def test_detect_multiple_circles():
+    ret_color = False
+    multiple_circle_detector = Multiple_Circle_Detector()
+    while True:
+        capture = device.update()
+        ret_color, color_image = capture.get_color_image() 
+        if not ret_color:
+            continue
+        # color_image = cv2.imread("circle-medium.png")
+        circle_coordinates, marked_image = multiple_circle_detector.detect_multiple_circles(color_image)   
+        print(circle_coordinates)
+        cv2.imshow("image", marked_image)
+        if cv2.waitKey(1) == ord('q'):
+            break
+
+
+def test_get_coarse_laser_positions():
+    print("Coarse laser positions:")
+    print(get_coarse_laser_positions(initial_position_mm=[0, 0, 50], width_mm=500, height_mm=500, delta_mm=2))
+
+
 
 print(find_distances(point_1_mm=[20, 20, 10], point_2_mm=[30, 30, 10], point_3_mm=[20, 30, 10], distances_mm=[170.88, 135.65, 60]))
-
-
-# def test_search_laser_positon():
-#     sensor_data, (width_range, height_range), max_pos = search_for_laser_position(initial_position_mm=[0, -20, 500], width_mm=50, height_mm=50, delta_mm=2)
-
-
-#     print(max_pos)
-
-#     plt.imshow(sensor_data, extent=[width_range[0], width_range[-1], height_range[-1], height_range[0]])
-#     plt.show()
-
-
-
-#     sensor_data, (width_range, height_range), max_pos = search_for_laser_position(initial_position_mm=max_pos, width_mm=10, height_mm=10, delta_mm=0.2)
-#     print(max_pos)
-
-#     plt.imshow(sensor_data, extent=[width_range[0], width_range[-1], height_range[-1], height_range[0]])
-#     plt.show()
-
-
-
 
 # test_detect_multiple_circles()
