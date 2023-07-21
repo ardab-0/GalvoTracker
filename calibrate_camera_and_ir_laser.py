@@ -8,8 +8,8 @@ from pykinect_azure import (
 )
 import numpy as np
 from circle_detector_library.circle_detector_module import *
-# import optoMDC
-# from mirror.coordinate_transformation import CoordinateTransform
+import optoMDC
+from mirror.coordinate_transformation import CoordinateTransform
 import time
 from utils import optimal_rotation_and_translation
 import pickle
@@ -17,61 +17,61 @@ import sys
 import matplotlib.pyplot as plt
 from image_processing.local_maxima_finding import find_local_maxima
 
-# # Constants
-# d = 0
-# mirror_rotation_deg = 45
-# num_iterations = 50
-# save_path = "calibration_parameters"
+# Constants
+d = 0
+mirror_rotation_deg = 45
+num_iterations = 50
+save_path = "calibration_parameters"
 
 
-# # Initialize the pykinect library, if the library is not found, add the library path as argument
-# pykinect.initialize_libraries()
+# Initialize the pykinect library, if the library is not found, add the library path as argument
+pykinect.initialize_libraries()
 
-# # Modify camera configuration
-# device_config = pykinect.default_configuration
-# device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_YUY2
-# device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_720P
-# device_config.depth_mode = pykinect.K4A_DEPTH_MODE_WFOV_2X2BINNED
-# # print(device_config)
+# Modify camera configuration
+device_config = pykinect.default_configuration
+device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_YUY2
+device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_720P
+device_config.depth_mode = pykinect.K4A_DEPTH_MODE_WFOV_2X2BINNED
+# print(device_config)
 
-# # Start device
-# device = pykinect.start_device(config=device_config)
+# Start device
+device = pykinect.start_device(config=device_config)
 
-# # initialize mirrors
-# mre2 = optoMDC.connect()
-# mre2.reset()
+# initialize mirrors
+mre2 = optoMDC.connect()
+mre2.reset()
 
-# # Set up mirror in closed loop control mode(XY)
-# ch_0 = mre2.Mirror.Channel_0
-# ch_0.StaticInput.SetAsInput()  # (1) here we tell the Manager that we will use a static input
-# ch_0.SetControlMode(optoMDC.Units.XY)
-# ch_0.Manager.CheckSignalFlow()  # This is a useful method to make sure the signal flow is configured correctly.
-# si_0 = mre2.Mirror.Channel_0.StaticInput
+# Set up mirror in closed loop control mode(XY)
+ch_0 = mre2.Mirror.Channel_0
+ch_0.StaticInput.SetAsInput()  # (1) here we tell the Manager that we will use a static input
+ch_0.SetControlMode(optoMDC.Units.XY)
+ch_0.Manager.CheckSignalFlow()  # This is a useful method to make sure the signal flow is configured correctly.
+si_0 = mre2.Mirror.Channel_0.StaticInput
 
-# ch_1 = mre2.Mirror.Channel_1
+ch_1 = mre2.Mirror.Channel_1
 
-# ch_1.StaticInput.SetAsInput()  # (1) here we tell the Manager that we will use a static input
-# ch_1.SetControlMode(optoMDC.Units.XY)
-# ch_1.Manager.CheckSignalFlow()  # This is a useful method to make sure the signal flow is configured correctly.
-# si_1 = mre2.Mirror.Channel_1.StaticInput
-
-
-# # initilaize serial port to PICO
-# s = serial.Serial(port="COM6", parity=serial.PARITY_EVEN, stopbits=serial.STOPBITS_ONE, timeout=1)
+ch_1.StaticInput.SetAsInput()  # (1) here we tell the Manager that we will use a static input
+ch_1.SetControlMode(optoMDC.Units.XY)
+ch_1.Manager.CheckSignalFlow()  # This is a useful method to make sure the signal flow is configured correctly.
+si_1 = mre2.Mirror.Channel_1.StaticInput
 
 
-
-# def get_sensor_reading(sensor_id): 
-#     """
-#     sensor_id: int
-#     """   
-#     s.flush()
-#     s.write(f"pd_{sensor_id}\n".encode())
-#     mes = s.read_until()
-#     return float(mes.decode().strip("\r\n"))
+# initilaize serial port to PICO
+s = serial.Serial(port="COM6", parity=serial.PARITY_EVEN, stopbits=serial.STOPBITS_ONE, timeout=1)
 
 
-def search_for_laser_position(initial_position_mm, width_mm, height_mm, delta_mm):
+
+def get_sensor_reading(sensor_id): 
+    """
+    sensor_id: int
+    """   
+    s.flush()
+    s.write(f"pd_{sensor_id}\n".encode())
+    mes = s.read_until()
+    return float(mes.decode().strip("\r\n"))
+
+
+def search_for_laser_position(initial_position_mm, width_mm, height_mm, delta_mm, sensor_id=1):
     """
         initial_position_mm: length 3 list
         width_mm: search area width
@@ -103,8 +103,8 @@ def search_for_laser_position(initial_position_mm, width_mm, height_mm, delta_mm
         si_0.SetXY(y_m[i])
         si_1.SetXY(x_m[i])
 
-        time.sleep(0.002)
-        sensor_readings.append(get_sensor_reading(0))
+        # time.sleep(0.002)
+        sensor_readings.append(get_sensor_reading(sensor_id))
 
     sensor_readings = np.array(sensor_readings)
     max_idx = np.argmax(sensor_readings)
@@ -118,32 +118,70 @@ def search_for_laser_position(initial_position_mm, width_mm, height_mm, delta_mm
     return sensor_data, coordinate_axes, max_position_mm, target_coordinates
 
 
-def get_coarse_laser_positions(initial_position_mm, width_mm, height_mm, delta_mm):
+
+def search_for_multiple_laser_position(initial_position_mm, width_mm, height_mm, delta_mm, sensor_ids):
     """
+        initial_position_mm: length 3 list
+        width_mm: search area width
+        height_mm: search area height
+        delta_mm: search step size
+    """
+    sample_x = int(width_mm / delta_mm) + 1
+    sample_y = int(height_mm / delta_mm) + 1
+    w = np.linspace(-width_mm / 2, width_mm / 2, sample_x)
+    h = np.linspace(-height_mm / 2, height_mm / 2, sample_y)
+    x_t = np.tile(w, sample_y)
+    y_t = np.repeat(h, sample_x)
+
+    x_t += initial_position_mm[0]
+    y_t += initial_position_mm[1]
+    z_t = initial_position_mm[2]
+
+    coordinate_transform = CoordinateTransform(
+        d=d, D=z_t, rotation_degree=mirror_rotation_deg
+    )
+    y_m, x_m = coordinate_transform.target_to_mirror(
+        y_t, x_t
+    )  # order is changed in order to change x and y axis
+
+    multiple_sensor_readings = []
     
-    """
-    def convert_coord_to_idx(coord, col):
-        return coord[1] * col + coord[0] 
+       
+    for i in range(len(x_m)):
+        sensor_readings = []
+        for id in sensor_ids:
+            # Point the laser
+            si_0.SetXY(y_m[i])
+            si_1.SetXY(x_m[i])
+
+            # time.sleep(0.002)
+            sensor_readings.append(get_sensor_reading(id))
+
+        multiple_sensor_readings.append(sensor_readings)
 
 
-    sensor_data, (width_range, height_range), max_pos, target_coordinates = search_for_laser_position(initial_position_mm, width_mm, height_mm, delta_mm)
-    x_t, y_t, z_t = target_coordinates
+    multiple_sensor_readings = np.array(multiple_sensor_readings)
+    max_indices = np.argmax(multiple_sensor_readings, axis=0)
+
+    multiple_sensor_data = np.reshape(multiple_sensor_readings, (sample_y, sample_x, len(sensor_ids)))
+    
+    coordinate_axes = (w+initial_position_mm[0], h+initial_position_mm[1])
+    max_position_list_mm = []
+    for i in range(len(sensor_ids)):
+        max_position_mm = (x_t[max_indices[i]], y_t[max_indices[i]], z_t)
+        max_position_list_mm.append(max_position_mm)
+
+    target_coordinates = (x_t, y_t, z_t) # z_t is not ndarray
+
+    return multiple_sensor_data, coordinate_axes, max_position_list_mm, target_coordinates
 
 
-    # normalize sensor_data
-    sensor_data = sensor_data / np.max(sensor_data)
+def get_coarse_laser_positions(initial_position_mm, width_mm, height_mm, delta_mm, sensor_ids):
+    
+    multiple_sensor_data, coordinate_axes, max_position_list_mm, target_coordinates = search_for_multiple_laser_position(initial_position_mm, width_mm, height_mm, delta_mm, sensor_ids)
+    
 
-    image_coords = find_local_maxima(sensor_data, number_of_maxima=3)
-    coords_3d = []
-
-    for im_coord in image_coords:
-        idx = convert_coord_to_idx( im_coord, col=len(sensor_data[0]) )
-        x = x_t[idx]
-        y = y_t[idx]
-        z = z_t
-        coords_3d.append([x, y, z]) 
-
-    return coords_3d
+    return max_position_list_mm
 
 
 def get_fine_laser_positions(rough_laser_coords):
@@ -152,8 +190,10 @@ def get_fine_laser_positions(rough_laser_coords):
     """
 
     fine_coords_3d = []
-    for coord in rough_laser_coords: 
-        sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=coord, width_mm=10, height_mm=10, delta_mm=0.2)
+    for i, coord in enumerate(rough_laser_coords):
+        id = i+1 # sensor ids start from 1
+        sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=coord, width_mm=10, height_mm=10, delta_mm=0.2, sensor_id=id)
+        sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=max_pos, width_mm=0.4, height_mm=0.4, delta_mm=0.05, sensor_id=id)
         fine_coords_3d.append(max_pos)
 
     # plt.imshow(sensor_data, extent=[width_range[0], width_range[-1], height_range[-1], height_range[0]])
@@ -238,36 +278,7 @@ class Multiple_Circle_Detector:
 
 
 
-# not working
-# def find_distances(points_1_mm, points_2_mm, distances_mm):
-
-#     A = np.zeros((len(points_1_mm), 3))
-#     y = np.array(distances_mm)
-#     y = np.square(y)
-#     y = y.reshape((-1, 1))
-
-#     for i in range(len(points_1_mm)):
-#         a = (points_1_mm[i][0] / points_1_mm[i][2])**2 + (points_1_mm[i][1] / points_1_mm[i][2])**2 + (points_1_mm[i][2] / points_1_mm[i][2])**2
-
-#         b = -(points_1_mm[i][0] * points_2_mm[i][0]) / points_1_mm[i][2]**2 -(points_1_mm[i][1] * points_2_mm[i][1]) / points_1_mm[i][2]**2 -(points_1_mm[i][2] * points_2_mm[i][2]) / points_1_mm[i][2]**2
-
-#         c = (points_2_mm[i][0] / points_1_mm[i][2])**2 + (points_2_mm[i][1] / points_1_mm[i][2])**2 + (points_2_mm[i][2] / points_1_mm[i][2])**2
-
-
-#         A[i, 0] = a
-#         A[i, 1] = b
-#         A[i, 2] = c
-
-
-#     x = np.linalg.pinv(A) @ b
-
-#     z1 = np.sqrt(x[0])
-#     z2 = np.sqrt(x[2])
-
-#     return z1, z2
-
-
-def find_distances_from_mirror_center(point_1_mm, point_2_mm, point_3_mm, distances_mm, eps=0.01 ):
+def find_distances_from_mirror_center(point_1_mm, point_2_mm, point_3_mm, distances_mm, eps_mm=0.01 ):
     """
     point 1 and point 3 must have same x distance on the target plate, target plate must be perpendicular to ground, laser must be parallel to ground
 
@@ -309,16 +320,16 @@ def find_distances_from_mirror_center(point_1_mm, point_2_mm, point_3_mm, distan
     print(x1_s)
     print(x2_s)
     
-    if abs(x1_f - x1_s) <= eps:
-        z3 = x1_f
-    elif abs(x1_f - x2_s) <= eps:
-        z3 = x1_f
-    elif abs(x2_f - x1_s) <= eps:
-        z3 = x2_f
-    elif abs(x2_f - x2_s) <= eps:
-        z3 = x2_f
+    if abs(x1_f - x1_s) <= eps_mm:
+        z3 = (x1_f + x1_s)/2
+    elif abs(x1_f - x2_s) <= eps_mm:
+        z3 = (x1_f + x2_s)/2
+    elif abs(x2_f - x1_s) <= eps_mm:
+        z3 = (x2_f + x1_s) /2
+    elif abs(x2_f - x2_s) <= eps_mm:
+        z3 = (x2_f + x2_s) / 2
     else:
-        print(f"Obtained distances are not within {eps}")
+        print(f"Obtained distances are not within {eps_mm} mm.")
 
     return (z2, z3, z2)
 
@@ -366,17 +377,19 @@ def identify_points(point1, point2, point3):
 
 
 
-def calibrate():
+def calibrate(initial_position_mm, width_mm, height_mm, delta_mm, sensor_ids):
 
     # find precise location of infrared detectors using laser
-    coarse_laser_pos = get_coarse_laser_positions(initial_position_mm=[0, 0, 500], width_mm=500, height_mm=500, delta_mm=2)
+    coarse_laser_pos = get_coarse_laser_positions(initial_position_mm, width_mm, height_mm, delta_mm, sensor_ids)
+    print(coarse_laser_pos)
 
     fine_laser_coords = get_fine_laser_positions(coarse_laser_pos)
+    print(fine_laser_coords)
 
     p1, p2, p3 = identify_points(fine_laser_coords[0], fine_laser_coords[1], fine_laser_coords[2])
 
     # adjust distances according to calibration plat geometry (assumed 100 mm spacing)
-    p1_z, p2_z, p3_z = find_distances_from_mirror_center(point_1_mm=p1, point_2_mm=p2, point_3_mm=p3, distances_mm=[100, 100*np.sqrt(2), 100])
+    p1_z, p2_z, p3_z = find_distances_from_mirror_center(point_1_mm=p1, point_2_mm=p2, point_3_mm=p3, distances_mm=[100, 100*np.sqrt(2), 100], eps_mm=5)
 
     real_zs = [p1_z, p2_z, p3_z]
     identified_points = [p1, p2, p3]
@@ -384,35 +397,40 @@ def calibrate():
     # laser detector positions in laser mirror coordinate system
     real_3d_coords = []
 
-    for i in range(real_zs):
-        sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=[identified_points[i][0], identified_points[i][1], real_zs[i]], width_mm=50, height_mm=50, delta_mm=2)
-        sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=max_pos, width_mm=10, height_mm=10, delta_mm=0.2)
+    for i in range(len(real_zs)):
+        sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=[identified_points[i][0], identified_points[i][1], real_zs[i]], width_mm=50, height_mm=50, delta_mm=2, sensor_id=i+1)
+        sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=max_pos, width_mm=10, height_mm=10, delta_mm=0.2, sensor_id=i+1)
+        sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=max_pos, width_mm=0.4, height_mm=0.4, delta_mm=0.05, sensor_id=i+1)
+
         real_3d_coords.append(max_pos)
 
-    # find location of laser detectors using depth camera
-    ret_color = False
-    multiple_circle_detector = Multiple_Circle_Detector()
-    while True:
-        capture = device.update()
-        ret_color, color_image = capture.get_color_image() 
-        if not ret_color:
-            continue
-        # color_image = cv2.imread("circle-medium.png")
-        circle_coordinates, marked_image = multiple_circle_detector.detect_multiple_circles(color_image)  
-        print(circle_coordinates)
-        if len(circle_coordinates) == 3:
-            break        
-        cv2.imshow("image", marked_image)
-        if cv2.waitKey(1) == ord('q'):
-            break
+    # # find location of laser detectors using depth camera
+    # ret_color = False
+    # multiple_circle_detector = Multiple_Circle_Detector()
+    # while True:
+    #     capture = device.update()
+    #     ret_color, color_image = capture.get_color_image() 
+    #     if not ret_color:
+    #         continue
+    #     # color_image = cv2.imread("circle-medium.png")
+    #     circle_coordinates, marked_image = multiple_circle_detector.detect_multiple_circles(color_image)  
+    #     print(circle_coordinates)
+    #     if len(circle_coordinates) == 3:
+    #         break        
+    #     cv2.imshow("image", marked_image)
+    #     if cv2.waitKey(1) == ord('q'):
+    #         break
 
     
-    p1_cam, p2_cam, p3_cam = identify_points(circle_coordinates[0], circle_coordinates[1], circle_coordinates[2])
+    # p1_cam, p2_cam, p3_cam = identify_points(circle_coordinates[0], circle_coordinates[1], circle_coordinates[2])
 
-    print(f"Point1 Laser: {p1},   Camera: {p1_cam}")
-    print(f"Point1 Laser: {p2},   Camera: {p2_cam}")
-    print(f"Point1 Laser: {p3},   Camera: {p3_cam}")
+    # print(f"Point1 Laser: {p1},   Camera: {p1_cam}")
+    # print(f"Point1 Laser: {p2},   Camera: {p2_cam}")
+    # print(f"Point1 Laser: {p3},   Camera: {p3_cam}")
 
+    print(f"Point1 Laser: {real_3d_coords[0]}")
+    print(f"Point2 Laser: {real_3d_coords[1]}")
+    print(f"Point3 Laser: {real_3d_coords[2]}")
 
 
     
@@ -462,12 +480,34 @@ def test_detect_multiple_circles():
 
 def test_get_coarse_laser_positions():
     print("Coarse laser positions:")
-    print(get_coarse_laser_positions(initial_position_mm=[0, 0, 50], width_mm=500, height_mm=500, delta_mm=2))
+    print(get_coarse_laser_positions(initial_position_mm=[0, 0, 50], width_mm=500, height_mm=500, delta_mm=2, sensor_ids=[1,2,3]))
 
 
+def test_search_for_multiple_laser_position():
+    multiple_sensor_data, coordinate_axes, max_position_list_mm, target_coordinates = search_for_multiple_laser_position(initial_position_mm=[-25, 50, 500], width_mm=150, height_mm=150, delta_mm=3, sensor_ids=[1, 2, 3])
+
+    print(max_position_list_mm)   
+
+
+    for i in range(3):
+        plt.figure()
+        plt.imshow(multiple_sensor_data[:,:,i])
+        
+    plt.show()
+
+def test_sensor_reading():
+    while True:
+        print("Sensor 1: ", get_sensor_reading(1))
+        time.sleep(0.05)
+        print("Sensor 2: ", get_sensor_reading(2))
+        time.sleep(0.05)
+        print("Sensor 3: ", get_sensor_reading(3))
+        time.sleep(1)
 
 #print(find_distances_from_mirror_center(point_1_mm=[20, 20, 10], point_2_mm=[30, 30, 10], point_3_mm=[20, 30, 10], distances_mm=[170.88, 135.65, 60]))
 
 # test_detect_multiple_circles()
 
-test_identify_points()
+#test_identify_points()
+
+calibrate(initial_position_mm=[-25, 50, 500], width_mm=150, height_mm=150, delta_mm=3, sensor_ids=[1, 2, 3])
