@@ -193,7 +193,6 @@ def get_fine_laser_positions(rough_laser_coords):
     for i, coord in enumerate(rough_laser_coords):
         id = i+1 # sensor ids start from 1
         sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=coord, width_mm=10, height_mm=10, delta_mm=0.2, sensor_id=id)
-        sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=max_pos, width_mm=0.4, height_mm=0.4, delta_mm=0.05, sensor_id=id)
         fine_coords_3d.append(max_pos)
 
     # plt.imshow(sensor_data, extent=[width_range[0], width_range[-1], height_range[-1], height_range[0]])
@@ -303,6 +302,8 @@ def find_distances_from_mirror_center(point_1_mm, point_2_mm, point_3_mm, distan
     a = (p2[0] / z0)**2 + (p2[1] / z0)**2 + (p2[2] / z0)**2
     b = -2*g[0]*p2[0]/z0 -2*g[1]*p2[1]/z0 -2*g[2]*p2[2]/z0
     c = g[0]**2 + g[1]**2 + g[2]**2 - distances_mm[0]**2
+
+
     x1_f, x2_f = quadratic_solver(a, b, c)
 
     print("p1-p2")
@@ -381,10 +382,10 @@ def calibrate(initial_position_mm, width_mm, height_mm, delta_mm, sensor_ids):
 
     # find precise location of infrared detectors using laser
     coarse_laser_pos = get_coarse_laser_positions(initial_position_mm, width_mm, height_mm, delta_mm, sensor_ids)
-    print(coarse_laser_pos)
+    print("Coarse laser position: ", coarse_laser_pos)
 
     fine_laser_coords = get_fine_laser_positions(coarse_laser_pos)
-    print(fine_laser_coords)
+    print("Fine laser position: ",fine_laser_coords)
 
     p1, p2, p3 = identify_points(fine_laser_coords[0], fine_laser_coords[1], fine_laser_coords[2])
 
@@ -400,7 +401,6 @@ def calibrate(initial_position_mm, width_mm, height_mm, delta_mm, sensor_ids):
     for i in range(len(real_zs)):
         sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=[identified_points[i][0], identified_points[i][1], real_zs[i]], width_mm=50, height_mm=50, delta_mm=2, sensor_id=i+1)
         sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=max_pos, width_mm=10, height_mm=10, delta_mm=0.2, sensor_id=i+1)
-        sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=max_pos, width_mm=0.4, height_mm=0.4, delta_mm=0.05, sensor_id=i+1)
 
         real_3d_coords.append(max_pos)
 
@@ -484,7 +484,7 @@ def test_get_coarse_laser_positions():
 
 
 def test_search_for_multiple_laser_position():
-    multiple_sensor_data, coordinate_axes, max_position_list_mm, target_coordinates = search_for_multiple_laser_position(initial_position_mm=[-25, 50, 500], width_mm=150, height_mm=150, delta_mm=3, sensor_ids=[1, 2, 3])
+    multiple_sensor_data, coordinate_axes, max_position_list_mm, target_coordinates = search_for_multiple_laser_position(initial_position_mm=[-40, 60, 500], width_mm=210, height_mm=180, delta_mm=3, sensor_ids=[1, 2, 3])
 
     print(max_position_list_mm)   
 
@@ -510,4 +510,7 @@ def test_sensor_reading():
 
 #test_identify_points()
 
-calibrate(initial_position_mm=[-25, 50, 500], width_mm=150, height_mm=150, delta_mm=3, sensor_ids=[1, 2, 3])
+#test_search_for_multiple_laser_position()
+
+calibrate(initial_position_mm=[-40, 50, 500], width_mm=180, height_mm=150, delta_mm=3, sensor_ids=[1, 2, 3])
+
