@@ -277,10 +277,31 @@ class Multiple_Circle_Detector:
 
 
 
-def find_distances_from_mirror_center(point_1_mm, point_2_mm, point_3_mm, distances_mm, eps_mm=0.01 ):
+def find_distances_from_mirror_center(point_1_mm, point_2_mm, point_3_mm, distances_mm, eps_mm=0.01, is_colinear=True):
     """
-    point 1 and point 3 must have same x distance on the target plate, target plate must be perpendicular to ground, laser must be parallel to ground
+    ------------------------------------------------------------------------------------------------------------------------------------------
+    if is_colinear=True
+        point 1 point 2 and point 3 must have same x distance on the target plate, target plate must be perpendicular to ground, laser must be parallel to ground
+        Calibration plate point order should be:
 
+        ---------------------
+        |    p1             |
+        |    p2             |
+        |    p3             |
+        ---------------------
+
+    else: 
+        point 1 and point 3 must have same x distance on the target plate, target plate must be perpendicular to ground, laser must be parallel to ground
+        Calibration plate point order should be:
+
+        ---------------------
+        |    p1          p2 |
+        |                   |
+        |    p3             |
+        ---------------------
+    ---------------------------------------------------------------------------------------------------------------------------------------
+
+    
     point_1_mm: list, 3d measured coordinate of laser
     point_2_mm: list, 3d measured coordinate of laser
     point_3_mm: list, 3d measured coordinate of laser
@@ -293,46 +314,53 @@ def find_distances_from_mirror_center(point_1_mm, point_2_mm, point_3_mm, distan
     p2 = np.array(point_2_mm)
     p3 = np.array(point_3_mm)
 
-    z2 = distances_mm[2] * point_1_mm[2] / (np.linalg.norm(p1-p3))
-    z0 = point_1_mm[2]
 
-    g = p1 * z2 / z0
-
-    # for points p1, p2
-    a = (p2[0] / z0)**2 + (p2[1] / z0)**2 + (p2[2] / z0)**2
-    b = -2*g[0]*p2[0]/z0 -2*g[1]*p2[1]/z0 -2*g[2]*p2[2]/z0
-    c = g[0]**2 + g[1]**2 + g[2]**2 - distances_mm[0]**2
-
-
-    x1_f, x2_f = quadratic_solver(a, b, c)
-
-    print("p1-p2")
-    print(x1_f)
-    print(x2_f)
-
-    g = p3 * z2 / z0
-    # for points p2, p3
-    a = (p2[0] / z0)**2 + (p2[1] / z0)**2 + (p2[2] / z0)**2
-    b = -2*g[0]*p2[0]/z0 -2*g[1]*p2[1]/z0 -2*g[2]*p2[2]/z0
-    c = g[0]**2 + g[1]**2 + g[2]**2 - distances_mm[1]**2
-    x1_s, x2_s = quadratic_solver(a, b, c)
-
-    print("p2-p3")
-    print(x1_s)
-    print(x2_s)
+    if is_colinear:
+        z2 = distances_mm[0] * point_1_mm[2] / (np.linalg.norm(p1-p2))
+        return z2, z2, z2
     
-    if abs(x1_f - x1_s) <= eps_mm:
-        z3 = (x1_f + x1_s)/2
-    elif abs(x1_f - x2_s) <= eps_mm:
-        z3 = (x1_f + x2_s)/2
-    elif abs(x2_f - x1_s) <= eps_mm:
-        z3 = (x2_f + x1_s) /2
-    elif abs(x2_f - x2_s) <= eps_mm:
-        z3 = (x2_f + x2_s) / 2
     else:
-        print(f"Obtained distances are not within {eps_mm} mm.")
 
-    return (z2, z3, z2)
+        z2 = distances_mm[2] * point_1_mm[2] / (np.linalg.norm(p1-p3))
+        z0 = point_1_mm[2]
+
+        g = p1 * z2 / z0
+
+        # for points p1, p2
+        a = (p2[0] / z0)**2 + (p2[1] / z0)**2 + (p2[2] / z0)**2
+        b = -2*g[0]*p2[0]/z0 -2*g[1]*p2[1]/z0 -2*g[2]*p2[2]/z0
+        c = g[0]**2 + g[1]**2 + g[2]**2 - distances_mm[0]**2
+
+
+        x1_f, x2_f = quadratic_solver(a, b, c)
+
+        print("p1-p2")
+        print(x1_f)
+        print(x2_f)
+
+        g = p3 * z2 / z0
+        # for points p2, p3
+        a = (p2[0] / z0)**2 + (p2[1] / z0)**2 + (p2[2] / z0)**2
+        b = -2*g[0]*p2[0]/z0 -2*g[1]*p2[1]/z0 -2*g[2]*p2[2]/z0
+        c = g[0]**2 + g[1]**2 + g[2]**2 - distances_mm[1]**2
+        x1_s, x2_s = quadratic_solver(a, b, c)
+
+        print("p2-p3")
+        print(x1_s)
+        print(x2_s)
+        
+        if abs(x1_f - x1_s) <= eps_mm:
+            z3 = (x1_f + x1_s)/2
+        elif abs(x1_f - x2_s) <= eps_mm:
+            z3 = (x1_f + x2_s)/2
+        elif abs(x2_f - x1_s) <= eps_mm:
+            z3 = (x2_f + x1_s) /2
+        elif abs(x2_f - x2_s) <= eps_mm:
+            z3 = (x2_f + x2_s) / 2
+        else:
+            print(f"Obtained distances are not within {eps_mm} mm.")
+
+        return (z2, z3, z2)
 
 def quadratic_solver(a, b, c):
     x1 = (-b + np.sqrt(b**2 - 4 * a * c)) / (2*a)
@@ -390,7 +418,7 @@ def calibrate(initial_position_mm, width_mm, height_mm, delta_mm, sensor_ids):
     p1, p2, p3 = identify_points(fine_laser_coords[0], fine_laser_coords[1], fine_laser_coords[2])
 
     # adjust distances according to calibration plat geometry (assumed 100 mm spacing)
-    p1_z, p2_z, p3_z = find_distances_from_mirror_center(point_1_mm=p1, point_2_mm=p2, point_3_mm=p3, distances_mm=[100, 100*np.sqrt(2), 100], eps_mm=5)
+    p1_z, p2_z, p3_z = find_distances_from_mirror_center(point_1_mm=p1, point_2_mm=p2, point_3_mm=p3, distances_mm=[50, 50, 100], eps_mm=5)
 
     real_zs = [p1_z, p2_z, p3_z]
     identified_points = [p1, p2, p3]
@@ -504,7 +532,6 @@ def test_sensor_reading():
         print("Sensor 3: ", get_sensor_reading(3))
         time.sleep(1)
 
-#print(find_distances_from_mirror_center(point_1_mm=[20, 20, 10], point_2_mm=[30, 30, 10], point_3_mm=[20, 30, 10], distances_mm=[170.88, 135.65, 60]))
 
 # test_detect_multiple_circles()
 
