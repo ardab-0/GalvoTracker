@@ -126,6 +126,12 @@ def remove_outliers(A, r):
 	#squared_distance[squ]
 
 
+def argsort(seq):
+    """
+		sort smallest to largest
+	"""
+    return sorted(range(len(seq)), key=seq.__getitem__)
+
 
 if __name__ == "__main__":
 	
