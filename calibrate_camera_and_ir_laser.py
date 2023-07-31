@@ -11,7 +11,7 @@ from circle_detector_library.circle_detector_module import *
 import optoMDC
 from mirror.coordinate_transformation import CoordinateTransform
 import time
-from utils import optimal_rotation_and_translation
+from utils import optimal_rotation_and_translation, argsort
 import pickle
 import sys
 import matplotlib.pyplot as plt
@@ -368,39 +368,72 @@ def quadratic_solver(a, b, c):
 
     return x1, x2
 
-def identify_points(point1, point2, point3):
+def identify_points(point1, point2, point3, is_colinear=True):
     """
-        Identify points and order them according to their position on calibration plate
+            ------------------------------------------------------------------------------------------------------------------------------------------
+    if is_colinear=True
+        point 1 point 2 and point 3 must have same x distance on the target plate, target plate must be perpendicular to ground, laser must be parallel to ground
         Calibration plate point order should be:
+
         ---------------------
-        |    p1       p2    |
-        |                   |
+        |    p1             |
+        |    p2             |
         |    p3             |
         ---------------------
 
+    else: 
+        point 1 and point 3 must have same x distance on the target plate, target plate must be perpendicular to ground, laser must be parallel to ground
+        Calibration plate point order should be:
+
+        ---------------------
+        |    p1          p2 |
+        |                   |
+        |    p3             |
+        ---------------------
+    ---------------------------------------------------------------------------------------------------------------------------------------
+
+        Identify points and order them according to their position on calibration plate
+       
         point1: list [x, y, z]
         point2: list [x, y, z]
         point3: list [x, y, z]
     """
-    points = [point1, point2, point3]
 
-    max_x = -100000000000000000 # arbitrary small number
-    max_x_idx = None
-    for i, p in enumerate(points):
-        if p[0] >= max_x:
-            max_x = p[0]
-            max_x_idx = i
+    if is_colinear:
 
-    idx_set = set([0, 1, 2])
-    idx_set.remove(max_x_idx)
-    idx_list = list(idx_set)
-    idx_1 = idx_list[0]
-    idx_2 = idx_list[1]
+        points = [point1, point2, point3]
+        point_y = []
+        point_y.append(point1[1])
+        point_y.append(point2[1])
+        point_y.append(point3[1])
 
-    if points[idx_1][1] >= points[idx_2][1]:
-        return points[idx_2], points[max_x_idx], points[idx_1]  # p1, p2, p3
+        sorted_args = argsort(point_y)
+
+        return points[sorted_args[0]], points[sorted_args[1]], points[sorted_args[2]] # p1, p2, p3
+
+
+        
+
     else:
-        return points[idx_1], points[max_x_idx], points[idx_2]  # p1, p2, p3
+        points = [point1, point2, point3]
+
+        max_x = -100000000000000000 # arbitrary small number
+        max_x_idx = None
+        for i, p in enumerate(points):
+            if p[0] >= max_x:
+                max_x = p[0]
+                max_x_idx = i
+
+        idx_set = set([0, 1, 2])
+        idx_set.remove(max_x_idx)
+        idx_list = list(idx_set)
+        idx_1 = idx_list[0]
+        idx_2 = idx_list[1]
+
+        if points[idx_1][1] >= points[idx_2][1]:
+            return points[idx_2], points[max_x_idx], points[idx_1]  # p1, p2, p3
+        else:
+            return points[idx_1], points[max_x_idx], points[idx_2]  # p1, p2, p3
 
 
 
