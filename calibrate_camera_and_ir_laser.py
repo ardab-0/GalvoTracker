@@ -202,17 +202,51 @@ def get_fine_laser_positions(rough_laser_coords):
     
 
 class Multiple_Circle_Detector:
-    def __init__(self, max_detection_count=5):
+    def __init__(self, max_detection_count=3):
         self.max_detection_count = max_detection_count 
         self.previous_circles = []
+
+    def get_surrounding_ellipse_points(self, detected_circle):
+        points = []
+        
+        x = detected_circle.x
+        y = detected_circle.y
+        v0 = detected_circle.v0
+        m0 = detected_circle.m0
+        v1 = detected_circle.v1
+        m1 = detected_circle.m1
+
+        e = 0
+        while e <= 2 * np.pi:
+            fx = x + np.cos(e) * v0 * m0 * 2 + v1 * m1 * 2 * np.sin(e)
+            fy = y + np.cos(e) * v1 * m0 * 2 - v0 * m1 * 2 * np.sin(e)
+            fxi = (int)(fx + 0.5)
+            fyi = (int)(fy + 0.5)
+            if fxi >= 0 and fxi < self.img_width and fyi >= 0 and fyi < self.img_height:
+                points.append([fxi, fyi])
+
+            e += 0.05
+
+        points = np.array(points, np.int32)
+        return points
+
+    def get_circle_coordinates(self, circles):
+        """
+            circles: list of detected circles
+        """
+        circle_coordinates = []
+        for circle in circles:
+            circle_coordinates.append([circle.x, circle.y])
+
+        return circle_coordinates
 
     def detect_multiple_circles(self, image, ):
         """
             returns detected circle coordinates as a list
         """
         img = image.copy()
-        img_height = img.shape[0]
-        img_width = img.shape[1]
+        self.img_height = img.shape[0]
+        self.img_width = img.shape[1]
 
         print(img.shape)
         detected_circles = []
@@ -225,7 +259,7 @@ class Multiple_Circle_Detector:
             else:
                 prevCircle = CircleClass()
 
-            circle_detector = CircleDetectorClass(img_width, img_height)
+            circle_detector = CircleDetectorClass(self.img_width, self.img_height)
             detected_circle = circle_detector.detect_np(img, prevCircle)
             
 
@@ -246,34 +280,14 @@ class Multiple_Circle_Detector:
                 thickness=2,
             )
 
-            points = []
-
-            x = detected_circle.x
-            y = detected_circle.y
-            v0 = detected_circle.v0
-            m0 = detected_circle.m0
-            v1 = detected_circle.v1
-            m1 = detected_circle.m1
-
-            e = 0
-            while e <= 2 * np.pi:
-                fx = x + np.cos(e) * v0 * m0 * 2 + v1 * m1 * 2 * np.sin(e)
-                fy = y + np.cos(e) * v1 * m0 * 2 - v0 * m1 * 2 * np.sin(e)
-                fxi = (int)(fx + 0.5)
-                fyi = (int)(fy + 0.5)
-                if fxi >= 0 and fxi < img_width and fyi >= 0 and fyi < img_height:
-                    points.append([fxi, fyi])
-
-                e += 0.05
-
-            points = np.array(points, np.int32)
+            points = self.get_surrounding_ellipse_points(detected_circle=detected_circle)
             points = points.reshape((-1, 1, 2))
             cv2.fillPoly(img, [points], (0,0,255))
             # plt.imshow(img)
             # plt.show()
             i += 1
         self.previous_circles = detected_circle_objects
-        return detected_circles, img
+        return detected_circle_objects, img
 
 
 
@@ -436,62 +450,112 @@ def identify_points(point1, point2, point3, is_colinear=True):
             return points[idx_1], points[max_x_idx], points[idx_2]  # p1, p2, p3
 
 
+def get3d_coords_from_pixel_coords(pix_coords, transformed_depth_img):
+    pix_x, pix_y = pix_coords
+    rgb_depth = transformed_depth_img[pix_y, pix_x]
+    pixels = k4a_float2_t((pix_x, pix_y))
+    pos3d_color = device.calibration.convert_2d_to_3d(pixels, rgb_depth, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_COLOR)
+    coordinates_3d = np.array([pos3d_color.xyz.x, pos3d_color.xyz.y, pos3d_color.xyz.z]).reshape((3, 1))
+    return coordinates_3d
 
+
+def get_sensor_pos_from_marker_pos(transformed_depth_img, marker_coords, marker_surrounding_ellipse_points, position_of_sensor_mm):
+    """
+        transformed_depth_img: depth image transformed into color image coordinate system
+        marker_coords: ndarray (1x2)
+        marker_surrounding_ellipse_points: ndarray (Nx2)
+        position_of_sensor_mm: ndarray (3,)
+
+    """
+    
+    # get sample points inside marker
+    x_diff = np.abs(marker_surrounding_ellipse_points[:,0] - marker_coords[0, 0])
+    x_sorted_args =  np.argsort(x_diff)
+
+    print("h")
+
+def record_color_and_depth_image():
+    while True:
+        capture = device.update()
+        ret_color, color_image = capture.get_color_image() 
+
+        ret_depth, transformed_depth_image = capture.get_transformed_depth_image()
+        if not ret_color or not ret_depth:
+            continue  
+
+        if cv2.waitKey(1) == ord('s'):
+            cv2.imwrite("color_im.png", color_image)
+            cv2.imwrite("transformed_depth_img.png", transformed_depth_image)
+        
+        cv2.imshow("image", color_image)
+        #cv2.imshow("image", transformed_depth_image)
+        if cv2.waitKey(1) == ord('q'):
+            break
 
 
 def calibrate(initial_position_mm, width_mm, height_mm, delta_mm, sensor_ids):
 
-    # find precise location of infrared detectors using laser
-    coarse_laser_pos = get_coarse_laser_positions(initial_position_mm, width_mm, height_mm, delta_mm, sensor_ids)
-    print("Coarse laser position: ", coarse_laser_pos)
+    # # find precise location of infrared detectors using laser
+    # coarse_laser_pos = get_coarse_laser_positions(initial_position_mm, width_mm, height_mm, delta_mm, sensor_ids)
+    # print("Coarse laser position: ", coarse_laser_pos)
 
-    fine_laser_coords = get_fine_laser_positions(coarse_laser_pos)
-    print("Fine laser position: ",fine_laser_coords)
+    # fine_laser_coords = get_fine_laser_positions(coarse_laser_pos)
+    # print("Fine laser position: ",fine_laser_coords)
 
-    p1, p2, p3 = identify_points(fine_laser_coords[0], fine_laser_coords[1], fine_laser_coords[2])
+    # p1, p2, p3 = identify_points(fine_laser_coords[0], fine_laser_coords[1], fine_laser_coords[2])
 
-    # adjust distances according to calibration plat geometry (assumed 100 mm spacing)
-    p1_z, p2_z, p3_z = find_distances_from_mirror_center(point_1_mm=p1, point_2_mm=p2, point_3_mm=p3, distances_mm=[50, 50, 100], eps_mm=5)
+    # # adjust distances according to calibration plat geometry (assumed 100 mm spacing)
+    # p1_z, p2_z, p3_z = find_distances_from_mirror_center(point_1_mm=p1, point_2_mm=p2, point_3_mm=p3, distances_mm=[50, 50, 100], eps_mm=5)
 
-    real_zs = [p1_z, p2_z, p3_z]
-    identified_points = [p1, p2, p3]
+    # real_zs = [p1_z, p2_z, p3_z]
+    # identified_points = [p1, p2, p3]
 
-    # laser detector positions in laser mirror coordinate system
-    real_3d_coords = []
+    # # laser detector positions in laser mirror coordinate system
+    # real_3d_coords = []
 
-    for i in range(len(real_zs)):
-        sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=[identified_points[i][0], identified_points[i][1], real_zs[i]], width_mm=50, height_mm=50, delta_mm=2, sensor_id=i+1)
-        sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=max_pos, width_mm=10, height_mm=10, delta_mm=0.2, sensor_id=i+1)
+    # for i in range(len(real_zs)):
+    #     sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=[identified_points[i][0], identified_points[i][1], real_zs[i]], width_mm=50, height_mm=50, delta_mm=2, sensor_id=i+1)
+    #     sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=max_pos, width_mm=10, height_mm=10, delta_mm=0.2, sensor_id=i+1)
 
-        real_3d_coords.append(max_pos)
+    #     real_3d_coords.append(max_pos)
 
-    # # find location of laser detectors using depth camera
-    # ret_color = False
-    # multiple_circle_detector = Multiple_Circle_Detector()
-    # while True:
-    #     capture = device.update()
-    #     ret_color, color_image = capture.get_color_image() 
-    #     if not ret_color:
-    #         continue
-    #     # color_image = cv2.imread("circle-medium.png")
-    #     circle_coordinates, marked_image = multiple_circle_detector.detect_multiple_circles(color_image)  
-    #     print(circle_coordinates)
-    #     if len(circle_coordinates) == 3:
-    #         break        
-    #     cv2.imshow("image", marked_image)
-    #     if cv2.waitKey(1) == ord('q'):
-    #         break
+    # find location of laser detectors using depth camera
+    ret_color = False
+    multiple_circle_detector = Multiple_Circle_Detector()
+    while True:
+        capture = device.update()
+        ret_color, color_image = capture.get_color_image() 
 
+        ret_depth, transformed_depth_image = capture.get_transformed_depth_image()
+        if not ret_color or not ret_depth:
+            continue  
+        # color_image = cv2.imread("circle-medium.png")
+        circles, marked_image = multiple_circle_detector.detect_multiple_circles(color_image)  
+        circle_coordinates = multiple_circle_detector.get_circle_coordinates(circles)
+        print(circle_coordinates)
+        if len(circle_coordinates) == 3:
+            break   
+        
+        
+
+        cv2.imshow("image", marked_image)
+        if cv2.waitKey(1) == ord('q'):
+            break
     
-    # p1_cam, p2_cam, p3_cam = identify_points(circle_coordinates[0], circle_coordinates[1], circle_coordinates[2])
+    for circle in circles:
+        circle_coordinates = multiple_circle_detector.get_circle_coordinates([circle])
+        surrounding_points = multiple_circle_detector.get_surrounding_ellipse_points(circle)
+        get_sensor_pos_from_marker_pos(transformed_depth_image, marker_coords=np.array(circle_coordinates[0]).reshape((1, 2)), marker_surrounding_ellipse_points=surrounding_points, position_of_sensor_mm=np.array([-50, 0, 0]))
+    
+    p1_cam, p2_cam, p3_cam = identify_points(circle_coordinates[0], circle_coordinates[1], circle_coordinates[2])
 
-    # print(f"Point1 Laser: {p1},   Camera: {p1_cam}")
-    # print(f"Point1 Laser: {p2},   Camera: {p2_cam}")
-    # print(f"Point1 Laser: {p3},   Camera: {p3_cam}")
+    print(f"Point1 Laser: {p1},   Camera: {p1_cam}")
+    print(f"Point1 Laser: {p2},   Camera: {p2_cam}")
+    print(f"Point1 Laser: {p3},   Camera: {p3_cam}")
 
-    print(f"Point1 Laser: {real_3d_coords[0]}")
-    print(f"Point2 Laser: {real_3d_coords[1]}")
-    print(f"Point3 Laser: {real_3d_coords[2]}")
+    # print(f"Point1 Laser: {real_3d_coords[0]}")
+    # print(f"Point2 Laser: {real_3d_coords[1]}")
+    # print(f"Point3 Laser: {real_3d_coords[2]}")
 
 
     
@@ -532,7 +596,8 @@ def test_detect_multiple_circles():
         if not ret_color:
             continue
         # color_image = cv2.imread("circle-medium.png")
-        circle_coordinates, marked_image = multiple_circle_detector.detect_multiple_circles(color_image)   
+        detected_circles, marked_image = multiple_circle_detector.detect_multiple_circles(color_image)   
+        circle_coordinates = multiple_circle_detector.get_circle_coordinates(detected_circles)
         print(circle_coordinates)
         cv2.imshow("image", marked_image)
         if cv2.waitKey(1) == ord('q'):
