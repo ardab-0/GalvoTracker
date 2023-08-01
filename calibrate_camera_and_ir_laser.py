@@ -467,12 +467,71 @@ def get_sensor_pos_from_marker_pos(transformed_depth_img, marker_coords, marker_
         position_of_sensor_mm: ndarray (3,)
 
     """
+    def check_points_y(y1, y2):
+        if marker_coords[0,1] >= y1:
+            if marker_coords[0, 1] < y2:
+                return True
+        else:
+            if marker_coords[0, 1] > y2:
+                return True
+        return False
+    
+    def check_points_x(x1, x2):
+        if marker_coords[0,0] >= x1:
+            if marker_coords[0, 0] < x2:
+                return True
+        else:
+            if marker_coords[0, 0] > x2:
+                return True
+        return False
     
     # get sample points inside marker
     x_diff = np.abs(marker_surrounding_ellipse_points[:,0] - marker_coords[0, 0])
     x_sorted_args =  np.argsort(x_diff)
 
-    print("h")
+    iy = 1
+    y1 = marker_surrounding_ellipse_points[x_sorted_args[0], 1]
+    while iy < len(x_sorted_args):
+        y2 = marker_surrounding_ellipse_points[x_sorted_args[iy], 1]
+        if check_points_y(y1, y2):
+            break
+        iy+=1
+
+
+    y_diff = np.abs(marker_surrounding_ellipse_points[:,1] - marker_coords[0, 1])
+    y_sorted_args =  np.argsort(y_diff)
+
+    ix = 1
+    x1 = marker_surrounding_ellipse_points[y_sorted_args[0], 0]
+    while ix < len(y_sorted_args):
+        x2 = marker_surrounding_ellipse_points[y_sorted_args[ix], 0]
+        if check_points_x(x1, x2):
+            break
+        ix+=1
+
+    
+    if ix == len(y_sorted_args) or iy == len(x_sorted_args):
+        print("Could not find proper bounds.")
+        return None
+    
+    y_bounds = [y1, y2]
+    x_bounds = [x1, x2]
+    y_bounds = y_bounds.sort()
+    x_bounds = x_bounds.sort()
+
+    dx_left = marker_coords[0, 0] - x_bounds[0]
+    dx_right =  x_bounds[1] - marker_coords[0, 0] 
+
+    dy_down = marker_coords[0, 1] - y_bounds[0]
+    dy_up =  y_bounds[1] - marker_coords[0, 1] 
+
+
+
+
+
+
+    
+
 
 def record_color_and_depth_image():
     while True:
@@ -637,5 +696,7 @@ def test_sensor_reading():
 
 #test_search_for_multiple_laser_position()
 
-calibrate(initial_position_mm=[-40, 50, 500], width_mm=180, height_mm=150, delta_mm=3, sensor_ids=[1, 2, 3])
+#calibrate(initial_position_mm=[-40, 50, 500], width_mm=180, height_mm=150, delta_mm=3, sensor_ids=[1, 2, 3])
 
+
+record_color_and_depth_image()
