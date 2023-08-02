@@ -459,78 +459,37 @@ def get3d_coords_from_pixel_coords(pix_coords, transformed_depth_img):
     return coordinates_3d
 
 
-def get_sensor_pos_from_marker_pos(transformed_depth_img, marker_coords, marker_surrounding_ellipse_points, position_of_sensor_mm):
+def get_sensor_pos_from_marker_pos(p1, p2, p3, distance_of_sensor_from_marker_mm, distance_of_second_sensor_from_first_sensor_mm):
     """
         transformed_depth_img: depth image transformed into color image coordinate system
-        marker_coords: ndarray (1x2)
-        marker_surrounding_ellipse_points: ndarray (Nx2)
-        position_of_sensor_mm: ndarray (3,)
+        p1, p2, p3: 3d camera positions of markers (3D)
+        distance_of_sensor_from_marker_mm: float, position of first sensor relative to first marker (- if sensor is on the left, + if sensor is on the right) 
+        distance_of_second_sensor_from_first_sensor_mm: float 
 
+
+        Sensor placement:
+         ---------------------
+        |    p1             |
+        |    p2             |
+        |    p3             |
+        ---------------------
+        Marker placement:
+
+        ---------------------
+        |    p1          p2 |
+        |                   |
+        |    p3             |
+        --------------------- 
     """
-    def check_points_y(y1, y2):
-        if marker_coords[0,1] >= y1:
-            if marker_coords[0, 1] < y2:
-                return True
-        else:
-            if marker_coords[0, 1] > y2:
-                return True
-        return False
-    
-    def check_points_x(x1, x2):
-        if marker_coords[0,0] >= x1:
-            if marker_coords[0, 0] < x2:
-                return True
-        else:
-            if marker_coords[0, 0] > x2:
-                return True
-        return False
-    
-    # get sample points inside marker
-    x_diff = np.abs(marker_surrounding_ellipse_points[:,0] - marker_coords[0, 0])
-    x_sorted_args =  np.argsort(x_diff)
 
-    iy = 1
-    y1 = marker_surrounding_ellipse_points[x_sorted_args[0], 1]
-    while iy < len(x_sorted_args):
-        y2 = marker_surrounding_ellipse_points[x_sorted_args[iy], 1]
-        if check_points_y(y1, y2):
-            break
-        iy+=1
+    r_vec, d_vec = extract_unit_vectors(p1, p2, p3)
 
 
-    y_diff = np.abs(marker_surrounding_ellipse_points[:,1] - marker_coords[0, 1])
-    y_sorted_args =  np.argsort(y_diff)
+    sensor_pos_1 = p1 + r_vec * distance_of_sensor_from_marker_mm
+    sensor_pos_2 = sensor_pos_1 + d_vec * distance_of_second_sensor_from_first_sensor_mm
+    sensor_pos_3 = sensor_pos_2 + d_vec * distance_of_second_sensor_from_first_sensor_mm
 
-    ix = 1
-    x1 = marker_surrounding_ellipse_points[y_sorted_args[0], 0]
-    while ix < len(y_sorted_args):
-        x2 = marker_surrounding_ellipse_points[y_sorted_args[ix], 0]
-        if check_points_x(x1, x2):
-            break
-        ix+=1
-
-    
-    if ix == len(y_sorted_args) or iy == len(x_sorted_args):
-        print("Could not find proper bounds.")
-        return None
-    
-    y_bounds = [y1, y2]
-    x_bounds = [x1, x2]
-    y_bounds = y_bounds.sort()
-    x_bounds = x_bounds.sort()
-
-    dx_left = marker_coords[0, 0] - x_bounds[0]
-    dx_right =  x_bounds[1] - marker_coords[0, 0] 
-
-    dy_down = marker_coords[0, 1] - y_bounds[0]
-    dy_up =  y_bounds[1] - marker_coords[0, 1] 
-
-
-
-
-
-
-    
+    return sensor_pos_1, sensor_pos_2, sensor_pos_3
 
 
 def record_color_and_depth_image():
@@ -550,6 +509,13 @@ def record_color_and_depth_image():
         #cv2.imshow("image", transformed_depth_image)
         if cv2.waitKey(1) == ord('q'):
             break
+
+
+def extract_unit_vectors(p1, p2, p3):
+    right_vec = (p2 - p1) / np.linalg.norm(p2-p1)
+    down_vec = (p3 - p1) / np.linalg.norm(p3-p1)
+
+    return right_vec, down_vec
 
 
 def calibrate(initial_position_mm, width_mm, height_mm, delta_mm, sensor_ids):
@@ -601,16 +567,18 @@ def calibrate(initial_position_mm, width_mm, height_mm, delta_mm, sensor_ids):
         if cv2.waitKey(1) == ord('q'):
             break
     
-    for circle in circles:
-        circle_coordinates = multiple_circle_detector.get_circle_coordinates([circle])
-        surrounding_points = multiple_circle_detector.get_surrounding_ellipse_points(circle)
-        get_sensor_pos_from_marker_pos(transformed_depth_image, marker_coords=np.array(circle_coordinates[0]).reshape((1, 2)), marker_surrounding_ellipse_points=surrounding_points, position_of_sensor_mm=np.array([-50, 0, 0]))
+   
     
-    p1_cam, p2_cam, p3_cam = identify_points(circle_coordinates[0], circle_coordinates[1], circle_coordinates[2])
+    p1_cam, p2_cam, p3_cam = identify_points(circle_coordinates[0], circle_coordinates[1], circle_coordinates[2], is_colinear=False)
 
-    print(f"Point1 Laser: {p1},   Camera: {p1_cam}")
-    print(f"Point1 Laser: {p2},   Camera: {p2_cam}")
-    print(f"Point1 Laser: {p3},   Camera: {p3_cam}")
+    p1_cam_3d = get3d_coords_from_pixel_coords(p1_cam, transformed_depth_img=transformed_depth_image)
+    p2_cam_3d = get3d_coords_from_pixel_coords(p2_cam, transformed_depth_img=transformed_depth_image)
+    p3_cam_3d = get3d_coords_from_pixel_coords(p3_cam, transformed_depth_img=transformed_depth_image)
+
+
+    sensor_pos_cam_1, sensor_pos_cam_2, sensor_pos_cam_3 = get_sensor_pos_from_marker_pos(p1_cam_3d, p2_cam_3d, p3_cam_3d, distance_of_sensor_from_marker_mm=-50, distance_of_second_sensor_from_first_sensor_mm=50)
+
+    
 
     # print(f"Point1 Laser: {real_3d_coords[0]}")
     # print(f"Point2 Laser: {real_3d_coords[1]}")
