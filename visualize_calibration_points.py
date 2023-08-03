@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pickle
 
 def main():
-    save_path = "calibration_parameters"
+    save_path = "ir_calibration_parameters"
 
 
     fig = plt.figure()
