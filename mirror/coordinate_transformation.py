@@ -196,7 +196,7 @@ class CoordinateTransform():
             
             if (i+1)/n_target> progress+0.1:
                 progress = i/n_target
-                print(int(round(progress,1)*100), '%')
+                #print(int(round(progress,1)*100), '%')
         
         # get indices for feasible points:
         i_feasible = []    
