@@ -599,6 +599,20 @@ def set_initial_laser_pos(initial_z=540):
 
     return mirror_x, mirror_y, mirror_z  # x, y, z position of laser
 
+def update_laser_position(old_point, z_new):
+    """
+        old_point: list length 3 
+        z_new: float
+
+        updates measured laser position by using calculated distance from mirror center (z_new) and initial distance assumption (z_old)
+    """
+    scale = z_new / old_point[2]
+
+    new_point = scale * np.array(old_point)
+
+    return new_point
+
+
 def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
     laser_points = []
     camera_points = []
@@ -661,9 +675,23 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
 
         sensor_pos_cam_1, sensor_pos_cam_2, sensor_pos_cam_3 = get_sensor_pos_from_marker_pos(avg_p1_cam_3d, avg_p2_cam_3d, avg_p3_cam_3d, distance_of_sensor_from_marker_mm=-65.5, distance_of_second_sensor_from_first_sensor_mm=50)
 
+        camera_points.append(sensor_pos_cam_1.reshape((-1)))
+        camera_points.append(sensor_pos_cam_2.reshape((-1)))
+        camera_points.append(sensor_pos_cam_3.reshape((-1)))
+
+        if num_iter > 0:
+            temp_camera_points_np = np.array(camera_points).T
+            initial_camera_points_np = temp_camera_points_np[:, 0:3]
+            current_camera_points_np = temp_camera_points_np[:, num_iter*3:(num_iter+1)*3]
+
+            R_cam, t_cam = optimal_rotation_and_translation(initial_camera_points_np, current_camera_points_np)
+            initial_search_point = R_cam @ p2_updated.reshape((3, 1)) + t_cam
+            x_init, y_init, z_init = initial_search_point[0, 0], initial_search_point[1, 0], initial_search_point[2, 0]
+        else:
+            x_init, y_init, z_init = set_initial_laser_pos()
 
         #################################### find precise location of infrared detectors using laser #######################################################
-        x_init, y_init, z_init = set_initial_laser_pos()
+        
 
 
         coarse_laser_pos = get_coarse_laser_positions([x_init, y_init, z_init], width_mm, height_mm, delta_mm, sensor_ids)
@@ -677,37 +705,24 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
         # adjust distances according to calibration plat geometry (assumed 100 mm spacing)
         p1_z, p2_z, p3_z = find_distances_from_mirror_center(point_1_mm=p1, point_2_mm=p2, point_3_mm=p3, distances_mm=[50, 50, 100], eps_mm=5) # all of  the zs are same
 
-        # repeat with known z
-        x_init, y_init, z_init = set_initial_laser_pos(initial_z=p1_z)
-        coarse_laser_pos = get_coarse_laser_positions([x_init, y_init, z_init], width_mm, height_mm, delta_mm, sensor_ids)
-        print("Coarse laser position: ", coarse_laser_pos)
+        p1_updated = update_laser_position(old_point=p1, z_new=p1_z)
+        p2_updated = update_laser_position(old_point=p2, z_new=p2_z)
+        p3_updated = update_laser_position(old_point=p3, z_new=p3_z)
 
-        fine_laser_coords = get_fine_laser_positions(coarse_laser_pos)
-        print("Fine laser position: ",fine_laser_coords)
-
-        p1, p2, p3 = identify_points(fine_laser_coords[0], fine_laser_coords[1], fine_laser_coords[2])
-
-        # adjust distances according to calibration plat geometry (assumed 100 mm spacing)
-        p1_z, p2_z, p3_z = find_distances_from_mirror_center(point_1_mm=p1, point_2_mm=p2, point_3_mm=p3, distances_mm=[50, 50, 100], eps_mm=5) # all of  the zs are same
-
-        real_zs = [p1_z, p2_z, p3_z]
-        identified_points = [p1, p2, p3]
+        updated_points = [p1_updated, p2_updated, p3_updated]
 
         # laser detector positions in laser mirror coordinate system
         real_3d_coords = []
 
-        for i in range(len(real_zs)):
-            sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=[identified_points[i][0], identified_points[i][1], real_zs[i]], width_mm=50, height_mm=50, delta_mm=2, sensor_id=i+1)
+        for i in range(len(updated_points)):
+            sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=[updated_points[i][0], updated_points[i][1], updated_points[i][2]], width_mm=50, height_mm=50, delta_mm=2, sensor_id=i+1)
             sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=max_pos, width_mm=10, height_mm=10, delta_mm=0.2, sensor_id=i+1)
 
             real_3d_coords.append(max_pos)
 
 
 
-        laser_points.extend(real_3d_coords)
-        camera_points.append(sensor_pos_cam_1.reshape((-1)))
-        camera_points.append(sensor_pos_cam_2.reshape((-1)))
-        camera_points.append(sensor_pos_cam_3.reshape((-1)))
+        laser_points.extend(real_3d_coords)        
         num_iter+=1
         print(f"Press enter to continue with iteration {num_iter}." )
         cv2.waitKey(0)
