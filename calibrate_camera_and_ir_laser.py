@@ -23,8 +23,8 @@ import tkinter as tk
 d = 0
 mirror_rotation_deg = 45
 save_path = "ir_calibration_parameters"
-CAPTURE_COUNT = 5
-ITER_COUNT = 3
+CAPTURE_COUNT = 6
+ITER_COUNT = 5
 PI_COM_PORT = "COM6"
 
 # global variables
@@ -675,24 +675,22 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
 
         sensor_pos_cam_1, sensor_pos_cam_2, sensor_pos_cam_3 = get_sensor_pos_from_marker_pos(avg_p1_cam_3d, avg_p2_cam_3d, avg_p3_cam_3d, distance_of_sensor_from_marker_mm=-65.5, distance_of_second_sensor_from_first_sensor_mm=50)
 
-        camera_points.append(sensor_pos_cam_1.reshape((-1)))
-        camera_points.append(sensor_pos_cam_2.reshape((-1)))
-        camera_points.append(sensor_pos_cam_3.reshape((-1)))
+        
 
-        if num_iter > 0:
-            temp_camera_points_np = np.array(camera_points).T
-            initial_camera_points_np = temp_camera_points_np[:, 0:3]
-            current_camera_points_np = temp_camera_points_np[:, num_iter*3:(num_iter+1)*3]
+        # if num_iter > 0:
+        #     temp_camera_points_np = np.array(camera_points).T
+        #     initial_camera_points_np = temp_camera_points_np[:, 0:3]
+        #     current_camera_points_np = temp_camera_points_np[:, num_iter*3:(num_iter+1)*3]
 
-            R_cam, t_cam = optimal_rotation_and_translation(initial_camera_points_np, current_camera_points_np)
-            initial_search_point = R_cam @ p2_updated.reshape((3, 1)) + t_cam
-            x_init, y_init, z_init = initial_search_point[0, 0], initial_search_point[1, 0], initial_search_point[2, 0]
-        else:
-            x_init, y_init, z_init = set_initial_laser_pos()
+        #     R_cam, t_cam = optimal_rotation_and_translation(initial_camera_points_np, current_camera_points_np)
+        #     initial_search_point = R_cam @ p2_updated.reshape((3, 1)) + t_cam
+        #     x_init, y_init, z_init = initial_search_point[0, 0], initial_search_point[1, 0], initial_search_point[2, 0]
+        # else:
+        #     x_init, y_init, z_init = set_initial_laser_pos()
 
         #################################### find precise location of infrared detectors using laser #######################################################
         
-
+        x_init, y_init, z_init = set_initial_laser_pos()
 
         coarse_laser_pos = get_coarse_laser_positions([x_init, y_init, z_init], width_mm, height_mm, delta_mm, sensor_ids)
         print("Coarse laser position: ", coarse_laser_pos)
@@ -720,12 +718,16 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
 
             real_3d_coords.append(max_pos)
 
-
-
-        laser_points.extend(real_3d_coords)        
-        num_iter+=1
-        print(f"Press enter to continue with iteration {num_iter}." )
-        cv2.waitKey(0)
+        print(f"Press s to save measurements, another character to discard measurements in current iteration." )
+        key = cv2.waitKey(0)
+        if  key== ord('s'):
+            camera_points.append(sensor_pos_cam_1.reshape((-1)))
+            camera_points.append(sensor_pos_cam_2.reshape((-1)))
+            camera_points.append(sensor_pos_cam_3.reshape((-1)))
+            laser_points.extend(real_3d_coords)        
+            num_iter+=1
+        
+        
 
 
 
