@@ -111,7 +111,7 @@ def search_for_laser_position(initial_position_mm, width_mm, height_mm, delta_mm
         si_0.SetXY(y_m[i])
         si_1.SetXY(x_m[i])
 
-        time.sleep(0.0001)
+        #time.sleep(0.0001)
         sensor_readings.append(get_sensor_reading(sensor_id))
 
     sensor_readings = np.array(sensor_readings)
@@ -677,21 +677,27 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
         sensor_pos_cam_1, sensor_pos_cam_2, sensor_pos_cam_3 = get_sensor_pos_from_marker_pos(avg_p1_cam_3d, avg_p2_cam_3d, avg_p3_cam_3d, distance_of_sensor_from_marker_mm=-73, distance_of_second_sensor_from_first_sensor_mm=75)
 
         
+        # deduce new position by using marker pattern if it is possible
+        if num_iter > 0:
+            current_camera_points = []
+            current_camera_points.append(sensor_pos_cam_1.reshape((-1)))
+            current_camera_points.append(sensor_pos_cam_2.reshape((-1)))
+            current_camera_points.append(sensor_pos_cam_3.reshape((-1)))
 
-        # if num_iter > 0:
-        #     temp_camera_points_np = np.array(camera_points).T
-        #     initial_camera_points_np = temp_camera_points_np[:, 0:3]
-        #     current_camera_points_np = temp_camera_points_np[:, num_iter*3:(num_iter+1)*3]
+            current_camera_points_np = np.array(current_camera_points).T
+            previous_camera_points_np = np.array(camera_points[3*(num_iter-1):3*num_iter]).T
 
-        #     R_cam, t_cam = optimal_rotation_and_translation(initial_camera_points_np, current_camera_points_np)
-        #     initial_search_point = R_cam @ p2_updated.reshape((3, 1)) + t_cam
-        #     x_init, y_init, z_init = initial_search_point[0, 0], initial_search_point[1, 0], initial_search_point[2, 0]
-        # else:
-        #     x_init, y_init, z_init = set_initial_laser_pos()
+            diff = current_camera_points_np - previous_camera_points_np
+            average_diff = np.mean(diff, axis=1)
 
-        #################################### find precise location of infrared detectors using laser #######################################################
+            initial_search_point = p2_updated.reshape((3, 1)) + average_diff.reshape((3, 1))
+            x_init, y_init, z_init = initial_search_point[0, 0], initial_search_point[1, 0], initial_search_point[2, 0]
+        else:
+            x_init, y_init, z_init = set_initial_laser_pos()
+
+        #################################### find location of infrared detectors using laser #######################################################
         
-        x_init, y_init, z_init = set_initial_laser_pos()
+        #x_init, y_init, z_init = set_initial_laser_pos()
 
         coarse_laser_pos = get_coarse_laser_positions([x_init, y_init, z_init], width_mm, height_mm, delta_mm, sensor_ids)
         print("Coarse laser position: ", coarse_laser_pos)
@@ -848,9 +854,9 @@ def test_sensor_reading():
 
 
 
-test_search_laser_positon()
+#test_search_laser_positon()
 
-#calibrate(width_mm=60, height_mm=210, delta_mm=3, sensor_ids=[1, 2, 3])
+calibrate(width_mm=60, height_mm=240, delta_mm=3, sensor_ids=[1, 2, 3])
 
 #test_detect_multiple_circles()
         
