@@ -37,8 +37,8 @@ pykinect.initialize_libraries()
 
 # Modify camera configuration
 device_config = pykinect.default_configuration
-device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_YUY2
-device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_720P
+device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_MJPG
+device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_1080P
 device_config.depth_mode = pykinect.K4A_DEPTH_MODE_WFOV_2X2BINNED
 # print(device_config)
 
@@ -111,7 +111,7 @@ def search_for_laser_position(initial_position_mm, width_mm, height_mm, delta_mm
         si_0.SetXY(y_m[i])
         si_1.SetXY(x_m[i])
 
-        # time.sleep(0.002)
+        time.sleep(0.0001)
         sensor_readings.append(get_sensor_reading(sensor_id))
 
     sensor_readings = np.array(sensor_readings)
@@ -327,7 +327,8 @@ def find_distances_from_mirror_center(point_1_mm, point_2_mm, point_3_mm, distan
     point_2_mm: list, 3d measured coordinate of laser
     point_3_mm: list, 3d measured coordinate of laser
     distances_mm: real distances between points in calibration plate [ |p1-p2|, |p2-p3|, |p1-p3| ]
-    eps: distance(mm) between points to be counted as same
+    eps_mm: distance(mm) between points to be counted as same not needed if is_colinear is True
+    is_colinear: bool, choose between 2 modes 
 
     return: distances of each point in mm
     """
@@ -673,7 +674,7 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
         avg_p3_cam_3d /= CAPTURE_COUNT        
 
 
-        sensor_pos_cam_1, sensor_pos_cam_2, sensor_pos_cam_3 = get_sensor_pos_from_marker_pos(avg_p1_cam_3d, avg_p2_cam_3d, avg_p3_cam_3d, distance_of_sensor_from_marker_mm=-65.5, distance_of_second_sensor_from_first_sensor_mm=50)
+        sensor_pos_cam_1, sensor_pos_cam_2, sensor_pos_cam_3 = get_sensor_pos_from_marker_pos(avg_p1_cam_3d, avg_p2_cam_3d, avg_p3_cam_3d, distance_of_sensor_from_marker_mm=-73, distance_of_second_sensor_from_first_sensor_mm=75)
 
         
 
@@ -701,7 +702,7 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
         p1, p2, p3 = identify_points(fine_laser_coords[0], fine_laser_coords[1], fine_laser_coords[2])
 
         # adjust distances according to calibration plat geometry (assumed 100 mm spacing)
-        p1_z, p2_z, p3_z = find_distances_from_mirror_center(point_1_mm=p1, point_2_mm=p2, point_3_mm=p3, distances_mm=[50, 50, 100], eps_mm=5) # all of  the zs are same
+        p1_z, p2_z, p3_z = find_distances_from_mirror_center(point_1_mm=p1, point_2_mm=p2, point_3_mm=p3, distances_mm=[75, 75, 150]) # all of  the zs are same
 
         p1_updated = update_laser_position(old_point=p1, z_new=p1_z)
         p2_updated = update_laser_position(old_point=p2, z_new=p2_z)
@@ -776,7 +777,7 @@ def test_identify_points():
 
 
 def test_search_laser_positon():
-    sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=[0, -20, 500], width_mm=50, height_mm=50, delta_mm=2)
+    sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=[0, 0, 400], width_mm=50, height_mm=100, delta_mm=2, sensor_id=2)
 
 
     print(max_pos)
@@ -786,7 +787,7 @@ def test_search_laser_positon():
 
 
 
-    sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=max_pos, width_mm=10, height_mm=10, delta_mm=0.2)
+    sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=max_pos, width_mm=10, height_mm=10, delta_mm=0.2, sensor_id=2)
     print(max_pos)
 
     plt.imshow(sensor_data, extent=[width_range[0], width_range[-1], height_range[-1], height_range[0]])
@@ -794,7 +795,7 @@ def test_search_laser_positon():
 
 def test_detect_multiple_circles():
     ret_color = False
-    multiple_circle_detector = Multiple_Circle_Detector()
+    multiple_circle_detector = Multiple_Circle_Detector(max_detection_count=6)
     while True:
         capture = device.update()
         ret_color, color_image = capture.get_color_image() 
@@ -803,8 +804,11 @@ def test_detect_multiple_circles():
         # color_image = cv2.imread("circle-medium.png")
         detected_circles, marked_image = multiple_circle_detector.detect_multiple_circles(color_image)   
         circle_coordinates = multiple_circle_detector.get_circle_coordinates(detected_circles)
-        print(circle_coordinates)
-        cv2.imshow("image", marked_image)
+        circle_coordinates = np.array(circle_coordinates)
+
+        for circle in circle_coordinates:
+            cv2.circle(color_image, center=(int(circle[0]), int(circle[1])), radius=10, color=(0, 255, 0), thickness=2)
+        cv2.imshow("image", color_image)
         if cv2.waitKey(1) == ord('q'):
             break
 
@@ -844,10 +848,11 @@ def test_sensor_reading():
 
 
 
+test_search_laser_positon()
 
+#calibrate(width_mm=60, height_mm=210, delta_mm=3, sensor_ids=[1, 2, 3])
 
-calibrate(width_mm=90, height_mm=150, delta_mm=3, sensor_ids=[1, 2, 3])
-
+#test_detect_multiple_circles()
         
 
 
