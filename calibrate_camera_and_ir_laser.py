@@ -638,7 +638,10 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
             if not ret_color or not ret_depth:
                 continue  
             # color_image = cv2.imread("circle-medium.png")
-            circles, _ = multiple_circle_detector.detect_multiple_circles(color_image)
+            gray = cv2.cvtColor(color_image, cv2.COLOR_RGB2GRAY)
+            gray = np.expand_dims(gray, axis=2)
+            gray = np.concatenate([gray, gray, gray], axis=2)
+            circles, _ = multiple_circle_detector.detect_multiple_circles(gray)
             circle_coordinates = multiple_circle_detector.get_circle_coordinates(circles)
             circle_coordinates = np.array(circle_coordinates)
 
@@ -715,6 +718,13 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
         p3_updated = update_laser_position(old_point=p3, z_new=p3_z)
 
         updated_points = [p1_updated, p2_updated, p3_updated]
+
+        # real_3d_coords = []
+        # real_3d_coords.append(p1_updated.reshape((-1)))
+        # real_3d_coords.append(p2_updated.reshape((-1)))
+        # real_3d_coords.append(p3_updated.reshape((-1)))
+
+
 
         # laser detector positions in laser mirror coordinate system
         real_3d_coords = []
@@ -801,20 +811,24 @@ def test_search_laser_positon():
 
 def test_detect_multiple_circles():
     ret_color = False
-    multiple_circle_detector = Multiple_Circle_Detector(max_detection_count=6)
+    multiple_circle_detector = Multiple_Circle_Detector(max_detection_count=3)
     while True:
         capture = device.update()
         ret_color, color_image = capture.get_color_image() 
         if not ret_color:
             continue
         # color_image = cv2.imread("circle-medium.png")
-        detected_circles, marked_image = multiple_circle_detector.detect_multiple_circles(color_image)   
+        gray = cv2.cvtColor(color_image, cv2.COLOR_RGB2GRAY)
+        gray = np.expand_dims(gray, axis=2)
+        gray = np.concatenate([gray, gray, gray], axis=2)
+
+        detected_circles, marked_image = multiple_circle_detector.detect_multiple_circles(gray)   
         circle_coordinates = multiple_circle_detector.get_circle_coordinates(detected_circles)
         circle_coordinates = np.array(circle_coordinates)
 
         for circle in circle_coordinates:
-            cv2.circle(color_image, center=(int(circle[0]), int(circle[1])), radius=10, color=(0, 255, 0), thickness=2)
-        cv2.imshow("image", color_image)
+            cv2.circle(gray, center=(int(circle[0]), int(circle[1])), radius=10, color=(0, 255, 0), thickness=2)
+        cv2.imshow("image", gray)
         if cv2.waitKey(1) == ord('q'):
             break
 
@@ -846,7 +860,7 @@ def test_sensor_reading():
         time.sleep(1)
 
 
-# test_detect_multiple_circles()
+#test_detect_multiple_circles()
 
 #test_identify_points()
 
