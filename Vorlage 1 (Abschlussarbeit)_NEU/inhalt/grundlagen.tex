@@ -1,0 +1,97 @@
+\chapter{Grundlagen}
+\label{ch:grundlagen}
+
+\section{Aufzählungen}
+\label{sec:aufzaehlungen}
+
+\LaTeX ~erlaubt viele verschiedene Formatierungen. Allein bei Aufzählungen sind \textit{description} und \textit{itemize} zu nennen:
+\begin{description}
+	\item[Ein Stichpunkt]
+	mit Beschreibung
+	\item[Noch ein Stichpunkt]
+	mit noch einer Beschreibung
+\end{description}
+
+\begin{itemize}
+\item \textit{kursiver Text}
+\item \textbf{fetter Text}
+\item normaler Text
+\item \tiny kleiner Text
+\end{itemize}
+
+
+\section{Verlinkungen und Zitate}
+\subsection{Verlinkungen}
+\label{subsec:verlinkungen}
+
+Dieses Kapitel hat die Nummer \ref{subsec:verlinkungen}. Referenzen können das gesamte Dokument umfassen und zum Beispiel auch auf Bilder wie \ref{fig:normales_bild} verweisen.\newline
+Ein Link aus dem Dokument in das Internet ist mit dem Paket hyperref ebenfalls möglich: \newline\url{https://wch.github.io/latexsheet/}\newline
+Unter dieser Adresse findet sich ein gutes \LaTeX ~Befehlsblatt!
+
+\subsection{Zitate}
+\label{subsec:zitate}
+Zitate ergeben ebenfalls Verlinkungen ins Quellenverzeichnis \cite{rfid_handbuch} und \cite[S.10]{tietze_schenk}.
+\begin{quote}
+Dies ist ein Zitat zum Test. Es ist an der Einrückung erkennbar. Bei langen Zitaten wird die automatische Einrückung der Folgezeilen sichtbar.
+\end{quote}
+
+
+\section{Einbinden von Bildern}
+\label{sec:bilder}
+
+\begin{figure}[!htb]\centering
+\input{bilder/grundlagen/parallelschwingkreis.tikz}
+\caption{Bild mit Tikz erstellt, Bildunterschrift einzeilig und zentriert.}
+\label{fig:bild_tikz}
+\end{figure}
+
+
+\begin{figure}[!htb]\centering
+\includegraphics*[width = 6cm]{bilder/grundlagen/RX_Basisbandsignal_IQ_Diagramm}
+\caption{Gewöhnliches Bild (hier pdf) und da dies eine zweizeilige Bildunterschrift ist, ist sie linksbündig und die zweite Zeile eingerückt.}
+\label{fig:normales_bild}
+\end{figure}
+
+
+
+\section{Gleichungen}
+\label{sec:gleichungen}
+Gleichungen wie $a=b+c$ können in einem Fließtext als Inline-Formel auftreten oder als abgesetzte Formel:
+\begin{align}
+	x = \frac{1+2+i}{2} \, .
+	\label{eq:gleichung1}
+\end{align}
+Abgesetzte Formeln müssen in den Text eingefügt werden wie folgender Satz zeigt. Die Eulerformel, die man in der Form
+\begin{align}
+	\mathrm{e}^{\mathrm{j}\varphi} = \cos(\varphi) + \mathrm{j} \sin(\varphi) 
+	\label{eq:gleichung2}
+\end{align}
+angeben kann, ist in vielen Formelsammlungen zu finden. \\
+Bei den Formeln ist auf ISO-31 und DIN 1338 konformes Setzen zu achten. Dokumente hierzu findet man unter \url{http://www.moritz-nadler.de/formelsatz.pdf} und \url{http://www.et.tu-dresden.de/ifa/fileadmin/user_upload/www_files/richtlinien_sa_da/auszug_din_1338.pdf}
+
+\newpage
+\section{Tabellen}
+
+Tabellen können einfach mit der tabular-Umgebung aufgebaut werden.\\
+Allerdings sind sie floats (sie ordnen sich automatisch an den besten Platz) und so oft irgendwo unterwegs. Diese Tabelle würde direkt über der Überschrift stehen, obwohl sie darunter definiert wurde. Dies kann mit [!ht] unterdrückt werden, was aber oft nicht sinnvoll ist (wegen den Regeln des Textsatzes). [ht] ist die abgeschwächte Version des Befehls und zu bevorzugen.
+
+	\begin{table}[ht]
+		\captionabove{Amateurfunkbänder (Auswahl)} %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		\centering
+			\begin{tabular}{| l | l | l |} %Ausrichtung festlegen
+					\hline Band & Frequenzen & Nutzungsstatus \\ \hline % Überschriften
+					\SI{80}{m} 	& \num{3,5} -- \SI{3,8}{MHz} 		& primär\\
+					\SI{40}{m} 	& \num{7} -- \SI{7,1}{MHz} 			& primär\\
+					\SI{20}{m} 	& \num{14} -- \SI{14,35}{MHz}		& primär \\
+					\SI{17}{m} 	& \num{18,068} -- \SI{18,168}{MHz} 	& primär\\
+					\SI{15}{m} 	& \num{21} -- \SI{21,45}{MHz} 		& primär\\
+					\SI{10}{m} 	& \num{28} -- \SI{29,7}{MHz} 		& primär\\
+					\SI{2}{m}	& \num{144} -- \SI{146}{MHz} 		& primär\\
+					\SI{70}{cm}	& \num{430} -- \SI{440}{MHz}		& primär\\
+					\SI{23}{cm}	& \num{1240} -- \SI{1300}{MHz} 		& sekundär\\
+					\SI{13}{cm}	& \num{2320} -- \SI{2450}{MHz} 		& sekundär\\
+					\hline
+			\end{tabular} 
+%		\caption{Amateurfunkbänder (Auswahl)}
+		\label{tab:Bandauswahl}
+	\end{table}

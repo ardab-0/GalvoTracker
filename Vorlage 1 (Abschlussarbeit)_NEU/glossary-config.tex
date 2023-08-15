@@ -1,0 +1,52 @@
+
+%Neuer Eintragstyp
+%\newglossary[fog]{formel}{foi}{foo}{Formelzeichen}
+\newglossary[flg]{formel}{fyi}{fyg}{Formelverzeichnis}
+
+
+\renewcommand*{\glspostdescription}{}
+
+\newglossarystyle{lhft}{%
+	\renewenvironment{theglossary}%
+	{\begin{longtable}{p{.1\linewidth}p{.75\linewidth}}}%
+		{\end{longtable}}%
+	\renewcommand*{\glossaryheader}{}%
+	\renewcommand*{\glsgroupheading}[1]{\initfamily \scalebox{2}{##1} & \\}%
+	\renewcommand*{\glsgroupheading}[1]{}%
+	\renewcommand*{\glsgroupskip}{}%
+	\renewcommand*{\glossaryentryfield}[5]{%		
+		\textrm{\textbf{\glstarget{##1}{##2}}} & ##3\glspostdescription##5\\\vspace{0.0cm}}%
+
+%	\renewcommand*{\glossarysubentryfield}[6]{%
+	%	& \glstarget{##2}{\strut}##4\glspostdescription\space ##6\\}%
+	%\renewcommand*{\glsgroupskip}{ & \\}%
+}
+
+%Ein neuer Verzeichnisstil der auch die Einheit mit ausgibt
+\newglossarystyle{lhftsymbols}{%  
+	% Verzeichnis wird ein 'longtable'  mit 5 Spalten
+	\renewenvironment{theglossary}%  
+	{ \begin{longtable}{p{8cm}rr}}%  
+		{\end{longtable}}%  
+	% Kopf der Tabelle
+	\renewcommand*{\glossaryheader}{%  
+		\bfseries Name & \bfseries Symbol & \bfseries Einheit %
+		\\\endhead}%  
+	% Kein Abstand zwischen Gruppen
+	\renewcommand*{\glsgroupheading}[1]{}%
+	%    
+	\renewcommand*{\glossaryentryfield}[5]{%  
+		%   \glsentryitem{##1}% Entry number if required  
+		\glstarget{##1}{##2}% Name
+		& ##4 %Symbol
+		& \glsentryuseri{##1}%Einheit
+		\\% end of row  
+	}%
+	% The command \glsgroupskip specifies what to do between glossary groups.
+	% Glossary styles must redefine this command. (Note that \glsgroupskip
+	% only occurs between groups, not at the start or end of the glossary.)
+	\renewcommand*{\glsgroupskip}{\relax}
+}
+
+\makeglossaries
+\makeindex

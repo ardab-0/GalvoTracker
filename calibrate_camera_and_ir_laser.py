@@ -677,7 +677,7 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
         avg_p3_cam_3d /= CAPTURE_COUNT        
 
 
-        sensor_pos_cam_1, sensor_pos_cam_2, sensor_pos_cam_3 = get_sensor_pos_from_marker_pos(avg_p1_cam_3d, avg_p2_cam_3d, avg_p3_cam_3d, distance_of_sensor_from_marker_mm=-73, distance_of_second_sensor_from_first_sensor_mm=75)
+        sensor_pos_cam_1, sensor_pos_cam_2, sensor_pos_cam_3 = get_sensor_pos_from_marker_pos(avg_p1_cam_3d, avg_p2_cam_3d, avg_p3_cam_3d, distance_of_sensor_from_marker_mm=-45, distance_of_second_sensor_from_first_sensor_mm=75)
 
         
         # deduce new position by using marker pattern if it is possible
@@ -719,21 +719,21 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
 
         updated_points = [p1_updated, p2_updated, p3_updated]
 
-        # real_3d_coords = []
-        # real_3d_coords.append(p1_updated.reshape((-1)))
-        # real_3d_coords.append(p2_updated.reshape((-1)))
-        # real_3d_coords.append(p3_updated.reshape((-1)))
+        real_3d_coords = []
+        real_3d_coords.append(p1_updated.reshape((-1)))
+        real_3d_coords.append(p2_updated.reshape((-1)))
+        real_3d_coords.append(p3_updated.reshape((-1)))
 
 
 
         # laser detector positions in laser mirror coordinate system
-        real_3d_coords = []
+        # real_3d_coords = []
 
-        for i in range(len(updated_points)):
-            sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=[updated_points[i][0], updated_points[i][1], updated_points[i][2]], width_mm=50, height_mm=50, delta_mm=2, sensor_id=i+1)
-            sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=max_pos, width_mm=10, height_mm=10, delta_mm=0.2, sensor_id=i+1)
+        # for i in range(len(updated_points)):
+        #     sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=[updated_points[i][0], updated_points[i][1], updated_points[i][2]], width_mm=50, height_mm=50, delta_mm=2, sensor_id=i+1)
+        #     sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=max_pos, width_mm=10, height_mm=10, delta_mm=0.2, sensor_id=i+1)
 
-            real_3d_coords.append(max_pos)
+        #     real_3d_coords.append(max_pos)
 
         print(f"Press s to save measurements, another character to discard measurements in current iteration." )
         key = cv2.waitKey(0)
