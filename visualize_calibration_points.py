@@ -10,14 +10,16 @@ def main():
     fig = plt.figure()
     ax = plt.axes(projection='3d')
 
-    with open('{}/parameters.pkl'.format(save_path), 'rb') as f:
+    with open('temp_parameters.pkl'.format(save_path), 'rb') as f:
         loaded_dict = pickle.load(f)
         R = loaded_dict["R"]
         t = loaded_dict["t"]
         laser_points = loaded_dict["laser_points"]
         camera_points = loaded_dict["camera_points"]
 
-    print(camera_points)
+    print(R)
+    print("\n\n")
+    print(t)
     cam_wrt_laser = R @ camera_points + t
 
 
