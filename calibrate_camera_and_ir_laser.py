@@ -623,6 +623,7 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
     camera_points = []
     num_iter=0
     previous_p2_pos = 0
+    font = cv2.FONT_HERSHEY_SIMPLEX
 
     while num_iter < ITER_COUNT:
         #################################### find location of laser detectors using depth camera ##################################################################
@@ -641,6 +642,8 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
             ret_depth, transformed_depth_image = capture.get_transformed_depth_image()
             if not ret_color or not ret_depth:
                 continue  
+
+            color_image_orig = color_image.copy()
             # color_image = cv2.imread("circle-medium.png")
             gray = cv2.cvtColor(color_image, cv2.COLOR_RGB2GRAY)
             gray = np.expand_dims(gray, axis=2)
@@ -651,11 +654,14 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
 
             for circle in circle_coordinates:
                 cv2.circle(color_image, center=(int(circle[0]), int(circle[1])), radius=20, color=(0, 255, 0), thickness=2)
-
-            cv2.imshow("image", color_image)
+            
+            cv2.putText(color_image, f"Current Iteration: {num_iter+1}/{ITER_COUNT}", (10, 20), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+            
 
             if len(circle_coordinates) == 3:
                 print("\n\nPress (y) to include image. Press (n) to discard image.")
+                cv2.putText(color_image, "Press (y) to include image. Press (n) to discard image.", (10, 40), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+                cv2.imshow("image", color_image)
                 if cv2.waitKey(0) == ord('y'):
                     num_color_img += 1
 
@@ -694,10 +700,16 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
             current_camera_points_np = np.array(current_camera_points).T
             previous_camera_points_np = np.array(camera_points[3*(num_iter-1):3*num_iter]).T
 
-            diff = current_camera_points_np - previous_camera_points_np
-            average_diff = np.mean(diff, axis=1)
+            # diff = current_camera_points_np - previous_camera_points_np
+            # average_diff = np.mean(diff, axis=1)
 
-            initial_search_point = previous_p2_pos.reshape((3, 1)) + average_diff.reshape((3, 1))
+            # initial_search_point = previous_p2_pos.reshape((3, 1)) + average_diff.reshape((3, 1))
+
+
+            R, t = optimal_rotation_and_translation(previous_camera_points_np, current_camera_points_np)
+            initial_search_point = R @ previous_p2_pos.reshape((3, 1)) + t
+
+
             x_init, y_init, z_init = initial_search_point[0, 0], initial_search_point[1, 0], initial_search_point[2, 0]
 
             p2_sensor_estimate = np.array([x_init, y_init, z_init])
@@ -712,7 +724,6 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
             x_init, y_init, z_init = set_initial_laser_pos()
 
             coarse_laser_pos = get_coarse_laser_positions([x_init, y_init, z_init], width_mm, height_mm, delta_mm, sensor_ids)
-            print("Coarse laser position: ", coarse_laser_pos)
 
         #################################### find location of infrared detectors using laser #######################################################
         
@@ -722,7 +733,6 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
 
         coarse_laser_pos = get_fine_laser_positions(coarse_laser_pos, search_length_mm=40, delta_mm=2)
         fine_laser_coords = get_fine_laser_positions(coarse_laser_pos, search_length_mm=10, delta_mm=0.5)
-        print("Fine laser position: ",fine_laser_coords)
 
         p1, p2, p3 = identify_points(fine_laser_coords[0], fine_laser_coords[1], fine_laser_coords[2])
 
@@ -751,7 +761,10 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
 
         #     real_3d_coords.append(max_pos)
 
-        print(f"Press s to save measurements, another character to discard measurements in current iteration." )
+        print(f"Press (s) to save measurements. Press another character to discard measurements in current iteration." )
+        cv2.putText(color_image_orig, f"Current Iteration: {num_iter+1}/{ITER_COUNT}", (10, 20), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+        cv2.putText(color_image_orig, "Press (s) to save measurements, another character to discard measurements in current iteration.", (10, 40), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+        cv2.imshow("image", color_image_orig)
         key = cv2.waitKey(0)
         if  key== ord('s'):
             camera_points.append(sensor_pos_cam_1.reshape((-1)))
