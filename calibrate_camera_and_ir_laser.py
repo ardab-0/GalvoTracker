@@ -26,6 +26,10 @@ save_path = "ir_calibration_parameters"
 CAPTURE_COUNT = 6
 ITER_COUNT = 5
 PI_COM_PORT = "COM6"
+distance_of_sensor_from_marker_mm=-30
+distance_of_second_sensor_from_first_sensor_mm=75
+
+
 
 # global variables
 mirror_x = 0
@@ -111,7 +115,7 @@ def search_for_laser_position(initial_position_mm, width_mm, height_mm, delta_mm
         si_0.SetXY(y_m[i])
         si_1.SetXY(x_m[i])
 
-        #time.sleep(0.0001)
+        time.sleep(0.001)
         sensor_readings.append(get_sensor_reading(sensor_id))
 
     sensor_readings = np.array(sensor_readings)
@@ -162,7 +166,7 @@ def search_for_multiple_laser_position(initial_position_mm, width_mm, height_mm,
             si_0.SetXY(y_m[i])
             si_1.SetXY(x_m[i])
 
-            # time.sleep(0.002)
+            time.sleep(0.001)
             sensor_readings.append(get_sensor_reading(id))
 
         multiple_sensor_readings.append(sensor_readings)
@@ -192,7 +196,7 @@ def get_coarse_laser_positions(initial_position_mm, width_mm, height_mm, delta_m
     return max_position_list_mm
 
 
-def get_fine_laser_positions(rough_laser_coords):
+def get_fine_laser_positions(rough_laser_coords, search_length_mm=10, delta_mm=0.4):
     """
         rough_laser_coords: list
     """
@@ -200,7 +204,7 @@ def get_fine_laser_positions(rough_laser_coords):
     fine_coords_3d = []
     for i, coord in enumerate(rough_laser_coords):
         id = i+1 # sensor ids start from 1
-        sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=coord, width_mm=10, height_mm=10, delta_mm=0.2, sensor_id=id)
+        sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=coord, width_mm=search_length_mm, height_mm=search_length_mm, delta_mm=delta_mm, sensor_id=id)
         fine_coords_3d.append(max_pos)
 
     # plt.imshow(sensor_data, extent=[width_range[0], width_range[-1], height_range[-1], height_range[0]])
@@ -506,7 +510,7 @@ def get_sensor_pos_from_marker_pos(p1, p2, p3, distance_of_sensor_from_marker_mm
     sensor_pos_1 = sensor_pos_2 - d_vec * distance_of_second_sensor_from_first_sensor_mm
     sensor_pos_3 = sensor_pos_2 + d_vec * distance_of_second_sensor_from_first_sensor_mm
 
-    return sensor_pos_1, sensor_pos_2, sensor_pos_3
+    return sensor_pos_1, sensor_pos_2, sensor_pos_3, r_vec, d_vec
 
 
 def record_color_and_depth_image():
@@ -618,7 +622,7 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
     laser_points = []
     camera_points = []
     num_iter=0
-    
+    previous_p2_pos = 0
 
     while num_iter < ITER_COUNT:
         #################################### find location of laser detectors using depth camera ##################################################################
@@ -677,7 +681,7 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
         avg_p3_cam_3d /= CAPTURE_COUNT        
 
 
-        sensor_pos_cam_1, sensor_pos_cam_2, sensor_pos_cam_3 = get_sensor_pos_from_marker_pos(avg_p1_cam_3d, avg_p2_cam_3d, avg_p3_cam_3d, distance_of_sensor_from_marker_mm=-45, distance_of_second_sensor_from_first_sensor_mm=75)
+        sensor_pos_cam_1, sensor_pos_cam_2, sensor_pos_cam_3, r_vec, d_vec = get_sensor_pos_from_marker_pos(avg_p1_cam_3d, avg_p2_cam_3d, avg_p3_cam_3d, distance_of_sensor_from_marker_mm=distance_of_sensor_from_marker_mm, distance_of_second_sensor_from_first_sensor_mm=distance_of_second_sensor_from_first_sensor_mm)
 
         
         # deduce new position by using marker pattern if it is possible
@@ -693,19 +697,31 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
             diff = current_camera_points_np - previous_camera_points_np
             average_diff = np.mean(diff, axis=1)
 
-            initial_search_point = p2_updated.reshape((3, 1)) + average_diff.reshape((3, 1))
+            initial_search_point = previous_p2_pos.reshape((3, 1)) + average_diff.reshape((3, 1))
             x_init, y_init, z_init = initial_search_point[0, 0], initial_search_point[1, 0], initial_search_point[2, 0]
+
+            p2_sensor_estimate = np.array([x_init, y_init, z_init])
+
+            p1_sensor_estimate = p2_sensor_estimate - d_vec.reshape((-1)) * distance_of_second_sensor_from_first_sensor_mm
+            p3_sensor_estimate = p2_sensor_estimate + d_vec.reshape((-1)) * distance_of_second_sensor_from_first_sensor_mm         
+
+            coarse_laser_pos = [p1_sensor_estimate, p2_sensor_estimate, p3_sensor_estimate] 
+           
+
         else:
             x_init, y_init, z_init = set_initial_laser_pos()
+
+            coarse_laser_pos = get_coarse_laser_positions([x_init, y_init, z_init], width_mm, height_mm, delta_mm, sensor_ids)
+            print("Coarse laser position: ", coarse_laser_pos)
 
         #################################### find location of infrared detectors using laser #######################################################
         
         #x_init, y_init, z_init = set_initial_laser_pos()
 
-        coarse_laser_pos = get_coarse_laser_positions([x_init, y_init, z_init], width_mm, height_mm, delta_mm, sensor_ids)
-        print("Coarse laser position: ", coarse_laser_pos)
+        
 
-        fine_laser_coords = get_fine_laser_positions(coarse_laser_pos)
+        coarse_laser_pos = get_fine_laser_positions(coarse_laser_pos, search_length_mm=40, delta_mm=2)
+        fine_laser_coords = get_fine_laser_positions(coarse_laser_pos, search_length_mm=10, delta_mm=0.5)
         print("Fine laser position: ",fine_laser_coords)
 
         p1, p2, p3 = identify_points(fine_laser_coords[0], fine_laser_coords[1], fine_laser_coords[2])
@@ -741,7 +757,8 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
             camera_points.append(sensor_pos_cam_1.reshape((-1)))
             camera_points.append(sensor_pos_cam_2.reshape((-1)))
             camera_points.append(sensor_pos_cam_3.reshape((-1)))
-            laser_points.extend(real_3d_coords)        
+            laser_points.extend(real_3d_coords)     
+            previous_p2_pos = p2_updated   
             num_iter+=1
         
         
