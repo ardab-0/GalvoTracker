@@ -26,7 +26,7 @@ save_path = "ir_calibration_parameters"
 CAPTURE_COUNT = 6
 ITER_COUNT = 5
 PI_COM_PORT = "COM6"
-distance_of_sensor_from_marker_mm=-30
+distance_of_sensor_from_marker_mm=-55
 distance_of_second_sensor_from_first_sensor_mm=75
 
 
@@ -480,10 +480,10 @@ def get3d_coords_from_pixel_coords(pix_coords, transformed_depth_img):
     return coordinates_3d
 
 
-def get_sensor_pos_from_marker_pos(p1, p2, p3, distance_of_sensor_from_marker_mm, distance_of_second_sensor_from_first_sensor_mm):
+def get_sensor_pos_from_marker_pos(marker_positions, distance_of_sensor_from_marker_mm, distance_of_second_sensor_from_first_sensor_mm):
     """
         transformed_depth_img: depth image transformed into color image coordinate system
-        p1, p2, p3: 3d camera positions of markers (3D)
+        marker_positions: 3d camera positions of markers (3D)
         distance_of_sensor_from_marker_mm: float, position of first sensor relative to first marker (- if sensor is on the left, + if sensor is on the right) 
         distance_of_second_sensor_from_first_sensor_mm: float 
 
@@ -496,17 +496,14 @@ def get_sensor_pos_from_marker_pos(p1, p2, p3, distance_of_sensor_from_marker_mm
         ---------------------
         Marker placement:
 
-        ---------------------
-        |    p1          p2 |
-        |                   |
-        |    p3             |
-        --------------------- 
+
     """
+    center_pos_3d = np.mean(marker_positions)
 
-    r_vec, d_vec = extract_unit_vectors(p1, p2, p3)
+    r_vec, d_vec = extract_unit_vectors(marker_positions)
 
 
-    sensor_pos_2 = p1 + r_vec * distance_of_sensor_from_marker_mm
+    sensor_pos_2 = center_pos_3d + r_vec * distance_of_sensor_from_marker_mm
     sensor_pos_1 = sensor_pos_2 - d_vec * distance_of_second_sensor_from_first_sensor_mm
     sensor_pos_3 = sensor_pos_2 + d_vec * distance_of_second_sensor_from_first_sensor_mm
 
@@ -532,9 +529,30 @@ def record_color_and_depth_image():
             break
 
 
-def extract_unit_vectors(p1, p2, p3):
-    right_vec = (p2 - p1) / np.linalg.norm(p2-p1)
-    down_vec = (p3 - p1) / np.linalg.norm(p3-p1)
+def extract_unit_vectors(marker_positions, marker_size=(9, 6)):
+    down_vec = 0
+    for i in range(marker_size[1]):        
+        for j in range(marker_size[0]-1):
+            idx_up = j + i * marker_size[0]
+            idx_down = 1+j + i * marker_size[0]
+            down_vec += (marker_positions[:, idx_down] - marker_positions[:, idx_up])
+
+    down_vec /= ( (marker_size[0]-1) * marker_size[1] )
+
+
+
+    right_vec = 0
+    for i in range(marker_size[1]-1):        
+        for j in range(marker_size[0]):
+            idx_left = j + (i+1) * marker_size[0]
+            idx_right = j + i * marker_size[0]
+            right_vec += (marker_positions[:, idx_right] - marker_positions[:, idx_left])
+
+    right_vec /= ( marker_size[0] * (marker_size[1]-1) )
+
+    right_vec /= np.linalg.norm(right_vec)
+    down_vec /= np.linalg.norm(down_vec)
+
 
     return right_vec, down_vec
 
@@ -624,15 +642,15 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
     num_iter=0
     previous_p2_pos = 0
     font = cv2.FONT_HERSHEY_SIMPLEX
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
     while num_iter < ITER_COUNT:
         #################################### find location of laser detectors using depth camera ##################################################################
         multiple_circle_detector = Multiple_Circle_Detector()
 
         num_color_img = 0
-        avg_p1_cam_3d = 0
-        avg_p2_cam_3d = 0
-        avg_p3_cam_3d = 0
+        avg_points_cam_3d = np.zeros((3, 9*6))
+        
 
         while num_color_img < CAPTURE_COUNT:
 
@@ -645,69 +663,66 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
 
             color_image_orig = color_image.copy()
             # color_image = cv2.imread("circle-medium.png")
-            gray = cv2.cvtColor(color_image, cv2.COLOR_RGB2GRAY)
-            gray = np.expand_dims(gray, axis=2)
-            gray = np.concatenate([gray, gray, gray], axis=2)
-            circles, _ = multiple_circle_detector.detect_multiple_circles(gray)
-            circle_coordinates = multiple_circle_detector.get_circle_coordinates(circles)
-            circle_coordinates = np.array(circle_coordinates)
-
-            for circle in circle_coordinates:
-                cv2.circle(color_image, center=(int(circle[0]), int(circle[1])), radius=20, color=(0, 255, 0), thickness=2)
+            gray = cv2.cvtColor(color_image, cv2.COLOR_BGR2GRAY)
+            # Find the chess board corners
+            ret, corners = cv2.findChessboardCorners(gray, (9,6), None)
+            # If found, add object points, image points (after refining them)
+            
+            corners2 = cv2.cornerSubPix(gray,corners, (11,11), (-1,-1), criteria)
+            # Draw and display the corners
+            cv2.drawChessboardCorners(color_image, (9,6), corners2, ret)
             
             cv2.putText(color_image, f"Current Iteration: {num_iter+1}/{ITER_COUNT}", (10, 20), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
             
 
-            if len(circle_coordinates) == 3:
-                print("\n\nPress (y) to include image. Press (n) to discard image.")
-                cv2.putText(color_image, "Press (y) to include image. Press (n) to discard image.", (10, 40), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-                cv2.imshow("image", color_image)
-                if cv2.waitKey(0) == ord('y'):
-                    num_color_img += 1
+            
+            print("\n\nPress (y) to include image. Press (n) to discard image.")
+            cv2.putText(color_image, "Press (y) to include image. Press (n) to discard image.", (10, 40), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+            cv2.imshow("image", color_image)
+            if cv2.waitKey(0) == ord('y'):
+                num_color_img += 1
 
-                    
+                
+                for i, point in enumerate(corners2):          
+                    point_cam_3d = get3d_coords_from_pixel_coords((point[0, 0], point[0, 1]), transformed_depth_img=transformed_depth_image).reshape((-1))
+                    avg_points_cam_3d[:, i] += point_cam_3d     
 
-                    p1_cam, p2_cam, p3_cam = identify_points(circle_coordinates[0], circle_coordinates[1], circle_coordinates[2], is_colinear=False)
-
-                    p1_cam_3d = get3d_coords_from_pixel_coords(p1_cam, transformed_depth_img=transformed_depth_image)
-                    p2_cam_3d = get3d_coords_from_pixel_coords(p2_cam, transformed_depth_img=transformed_depth_image)
-                    p3_cam_3d = get3d_coords_from_pixel_coords(p3_cam, transformed_depth_img=transformed_depth_image)          
-
-                    avg_p1_cam_3d += p1_cam_3d 
-                    avg_p2_cam_3d += p2_cam_3d
-                    avg_p3_cam_3d += p3_cam_3d      
+                
+      
             
 
             if cv2.waitKey(1) == ord('q'):
                 sys.exit()
         
 
-        avg_p1_cam_3d /= CAPTURE_COUNT
-        avg_p2_cam_3d /= CAPTURE_COUNT
-        avg_p3_cam_3d /= CAPTURE_COUNT        
+        avg_points_cam_3d /= CAPTURE_COUNT               
 
 
-        sensor_pos_cam_1, sensor_pos_cam_2, sensor_pos_cam_3, r_vec, d_vec = get_sensor_pos_from_marker_pos(avg_p1_cam_3d, avg_p2_cam_3d, avg_p3_cam_3d, distance_of_sensor_from_marker_mm=distance_of_sensor_from_marker_mm, distance_of_second_sensor_from_first_sensor_mm=distance_of_second_sensor_from_first_sensor_mm)
+        sensor_pos_cam_1, sensor_pos_cam_2, sensor_pos_cam_3, r_vec, d_vec = get_sensor_pos_from_marker_pos(avg_points_cam_3d, distance_of_sensor_from_marker_mm=distance_of_sensor_from_marker_mm, distance_of_second_sensor_from_first_sensor_mm=distance_of_second_sensor_from_first_sensor_mm)
 
         
         # deduce new position by using marker pattern if it is possible
         if num_iter > 0:
-            current_camera_points = []
-            current_camera_points.append(sensor_pos_cam_1.reshape((-1)))
-            current_camera_points.append(sensor_pos_cam_2.reshape((-1)))
-            current_camera_points.append(sensor_pos_cam_3.reshape((-1)))
+            
 
-            current_camera_points_np = np.array(current_camera_points).T
-            previous_camera_points_np = np.array(camera_points[3*(num_iter-1):3*num_iter]).T
+            current_camera_points_np = avg_points_cam_3d
 
-            diff = current_camera_points_np - previous_camera_points_np
-            average_diff = np.mean(diff, axis=1)
+            # diff = current_camera_points_np - previous_camera_points_np
+            # average_diff = np.mean(diff, axis=1)
 
-            initial_search_point = previous_p2_pos.reshape((3, 1)) + average_diff.reshape((3, 1))
+            # initial_search_point = previous_p2_pos.reshape((3, 1)) + average_diff.reshape((3, 1))
 
 
-            # R, t = optimal_rotation_and_translation(previous_camera_points_np, current_camera_points_np)
-            # initial_search_point = R @ previous_p2_pos.reshape((3, 1)) + t
+            R, t = optimal_rotation_and_translation(previous_camera_points_np, current_camera_points_np)
+
+            calibration_dict = {"R": R,
+                                "t": t,
+                                "laser_points": current_camera_points_np,
+                                "camera_points": previous_camera_points_np}
+
+            with open('mid_parameters.pkl'.format(save_path), 'wb') as f:
+                pickle.dump(calibration_dict, f)
+            initial_search_point = R @ previous_p2_pos.reshape((3, 1)) + t
 
 
             x_init, y_init, z_init = initial_search_point[0, 0], initial_search_point[1, 0], initial_search_point[2, 0]
@@ -772,6 +787,7 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
             camera_points.append(sensor_pos_cam_3.reshape((-1)))
             laser_points.extend(real_3d_coords)     
             previous_p2_pos = p2_updated   
+            previous_camera_points_np = avg_points_cam_3d
             num_iter+=1
         
         
