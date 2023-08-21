@@ -13,16 +13,16 @@ from image_processing.black_white import black_and_white_threshold
 from image_processing.color_picker import Color_Picker
 
 
-######################### Constants 
+######################### Constants 7
 d = 0 # mm
 mirror_rotation_deg = 45
 num_iterations = 50
 save_path = "ir_calibration_parameters_test"
-accuracy_path = "calibration_accuracy"
-CALIBRATION_ITER = 3
+accuracy_path = "calibration_accuracy_423mm_1080p"
+CALIBRATION_ITER = 8
 sample_x = 5
-sample_y = 3
-z_t = 573 # mm
+sample_y = 5
+z_t = 423 # mm
 lower_red = np.array([140,   10, 240]) 
 upper_red = np.array([180, 130, 256])
 
@@ -44,8 +44,8 @@ R, t = optimal_rotation_and_translation(camera_points, laser_points)
 
 
 
-a = np.linspace(-100, 100, sample_x)
-b = np.linspace(-50, 50, sample_y)
+a = np.linspace(-200, 200, sample_x)
+b = np.linspace(-100, 100, sample_y)
 
 x_t = np.tile(a, sample_y)
 y_t = np.repeat(b, sample_x)
@@ -59,8 +59,8 @@ pykinect.initialize_libraries()
 
 # Modify camera configuration
 device_config = pykinect.default_configuration
-device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_YUY2
-device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_720P
+device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_BGRA32
+device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_1080P
 device_config.depth_mode = pykinect.K4A_DEPTH_MODE_WFOV_2X2BINNED
 # print(device_config)
 
@@ -167,7 +167,7 @@ for i in range(len(x_m)):
     print("RMSE: ", rmse)
     rmse_scores.append(rmse)
 
-    cv2.waitKey(0)
+    #cv2.waitKey(0)
     
 
 accuracy_results = {"x_t": x_t,
