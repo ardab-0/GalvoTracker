@@ -17,7 +17,7 @@ from image_processing.color_picker import Color_Picker
 d = 0
 mirror_rotation_deg = 45
 num_iterations = 50
-save_path = "ir_calibration_parameters"
+save_path = "ir_calibration_parameters_test"
 
 
 lower_red = np.array([140,   10, 240]) 
@@ -31,12 +31,12 @@ with open('{}/parameters.pkl'.format(save_path), 'rb') as f:
 
 sample_x = 5
 sample_y = 3
-a = np.linspace(0, 100, sample_x)
-b = np.linspace(0, 50, sample_y)
+a = np.linspace(-100, 100, sample_x)
+b = np.linspace(-50, 50, sample_y)
 
 x_t = np.tile(a, sample_y)
 y_t = np.repeat(b, sample_x)
-z_t = [ 510 ]
+z_t = [ 575 ]
 
 laser_points = []
 camera_points = []

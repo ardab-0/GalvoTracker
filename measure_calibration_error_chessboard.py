@@ -18,6 +18,9 @@ save_path = "ir_calibration_parameters_test"
 # target coordinate offset (mm)
 lower_red = np.array([140,   10, 240]) 
 upper_red = np.array([180, 130, 256])
+CHESSBOARD_WIDTH = 9
+CHESSBOARD_LENGTH = 6
+
 
 with open('{}/parameters.pkl'.format(save_path), 'rb') as f:
     loaded_dict = pickle.load(f)
@@ -34,7 +37,16 @@ def onMousemove(event, x, y, flags, param):
 		mouse_x = x
 		mouse_y = y
 
-
+def get3d_coords_from_pixel_coords(pix_coords, transformed_depth_img, device):
+    pix_x, pix_y = pix_coords
+    pix_x = int(pix_x)
+    pix_y = int(pix_y)
+    
+    rgb_depth = transformed_depth_img[pix_y, pix_x]
+    pixels = k4a_float2_t((pix_x, pix_y))
+    pos3d_color = device.calibration.convert_2d_to_3d(pixels, rgb_depth, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_COLOR)
+    coordinates_3d = np.array([pos3d_color.xyz.x, pos3d_color.xyz.y, pos3d_color.xyz.z]).reshape((3, 1))
+    return coordinates_3d
 
 def main():            
 
@@ -70,59 +82,75 @@ def main():
     # Start device
     device = pykinect.start_device(config=device_config)
 
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
 
     cv2.namedWindow('Laser Detector',cv2.WINDOW_NORMAL)
     cv2.setMouseCallback('Laser Detector', onMousemove)
 
+    ret = False
 
-    while True:        
-        start = time.time()
-        # Get capture
-        
-        capture = device.update()
-
-        # Get the color image from the capture
-        ret_color, color_image = capture.get_color_image()
-
-        # Get the colored depth
-        ret_depth, transformed_depth_image = capture.get_transformed_depth_image()
-
+    while not ret:             
+        capture = device.update()        
+        ret_color, color_image = capture.get_color_image()       
+        ret_depth, transformed_depth_image = capture.get_transformed_depth_image() 
         if not ret_color or not ret_depth:
-            continue  
+            continue 
+        color_image_display = color_image.copy()
+        gray = cv2.cvtColor(color_image, cv2.COLOR_BGR2GRAY)
+        ret, corners = cv2.findChessboardCorners(gray, (CHESSBOARD_WIDTH, CHESSBOARD_LENGTH), None)
+    
+    corners2 = cv2.cornerSubPix(gray,corners, (11,11), (-1,-1), criteria)
+    #cv2.drawChessboardCorners(color_image_display, (9,6), corners2, ret)
 
-        
-        pix_x = mouse_x
-        pix_y = mouse_y
-        rgb_depth = transformed_depth_image[pix_y, pix_x]
-        pixels = k4a_float2_t((pix_x, pix_y))
+    centers = []
+    
+    for j in range(CHESSBOARD_LENGTH - 1):
+        for i in range(CHESSBOARD_WIDTH - 1):
+            tl = i + j * CHESSBOARD_WIDTH
+            tr = tl + 1
+            bl = tl + CHESSBOARD_WIDTH
+            br = bl + 1 
+            center = corners[tl] + corners[tr] + corners[bl] + corners[br]
+            center /= 4
 
-        pos3d_color = device.calibration.convert_2d_to_3d(pixels, rgb_depth, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_COLOR)  
+            centers.append(center)
 
-        mouse_in_camera_coordinates = np.array([pos3d_color.xyz.x, pos3d_color.xyz.y, pos3d_color.xyz.z]).reshape((3, 1))        
+    
+    
+
+    for i, point in enumerate(corners2):          
+        point_cam_3d = get3d_coords_from_pixel_coords((point[0, 0], point[0, 1]), transformed_depth_img=transformed_depth_image, device=device).reshape((-1))       
         # rotate and translate
-        camera_coordinates_in_laser_coordinates =  R @ mouse_in_camera_coordinates + t        
+        camera_coordinates_in_laser_coordinates =  R @ point_cam_3d.reshape((3, 1)) + t        
         coordinate_transform = CoordinateTransform(d=d, D=camera_coordinates_in_laser_coordinates[2], rotation_degree=mirror_rotation_deg)
         y_m, x_m = coordinate_transform.target_to_mirror(camera_coordinates_in_laser_coordinates[1], camera_coordinates_in_laser_coordinates[0]) # order is changed in order to change x and y axis
                 
         if(len(y_m) > 0 and len(x_m) > 0):
             si_0.SetXY(y_m[0])        
-            si_1.SetXY(x_m[0]) 
+            si_1.SetXY(x_m[0])    
 
+        ret_color = False
+        while not ret_color:             
+            capture = device.update()        
+            ret_color, color_image = capture.get_color_image()     
 
-
-    ######################################################################
-
-
-
+        color_image_display = color_image.copy()    
         circle = detect_circle_position(color_image, lower_range=lower_red, upper_range=upper_red)
 
-        if circle is  None:
-            print("Laser is not detected")                
-            continue
+        while circle is  None:
+            capture = device.update()        
+            ret_color, color_image = capture.get_color_image() 
+            if not ret_color:
+                    continue
+            color_image_display = color_image.copy()
+
+            circle = detect_circle_position(color_image, lower_range=lower_red, upper_range=upper_red)
+
+
 
         circle = np.round(circle).astype("int")
-        cv2.circle(color_image, center=(circle[0], circle[1]), radius=circle[2], color=(0, 255, 0), thickness=2)
+        cv2.circle(color_image_display, center=(circle[0], circle[1]), radius=circle[2], color=(0, 255, 0), thickness=2)
 
         pix_x = circle[0]
         pix_y = circle[1]
@@ -133,32 +161,11 @@ def main():
         pos3d_color = device.calibration.convert_2d_to_3d(pixels, rgb_depth, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_COLOR)       
         laser_in_camera_coordinates = np.array([pos3d_color.xyz.x, pos3d_color.xyz.y, pos3d_color.xyz.z])
 
-        rmse = np.sqrt(np.mean(np.square(mouse_in_camera_coordinates.reshape((-1)) - laser_in_camera_coordinates)))
-    ######################################################################
-
-             
-
-
-
-        
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(color_image, f"fps: {1 / (time.time() - start)}", (10, 20), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-
-        cv2.putText(color_image, f"Target Coordinates w.r.t. mirror center:", (10, 40), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        cv2.putText(color_image, f"X: {camera_coordinates_in_laser_coordinates[0]}", (10, 60), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        cv2.putText(color_image, f"Y: {camera_coordinates_in_laser_coordinates[1]}", (10, 80), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        cv2.putText(color_image, f"Z: {camera_coordinates_in_laser_coordinates[2]}", (10, 100), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-
-        cv2.putText(color_image, f"RMSE: {rmse}", (10, 120), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-
-
-        
-        # cv2.circle(color_image, center=(mouse_x, mouse_y), radius=10, color=(0, 255, 0), thickness=2)
-        # Show detected target position
-        cv2.imshow('Laser Detector',color_image)
-        # Press q key to stop
-        if cv2.waitKey(1) == ord('q'):
-            break
+        rmse = np.sqrt(np.mean(np.square(point_cam_3d.reshape((-1)) - laser_in_camera_coordinates)))          
+    
+        print("RMSE: ", rmse)  
+        cv2.imshow('Laser Detector',color_image_display)
+        cv2.waitKey(0)
 
 
 

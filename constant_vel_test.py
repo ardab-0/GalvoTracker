@@ -35,7 +35,7 @@ def updatePos(dt):
     global mouse_x, mouse_y, mul
     
     mouse_x = mouse_x + dt*400*mul
-    if mouse_x > 900:
+    if mouse_x > 600:
          mul = -1
     elif mouse_x < 200:
          mul = 1
