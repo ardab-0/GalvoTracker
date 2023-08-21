@@ -5,7 +5,7 @@
 \documentclass[
 12pt,               										% Schriftgroesse
 a4paper,            										% Layout fuer DINA4
-german,             										% deutsche Sprache, global
+english,             										% deutsche Sprache, global
 twoside,            										% Layout fuer beidseitigen Druck
 headinclude,        										% Kopfzeile wird Seiten-Layouts mit beruecksichtigt
 headsepline,        										% horizontale Linie unter Kolumnentitel
@@ -55,6 +55,7 @@ listof=totoc,version=first									% Abbildungs- und Tabellenverzeichnis ins Inh
 \usepackage{tikz}
 \usepackage[european,siunitx]{circuitikz}
 \usepackage{pgfplots}
+\usepackage{gensymb}
 
 %---- Einstellungen fuer matlab2tikz -------
 \pgfplotsset{compat=newest}
@@ -128,6 +129,8 @@ listof=totoc,version=first									% Abbildungs- und Tabellenverzeichnis ins Inh
 \include{inhalt/einleitung}									% Einleitung (Bezeichnung passend zur Arbeit!)
 
 \include{inhalt/grundlagen}									% Beginn Hauptteil
+
+\include{inhalt/project}	
 
 \include{inhalt/zusammenfassung}							% Zusammenfassung (Bezeichnung passend zur Arbeit!)
 

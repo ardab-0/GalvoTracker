@@ -2,8 +2,23 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {2.1}{\ignorespaces Bild mit Tikz erstellt, Bildunterschrift einzeilig und zentriert.\relax }}{3}{figure.caption.16}%
-\contentsline {figure}{\numberline {2.2}{\ignorespaces Gewöhnliches Bild (hier pdf) und da dies eine zweizeilige Bildunterschrift ist, ist sie linksbündig und die zweite Zeile eingerückt.\relax }}{3}{figure.caption.17}%
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Bild mit Tikz erstellt, Bildunterschrift einzeilig und zentriert.\relax }}{3}{figure.caption.13}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Gewöhnliches Bild (hier pdf) und da dies eine zweizeilige Bildunterschrift ist, ist sie linksbündig und die zweite Zeile eingerückt.\relax }}{3}{figure.caption.14}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Laser, depth camera, and beam steering mirror setup\relax }}{6}{figure.caption.22}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Internal mirror coordinate system[1]\relax }}{7}{figure.caption.23}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Relation between rotation of the mirror ($\theta $) and the mirror coordinate (x) in X-axis[1]\relax }}{7}{figure.caption.24}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Mirror coordinate system [1]\relax }}{7}{figure.caption.25}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Position error test setup\relax }}{10}{figure.caption.29}%
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Power(mW) - Position(mm) graphs for raw signal and cubic interpolation signal\relax }}{10}{figure.caption.30}%
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Power(mW) - Position(mm) graphs for raw signal and cubic interpolation signal\relax }}{11}{figure.caption.31}%
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Power(mW) - Position(mm) graphs for raw signal and cubic interpolation signal\relax }}{11}{figure.caption.32}%
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Recording of the same points in steering mirror and depth camera coordinate systems \relax }}{13}{figure.caption.39}%
+\contentsline {figure}{\numberline {3.10}{\ignorespaces Camera points after the transformation \relax }}{14}{figure.caption.40}%
+\contentsline {figure}{\numberline {3.11}{\ignorespaces Rough sensor image.\relax }}{15}{figure.caption.44}%
+\contentsline {figure}{\numberline {3.12}{\ignorespaces Fine sensor image.\relax }}{15}{figure.caption.44}%
+\contentsline {figure}{\numberline {3.13}{\ignorespaces Sensor positions (S1, S2, S3), detected sensor positions (M1, M2, M3) and steering mirror position (O) from camera view.\relax }}{17}{figure.caption.45}%
+\contentsline {figure}{\numberline {3.14}{\ignorespaces Sensor positions (S1, S2, S3), detected sensor positions (M1, M2, M3) and steering mirror position (O) from top view.\relax }}{17}{figure.caption.45}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

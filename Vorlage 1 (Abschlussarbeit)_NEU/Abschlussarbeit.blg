@@ -1,34 +1,25 @@
-This is BibTeX, Version 0.99d
+This is BibTeX, Version 0.99d (TeX Live 2023)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: Abschlussarbeit.aux
-Reallocating 'name_of_file' (item size: 1) to 21 items.
 A level-1 auxiliary file: inhalt/deckblatt.aux
-Reallocating 'name_of_file' (item size: 1) to 22 items.
 A level-1 auxiliary file: inhalt/erklaerung.aux
-Reallocating 'name_of_file' (item size: 1) to 20 items.
 A level-1 auxiliary file: inhalt/abstract.aux
-Reallocating 'name_of_file' (item size: 1) to 19 items.
 A level-1 auxiliary file: inhalt/symbole.aux
-Reallocating 'name_of_file' (item size: 1) to 22 items.
 A level-1 auxiliary file: inhalt/einleitung.aux
-Reallocating 'name_of_file' (item size: 1) to 22 items.
 A level-1 auxiliary file: inhalt/grundlagen.aux
-Reallocating 'name_of_file' (item size: 1) to 27 items.
+A level-1 auxiliary file: inhalt/project.aux
 A level-1 auxiliary file: inhalt/zusammenfassung.aux
-Reallocating 'name_of_file' (item size: 1) to 18 items.
 A level-1 auxiliary file: inhalt/anhang.aux
-Reallocating 'name_of_file' (item size: 1) to 9 items.
 The style file: unsrtdin.bst
-Reallocating 'name_of_file' (item size: 1) to 10 items.
-Reallocating 'singl_function' (item size: 4) to 100 items.
-Reallocating 'singl_function' (item size: 4) to 100 items.
-Reallocating 'wiz_functions' (item size: 4) to 6000 items.
-Reallocating 'singl_function' (item size: 4) to 100 items.
-Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: literatur.bib
 You've used 2 entries,
             4011 wiz_defined-function locations,
-            795 strings with 5818 characters,
+            796 strings with 5836 characters,
 and the built_in function-call counts, 606 in all, are:
 = -- 38
 > -- 15
