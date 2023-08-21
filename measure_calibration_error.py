@@ -13,30 +13,42 @@ from image_processing.black_white import black_and_white_threshold
 from image_processing.color_picker import Color_Picker
 
 
-# Constants 
-d = 0
+######################### Constants 
+d = 0 # mm
 mirror_rotation_deg = 45
 num_iterations = 50
 save_path = "ir_calibration_parameters_test"
-
-
+accuracy_path = "calibration_accuracy"
+CALIBRATION_ITER = 3
+sample_x = 5
+sample_y = 3
+z_t = 573 # mm
 lower_red = np.array([140,   10, 240]) 
 upper_red = np.array([180, 130, 256])
 
+####################### Constants 
+
+
+
 with open('{}/parameters.pkl'.format(save_path), 'rb') as f:
     loaded_dict = pickle.load(f)
-    R = loaded_dict["R"]
-    t = loaded_dict["t"]
+    laser_points = loaded_dict["laser_points"]
+    camera_points = loaded_dict["camera_points"]
 
 
-sample_x = 5
-sample_y = 3
+
+laser_points = laser_points[:, :3*CALIBRATION_ITER]
+camera_points = camera_points[:, :3*CALIBRATION_ITER]
+R, t = optimal_rotation_and_translation(camera_points, laser_points)
+
+
+
+
 a = np.linspace(-100, 100, sample_x)
 b = np.linspace(-50, 50, sample_y)
 
 x_t = np.tile(a, sample_y)
 y_t = np.repeat(b, sample_x)
-z_t = [ 575 ]
 
 laser_points = []
 camera_points = []
@@ -76,90 +88,95 @@ si_1 = mre2.Mirror.Channel_1.StaticInput
 
 
 
+rmse_scores = []
 
-for z in z_t:
-    coordinate_transform = CoordinateTransform(d=d, D=z, rotation_degree=mirror_rotation_deg)
-
-
-
-    y_m, x_m = coordinate_transform.target_to_mirror(y_t, x_t) # order is changed in order to change x and y axis
-
-    
-    input(f"Press enter to start calibration in distance {z} mm from mirror.")
-    # Set mirror position
-    for i in range(len(x_m)):
-
-        # Point the laser
-        si_0.SetXY(y_m[i])        
-        si_1.SetXY(x_m[i])    
-
-        time.sleep(0.5)
-
-        reference_point_in_laser_coordinates = np.array([x_t[i], y_t[i], z]).reshape((3, 1))
-        reference_point_in_camera_coordinates = R.T @ (reference_point_in_laser_coordinates - t)
-        reference_point_in_camera_coordinates_k4a = k4a_float3_t((reference_point_in_camera_coordinates[0], reference_point_in_camera_coordinates[1], reference_point_in_camera_coordinates[2]))
+coordinate_transform = CoordinateTransform(d=d, D=z_t, rotation_degree=mirror_rotation_deg)
 
 
-        reference_pos2d_color = device.calibration.convert_3d_to_2d(reference_point_in_camera_coordinates_k4a, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_COLOR)
-        reference_pos2d_color = [reference_pos2d_color.xy.x, reference_pos2d_color.xy.y]
 
-        average_laser_pos_in_camera_coordinates_np = np.zeros((3), dtype=float)
-        number_of_camera_coordinates_in_batch = 0
-        while  number_of_camera_coordinates_in_batch < num_iterations:
-            # Get capture
-            capture = device.update()
-
-            # Get the color image from the capture
-            ret_color, color_image = capture.get_color_image()
-
-            # Get the colored depth
-            ret_depth, transformed_depth_image = capture.get_transformed_depth_image()
-
-            if not ret_color or not ret_depth:
-                continue
-
-            circle = detect_circle_position(color_image, lower_range=lower_red, upper_range=upper_red)
-
-            if circle is  None:
-                print("Laser is not detected")                
-                continue
-
-            circle = np.round(circle).astype("int")
-            cv2.circle(color_image, center=(circle[0], circle[1]), radius=circle[2], color=(0, 255, 0), thickness=2)
-
-            pix_x = circle[0]
-            pix_y = circle[1]
-            rgb_depth = transformed_depth_image[pix_y, pix_x]
-
-            pixels = k4a_float2_t((pix_x, pix_y))
-
-            pos3d_color = device.calibration.convert_2d_to_3d(pixels, rgb_depth, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_COLOR)
-
-        
-            cv2.circle(color_image, center=(int(reference_pos2d_color[0]), int(reference_pos2d_color[1])), radius=circle[2], color=(0, 0, 255), thickness=2)   
-            cv2.imshow('Laser Detector', color_image)
-            laser_in_camera_coordinates = np.array([pos3d_color.xyz.x, pos3d_color.xyz.y, pos3d_color.xyz.z])
-            average_laser_pos_in_camera_coordinates_np += laser_in_camera_coordinates
-            number_of_camera_coordinates_in_batch += 1
-
-        
+y_m, x_m = coordinate_transform.target_to_mirror(y_t, x_t) # order is changed in order to change x and y axis
 
 
-        if number_of_camera_coordinates_in_batch == 0:
+input(f"Press enter to start calibration in distance {z_t} mm from mirror.")
+# Set mirror position
+for i in range(len(x_m)):
+
+    # Point the laser
+    si_0.SetXY(y_m[i])        
+    si_1.SetXY(x_m[i])    
+
+    time.sleep(0.5)
+
+    reference_point_in_laser_coordinates = np.array([x_t[i], y_t[i], z_t]).reshape((3, 1))
+    reference_point_in_camera_coordinates = R.T @ (reference_point_in_laser_coordinates - t)
+    reference_point_in_camera_coordinates_k4a = k4a_float3_t((reference_point_in_camera_coordinates[0], reference_point_in_camera_coordinates[1], reference_point_in_camera_coordinates[2]))
+
+
+    reference_pos2d_color = device.calibration.convert_3d_to_2d(reference_point_in_camera_coordinates_k4a, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_COLOR)
+    reference_pos2d_color = [reference_pos2d_color.xy.x, reference_pos2d_color.xy.y]
+
+    average_laser_pos_in_camera_coordinates_np = np.zeros((3), dtype=float)
+    number_of_camera_coordinates_in_batch = 0
+    while  number_of_camera_coordinates_in_batch < num_iterations:
+        # Get capture
+        capture = device.update()
+
+        # Get the color image from the capture
+        ret_color, color_image = capture.get_color_image()
+
+        # Get the colored depth
+        ret_depth, transformed_depth_image = capture.get_transformed_depth_image()
+
+        if not ret_color or not ret_depth:
             continue
-        average_laser_pos_in_camera_coordinates_np /= number_of_camera_coordinates_in_batch
 
-        average_laser_pos_in_laser_coordinates_np = R @ average_laser_pos_in_camera_coordinates_np.reshape((3, 1)) + t
+        circle = detect_circle_position(color_image, lower_range=lower_red, upper_range=upper_red)
 
-        rmse = np.sqrt(np.mean(np.square(average_laser_pos_in_laser_coordinates_np - reference_point_in_laser_coordinates)))
-        print("RMSE: ", rmse)
+        if circle is  None:
+            print("Laser is not detected")                
+            continue
 
+        circle = np.round(circle).astype("int")
+        cv2.circle(color_image, center=(circle[0], circle[1]), radius=circle[2], color=(0, 255, 0), thickness=2)
 
-        cv2.waitKey(0)
+        pix_x = circle[0]
+        pix_y = circle[1]
+        rgb_depth = transformed_depth_image[pix_y, pix_x]
+
+        pixels = k4a_float2_t((pix_x, pix_y))
+
+        pos3d_color = device.calibration.convert_2d_to_3d(pixels, rgb_depth, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_COLOR)
+
+    
+        cv2.circle(color_image, center=(int(reference_pos2d_color[0]), int(reference_pos2d_color[1])), radius=circle[2], color=(0, 0, 255), thickness=2)   
+        cv2.imshow('Laser Detector', color_image)
+        laser_in_camera_coordinates = np.array([pos3d_color.xyz.x, pos3d_color.xyz.y, pos3d_color.xyz.z])
+        average_laser_pos_in_camera_coordinates_np += laser_in_camera_coordinates
+        number_of_camera_coordinates_in_batch += 1
+
     
 
 
+    if number_of_camera_coordinates_in_batch == 0:
+        continue
+    average_laser_pos_in_camera_coordinates_np /= number_of_camera_coordinates_in_batch
 
+    average_laser_pos_in_laser_coordinates_np = R @ average_laser_pos_in_camera_coordinates_np.reshape((3, 1)) + t
+
+    rmse = np.sqrt(np.mean(np.square(average_laser_pos_in_laser_coordinates_np - reference_point_in_laser_coordinates)))
+    print("RMSE: ", rmse)
+    rmse_scores.append(rmse)
+
+    cv2.waitKey(0)
+    
+
+accuracy_results = {"x_t": x_t,
+                    "y_t": y_t,
+                    "z_t": z_t,
+                    "rmse": rmse_scores}
+
+with open('{}/iter_{}.pkl'.format(accuracy_path, CALIBRATION_ITER), 'wb') as f:
+    pickle.dump(accuracy_results, f)
    
 mre2.disconnect()
 print("done")

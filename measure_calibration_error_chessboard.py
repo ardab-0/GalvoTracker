@@ -67,6 +67,7 @@ def main():
     ch_1.SetControlMode(optoMDC.Units.XY)           
     ch_1.Manager.CheckSignalFlow()                       # This is a useful method to make sure the signal flow is configured correctly.
     si_1 = mre2.Mirror.Channel_1.StaticInput
+    
 
 
     # Initialize the library, if the library is not found, add the library path as argument
