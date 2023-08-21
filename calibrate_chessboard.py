@@ -22,9 +22,9 @@ import tkinter as tk
 # Constants
 d = 0
 mirror_rotation_deg = 45
-save_path = "ir_calibration_parameters"
+save_path = "ir_calibration_parameters_test"
 CAPTURE_COUNT = 6
-ITER_COUNT = 5
+ITER_COUNT = 10
 PI_COM_PORT = "COM6"
 distance_of_sensor_from_marker_mm=-55
 distance_of_second_sensor_from_first_sensor_mm=75
@@ -702,7 +702,7 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
 
         
         # deduce new position by using marker pattern if it is possible
-        if num_iter > 0:
+        if num_iter > 1:
             
 
             current_camera_points_np = avg_points_cam_3d
@@ -833,7 +833,7 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
                             "laser_points": laser_points_np,
                             "camera_points": camera_points_np}
 
-        with open('{}/parameters.pkl'.format(save_path), 'wb') as f:
+        with open('{}/parameters_{}_iter.pkl'.format(save_path, ITER_COUNT), 'wb') as f:
             pickle.dump(calibration_dict, f)
 
 

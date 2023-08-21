@@ -4,13 +4,13 @@ import matplotlib.pyplot as plt
 import pickle
 
 def main():
-    save_path = "ir_calibration_parameters"
+    save_path = "ir_calibration_parameters_test"
 
 
     fig = plt.figure()
     ax = plt.axes(projection='3d')
 
-    with open('temp_parameters.pkl'.format(save_path), 'rb') as f:
+    with open('{}/parameters.pkl'.format(save_path), 'rb') as f:
         loaded_dict = pickle.load(f)
         R = loaded_dict["R"]
         t = loaded_dict["t"]

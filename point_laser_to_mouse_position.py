@@ -14,7 +14,7 @@ from pykinect_azure.k4a.transformation import Transformation
 # Constants 
 d = 0
 mirror_rotation_deg = 45
-save_path = "ir_calibration_parameters"
+save_path = "ir_calibration_parameters_test"
 # target coordinate offset (mm)
 
 
