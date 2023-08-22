@@ -530,18 +530,18 @@ a point in mirror coordinate system, m, with the following mapping:
 \end{figure}
 
 
-R is $3x3$ an orthogonal rotation matrix and t is a $3x1$ translation 
+R is $3x3$ an orthogonal rotation matrix and t is a $3x1$ translation
 vector. Optimal R and t are found by the following algorithm [2] [3] [4]:
-R is an orthogonal rotation matrix and t is a translation vector. 
+R is an orthogonal rotation matrix and t is a translation vector.
 Optimal R and t are found by the following algorithm [2] [3] [4]:
 
 
 To find the rotation matrix R,
 
 \begin{align*}
-    H &= (A-m_{A})(B-m_{B})^{T} \\
-    U, S, V^{T} &= SVD(H) \\
-    R &= VU^{T}
+    H           & = (A-m_{A})(B-m_{B})^{T} \\
+    U, S, V^{T} & = SVD(H)                 \\
+    R           & = VU^{T}
 \end{align*}
 
 
@@ -553,11 +553,11 @@ To find translation vector t,
 
 
 
-Optimal transformation maps each point in camera coordinate 
-system to a point in mirror coordinate system. After the 
-mapping mirror points and camera points are almost aligned 
-as shown in Figure 8. With this mapping, any point recorded 
-by depth camera can be transformed into a point which can be 
+Optimal transformation maps each point in camera coordinate
+system to a point in mirror coordinate system. After the
+mapping mirror points and camera points are almost aligned
+as shown in Figure 8. With this mapping, any point recorded
+by depth camera can be transformed into a point which can be
 used by the mirror controller.
 
 
@@ -572,62 +572,62 @@ used by the mirror controller.
 \label{sec:Calibration Procedure}
 
 
-Calibration of the system is done in order to coordinate depth 
-camera and mirror together. Both steering mirror and depth 
-camera have their own coordinate systems. The relationship 
-between these coordinate systems is unknown which makes them 
-unable to perform tasks together. The main objective of the 
-calibration is to find the rotation and translation of the 
-coordinate systems relative to each other.  For this purpose, 
-the optimal R and t finding algorithm discussed in previous 
-chapter is used. 
-Calibration procedure is responsible for obtaining point pairs 
-consisting of a point in depth camera coordinate system and its 
-corresponding point in steering mirror coordinate system. After 
-the collection of the dataset, the mapping is computed and saved 
-for later usage. Point pair collection operation depends on the 
-type of laser used in the system. For easier testing a visible 
-laser is used. However, in the end system an IR laser is used. 
-Using IR laser restricts the usage of camera since it is not 
-visible by camera sensor. IR laser requires IR light intensity 
-sensors to detect and a different calibration procedure than 
-visible laser.  
+Calibration of the system is done in order to coordinate depth
+camera and mirror together. Both steering mirror and depth
+camera have their own coordinate systems. The relationship
+between these coordinate systems is unknown which makes them
+unable to perform tasks together. The main objective of the
+calibration is to find the rotation and translation of the
+coordinate systems relative to each other.  For this purpose,
+the optimal R and t finding algorithm discussed in previous
+chapter is used.
+Calibration procedure is responsible for obtaining point pairs
+consisting of a point in depth camera coordinate system and its
+corresponding point in steering mirror coordinate system. After
+the collection of the dataset, the mapping is computed and saved
+for later usage. Point pair collection operation depends on the
+type of laser used in the system. For easier testing a visible
+laser is used. However, in the end system an IR laser is used.
+Using IR laser restricts the usage of camera since it is not
+visible by camera sensor. IR laser requires IR light intensity
+sensors to detect and a different calibration procedure than
+visible laser.
 
 
 \subsection{Visible Laser}
 \label{sec:Visible Laser}
 
-The laser is pointed at 30 different positions in a plane 
-560 mm away from the mirror center. These points are recorded 
-as mirror points B. Each laser position is extracted from the 
-color images by using Hough Circle Detection algorithm. Once 
-2D pixel coordinates are found they are converted to 3D 
-coordinates by Kinect Azure SDK's k4a::calibration::convert\_2d\_to\_3d [5] 
-function. Extracted 3D depth camera points are named A. 
-Points A and B are formed into matrices with shape 3xN. 
+The laser is pointed at 30 different positions in a plane
+560 mm away from the mirror center. These points are recorded
+as mirror points B. Each laser position is extracted from the
+color images by using Hough Circle Detection algorithm. Once
+2D pixel coordinates are found they are converted to 3D
+coordinates by Kinect Azure SDK's k4a::calibration::convert\_2d\_to\_3d [5]
+function. Extracted 3D depth camera points are named A.
+Points A and B are formed into matrices with shape 3xN.
 Finally, algorithm 1 is used to find R and t matrices
 
 
 \subsection{IR Laser}
 \label{sec:IR Laser}
 
-IR laser requires different calibration method from the 
-visible laser. Point patching operation is done via 
-laser intensity sensors. The sensor setup used to detect 
-positions is in figure below. 3 sensors generate analog 
-output signals based on the intensity of light hitting 
-them. The analog signal is captured by ADCs on a Raspberry 
+IR laser requires different calibration method from the
+visible laser. Point patching operation is done via
+laser intensity sensors. The sensor setup used to detect
+positions is in figure below. 3 sensors generate analog
+output signals based on the intensity of light hitting
+them. The analog signal is captured by ADCs on a Raspberry
 Pi Pico board and transmitted to host computer via USB.
 --add sensor picture
-While the sensor is recording the signal intensity, 
-laser scans the area near the sensor position based on an 
-initial sensor position estimate in terms of a 3D coordinate. 
-Each signal point is plotted with respect to position of the 
-laser at the time of recording. As a result, an intensity 
-profile is generated. The maximum intensity level of this 
-profile is chosen as the sensor position. This process is 
-performed by all three sensors, and 3 different images 
-are generated. In each image a peak intensity is observed, 
+While the sensor is recording the signal intensity,
+laser scans the area near the sensor position based on an
+initial sensor position estimate in terms of a 3D coordinate.
+Each signal point is plotted with respect to position of the
+laser at the time of recording. As a result, an intensity
+profile is generated. The maximum intensity level of this
+profile is chosen as the sensor position. This process is
+performed by all three sensors, and 3 different images
+are generated. In each image a peak intensity is observed,
 and it is marked as that specific sensor's position.
 
 
@@ -646,12 +646,12 @@ and it is marked as that specific sensor's position.
 
 
 
-3 3D coordinates generated are not exact coordinates due to the 
-initial position estimate. The x and y positions determined by 
-scanning the laser are valid if and only if the initial distance 
-between mirror center and target plane is correct. Since this won't 
-be the case for most cases, found points should be used to calculate 
-the real distance between mirror center and target plane. 
+3 3D coordinates generated are not exact coordinates due to the
+initial position estimate. The x and y positions determined by
+scanning the laser are valid if and only if the initial distance
+between mirror center and target plane is correct. Since this won't
+be the case for most cases, found points should be used to calculate
+the real distance between mirror center and target plane.
 
 
 \begin{figure}[!htb]\centering
@@ -667,11 +667,200 @@ the real distance between mirror center and target plane.
 
 
 
-To calculate the distance between mirror center and target plane, 
-the geometry of the sensors is used. Sensors are placed on top 
-of each other as in Figure 9 and the plate holding the sensors is 
-placed perpendicular to ground. This configuration places all the 
-sensors at the same distance from mirror center in the z direction. 
-Using this constraint, the distance between sensors and mirror 
-center in z direction is calculated: 
+To calculate the distance between mirror center and target plane,
+the geometry of the sensors is used. Sensors are placed on top
+of each other as in Figure 9 and the plate holding the sensors is
+placed perpendicular to ground. This configuration places all the
+sensors at the same distance from mirror center in the z direction.
+Using this constraint, the distance between sensors and mirror
+center in z direction is calculated:
 
+\begin{align*}
+    d1 & = |M1 \cdot \frac{z2}{z1} - M2 \cdot \frac{z2}{z1} | & d2 & = |M2 \cdot \frac{z2}{z1} - M3 \cdot \frac{z2}{z1} | & d3 & = |M1 \cdot \frac{z2}{z1} - M3 \cdot \frac{z2}{z1} | \\
+    z2 & =  \frac{d1 \cdot z1}{|M1 - M2|}                     & z2 & =  \frac{d2 \cdot z1}{|M2 - M3|}                     & z2 & =  \frac{d3 \cdot z1}{|M1 - M3|}
+\end{align*}
+
+
+
+
+With the z2 distance obtained, previous 3D coordinates are
+updated and they are saved as mirror points B.
+The next step is to find the sensor positions with the depth
+camera and to obtain depth camera points A. To localize the
+sensors, the marker pattern in figure below is attached to
+the sensor plate. Each circular fiducial marker is localized
+using WHYCon algorithm (will be discussed later). Two unit
+vectors are extracted from the 3D coordinates of markers.
+
+
+\begin{align*}
+    u_{l} & = B-A & u_{d} & = C-A
+\end{align*}
+
+
+
+\begin{figure}[!htb]\centering
+    \includegraphics*[width = 6cm]{bilder/project/localization_marker_1.png}
+    \caption{Localization marker pattern with WHYCon marker}
+    \label{fig:whycon localization marker}
+\end{figure}
+
+
+
+Unit vectors $u_{l}$ and $u_{d}$ are used to locate the 3D position of
+the sensors. This is possible since markers and the marker pattern are
+on the same plane. Found points are recorded as depth camera points A.
+Points $A$ and $B$ are formed into matrices with shape $3xN$. Finally, algorithm
+1 is used to find $R$ and $t$ matrices.
+
+
+\subsection{Calibration Results}
+
+
+
+
+\section{Detection Algorithms}
+
+Position estimation is the first step to tracking the position
+of the body. One of the most common approaches to this problem
+is usage of visual markers. A visual marker can be distinguished
+from the environment without too much difficulty due to its
+characteristics. For the project 3 different algorithms are tested:
+ArUco, Hough Circle Detector, and WHYCon. Detection algorithms
+are evaluated based on their processing times in order to choose
+the best option for the system.
+
+\subsection{ArUco}
+
+ArUco is a popular binary square fiducial marker used for
+absolute pose estimation.  ArUCo markers are black square
+shapes with an inner grid structure to encode a binary code.
+The binary code is used to identify the markers and distinguish
+multiple markers inside the same camera view. Due to the encoding,
+Aruco markers are not easily detected from far distances. [6]
+
+\begin{figure}[!htb]\centering
+    \includegraphics*[width = 16cm]{bilder/project/aruco_marker.png}
+    \caption{ArUco marker with ids 0 up to 3 [6]}
+    \label{fig:aruco marker}
+\end{figure}
+
+
+\subsection{Hough Circle Detector}
+--TODO
+
+
+\subsection{WHYCon}
+
+WHYCon is an open-source marker-based localization system. It is
+highly computationally efficient. [7] WHYCon doesn’t provide ant
+identification information, its marker consists of black and white
+concentric circles. Due to its simplicity, it can be identified
+easily and it requires low computational resources. Durin
+implementation, only option that was able to run on a Windows
+machine was a C++ repository. To connect the algorithm to rest
+of the system, Python bindings were implemented using Pybind11.
+
+\begin{figure}[!htb]\centering
+    \includegraphics*[width = 6cm]{bilder/project/whycon_marker.png}
+    \caption{WHYCon marker [8]}
+    \label{fig:whycon marker}
+\end{figure}
+
+
+\subsection{Algorithm Performance Comparison}
+
+All of the algorithms are run on the same computer with Intel i7.
+Based on the runtimes WHYCon is the most performant algorithm.
+ArUco has similar performance with 4ms, but in case of movement
+and bad lighting conditions the runtime can increase up to 30ms.
+With a 30ms runtime the algorithm is not suitable for real time
+tracking. Hough Circle Detector also has good runtime, but WHYCon
+outperforms it. Due to its performance, WHYCon is used in the system.
+
+\begin{table}[ht]
+    \captionabove{Detection Algorithm Performances} %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \centering
+    \begin{tabular}{| c | c |} %Ausrichtung festlegen
+        \hline Algorithm      & Runtime (ms) \\ \hline % Überschriften
+        ArUco                 & 4-30         \\
+        WHYCon                & 2-3          \\
+        Hough Circle Detector & 8-10         \\
+        \hline
+    \end{tabular}
+    %		\caption{Amateurfunkbänder (Auswahl)}
+    \label{tab:detection_algorithm_performance}
+\end{table}
+
+
+\begin{table}[ht]
+    \captionabove{Runtime of different code sections} %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \centering
+    \begin{tabular}{| c | c |} %Ausrichtung festlegen
+        \hline Code Sections                                         & Elapsed Time (ms) \\ \hline % Überschriften
+        Capturing Color Image                                        & 3                 \\
+        Marker Detection                                             & 2                 \\
+        Transforming Depth Image to Color Camera's Coordinate System & 15                \\
+        3D to mirror coordinate conversion                           & 1                 \\
+        Mirror Adjustment                                            & 2                 \\
+        \textbf{Total Time}                                          & \textbf{23}       \\
+        \hline
+    \end{tabular}
+    %		\caption{Amateurfunkbänder (Auswahl)}
+    \label{tab:code_runtime}
+\end{table}
+
+
+\section{Maximum distance of detection with different marker sizes}
+
+Maximum distance detection test is performed with WHYCon
+detection algorithm. Tests are performed with distances 400mm,
+600mm. 800mm away from steering mirror center. Tests are repeated
+for 720p and 1080p image resolutions.
+
+
+\begin{figure}
+    \begin{subfigure}[b]{.45\linewidth}
+        \includegraphics[width=\linewidth]{bilder/project/720p400mm.png}
+        \caption{720p 400mm}\label{fig:720p400mm}
+    \end{subfigure}
+    \begin{subfigure}[b]{.45\linewidth}
+        \includegraphics[width=\linewidth]{bilder/project/1080p400mm.png}
+        \caption{1080p 400mm}\label{fig:1080p400mm}
+    \end{subfigure}
+
+
+    \begin{subfigure}[b]{.45\linewidth}
+        \includegraphics[width=\linewidth]{bilder/project/720p600mm.png}
+        \caption{720p 600mm}\label{fig:720p600mm}
+    \end{subfigure}
+    \begin{subfigure}[b]{.45\linewidth}
+        \includegraphics[width=\linewidth]{bilder/project/1080p600mm.png}
+        \caption{1080p 600mm}\label{fig:1080p600mm}
+    \end{subfigure}
+
+
+    \begin{subfigure}[b]{.45\linewidth}
+        \includegraphics[width=\linewidth]{bilder/project/720p800mm.png}
+        \caption{720p 800mm}\label{fig:720p800mm}
+    \end{subfigure}
+    \begin{subfigure}[b]{.45\linewidth}
+        \includegraphics[width=\linewidth]{bilder/project/1080p800mm.png}
+        \caption{1080p 800mm}\label{fig:1080p800mm}
+    \end{subfigure}
+
+
+    \begin{subfigure}[b]{.45\linewidth}
+        \includegraphics[width=\linewidth]{bilder/project/720p1000mm.png}
+        \caption{720p 1000mm}\label{fig:720p1000mm}
+    \end{subfigure}
+    \begin{subfigure}[b]{.45\linewidth}
+        \includegraphics[width=\linewidth]{bilder/project/1080p1000mm.png}
+        \caption{1080p 1000mm}\label{fig:1080p1000mm}
+    \end{subfigure}
+    \caption{Detection results of WHYCon marker at different distances and different resolutions}
+    \label{fig:detection_results}
+\end{figure}
+
+
+\section{Tracking Performance}

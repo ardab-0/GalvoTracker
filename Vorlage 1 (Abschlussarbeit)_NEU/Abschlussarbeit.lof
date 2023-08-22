@@ -19,6 +19,10 @@
 \contentsline {figure}{\numberline {3.12}{\ignorespaces Fine sensor image.\relax }}{15}{figure.caption.44}%
 \contentsline {figure}{\numberline {3.13}{\ignorespaces Sensor positions (S1, S2, S3), detected sensor positions (M1, M2, M3) and steering mirror position (O) from camera view.\relax }}{17}{figure.caption.45}%
 \contentsline {figure}{\numberline {3.14}{\ignorespaces Sensor positions (S1, S2, S3), detected sensor positions (M1, M2, M3) and steering mirror position (O) from top view.\relax }}{17}{figure.caption.45}%
+\contentsline {figure}{\numberline {3.15}{\ignorespaces Localization marker pattern with WHYCon marker\relax }}{18}{figure.caption.46}%
+\contentsline {figure}{\numberline {3.16}{\ignorespaces ArUco marker with ids 0 up to 3 [6]\relax }}{19}{figure.caption.50}%
+\contentsline {figure}{\numberline {3.17}{\ignorespaces WHYCon marker [8]\relax }}{19}{figure.caption.53}%
+\contentsline {figure}{\numberline {3.18}{\ignorespaces Detection results of WHYCon marker at different distances and different resolutions\relax }}{21}{figure.caption.58}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

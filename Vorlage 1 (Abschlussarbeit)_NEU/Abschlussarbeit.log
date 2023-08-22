@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.7.28)  20 AUG 2023 18:08
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.7.28)  22 AUG 2023 13:41
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1056,7 +1056,7 @@ Package: gensymb 2022/10/17 v1.0.2 (KJH)
 )
 \figureheight=\skip73
 \figurewidth=\skip74
-LaTeX Font Info:    Trying to load font information for T1+lmr on input line 106.
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 108.
  (d:/texlive/2023/texmf-dist/tex/latex/lm/t1lmr.fd
 File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) (./Abschlussarbeit.aux (./inhalt/deckblatt.aux) (./inhalt/erklaerung.aux) (./inhalt/abstract.aux) (./inhalt/symbole.aux) (./inhalt/einleitung.aux) (./inhalt/grundlagen.aux) (./inhalt/project.aux
@@ -1066,24 +1066,24 @@ LaTeX Warning: Label `fig:sensor_rough' multiply defined.
 ) (./inhalt/zusammenfassung.aux) (./inhalt/anhang.aux))
 \openout1 = `Abschlussarbeit.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 106.
-LaTeX Font Info:    ... okay on input line 106.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 106.
-LaTeX Font Info:    ... okay on input line 106.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 106.
-LaTeX Font Info:    ... okay on input line 106.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 106.
-LaTeX Font Info:    ... okay on input line 106.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 106.
-LaTeX Font Info:    ... okay on input line 106.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 106.
-LaTeX Font Info:    ... okay on input line 106.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 106.
-LaTeX Font Info:    ... okay on input line 106.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 106.
-LaTeX Font Info:    ... okay on input line 106.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 106.
-LaTeX Font Info:    ... okay on input line 106.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 108.
+LaTeX Font Info:    ... okay on input line 108.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 108.
+LaTeX Font Info:    ... okay on input line 108.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 108.
+LaTeX Font Info:    ... okay on input line 108.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 108.
+LaTeX Font Info:    ... okay on input line 108.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 108.
+LaTeX Font Info:    ... okay on input line 108.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 108.
+LaTeX Font Info:    ... okay on input line 108.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 108.
+LaTeX Font Info:    ... okay on input line 108.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 108.
+LaTeX Font Info:    ... okay on input line 108.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 108.
+LaTeX Font Info:    ... okay on input line 108.
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: float package is loaded.
 Package caption Info: hyperref package is loaded.
@@ -1109,16 +1109,16 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 48
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
 \c@lstlisting=\count364
-Package scrhack Info: undefining \float@addtolists on input line 106.
+Package scrhack Info: undefining \float@addtolists on input line 108.
  (d:/texlive/2023/texmf-dist/tex/latex/translations/translations-basic-dictionary-german.trsl
 File: translations-basic-dictionary-german.trsl (german translation file `translations-basic-dictionary')
 )
-Package translations Info: loading dictionary `translations-basic-dictionary' for `german'. on input line 106.
+Package translations Info: loading dictionary `translations-basic-dictionary' for `german'. on input line 108.
  (d:/texlive/2023/texmf-dist/tex/latex/translations/translations-basic-dictionary-english.trsl
 File: translations-basic-dictionary-english.trsl (english translation file `translations-basic-dictionary')
 )
-Package translations Info: loading dictionary `translations-basic-dictionary' for `english'. on input line 106.
-Package hyperref Info: Link coloring OFF on input line 106.
+Package translations Info: loading dictionary `translations-basic-dictionary' for `english'. on input line 108.
+Package hyperref Info: Link coloring OFF on input line 108.
  (./Abschlussarbeit.out) (./Abschlussarbeit.out)
 \@outlinefile=\write4
 \openout4 = `Abschlussarbeit.out'.
@@ -1130,7 +1130,7 @@ Class scrbook Info: loading recommended package `bookmark'.
 (scrbook)           `bookmarkpackage=false' before \begin{document} and
 (scrbook)           you can avoid this message adding:
 (scrbook)             \usepackage{bookmark}
-(scrbook)           before \begin{document} on input line 106.
+(scrbook)           before \begin{document} on input line 108.
  (d:/texlive/2023/texmf-dist/tex/latex/bookmark/bookmark.sty
 Package: bookmark 2020-11-06 v1.29 PDF bookmarks (HO)
  (d:/texlive/2023/texmf-dist/tex/latex/bookmark/bkm-pdftex.def
@@ -1139,13 +1139,13 @@ File: bkm-pdftex.def 2020-11-06 v1.29 bookmark driver for pdfTeX (HO)
 ))
 Package pgfplots notification 'compat/show suggested version=true': document has been generated with the most recent feature set (\pgfplotsset{compat=1.18}).
 
-LaTeX Info: Redefining \celsius on input line 106.
-Package gensymb Info: Faking symbols for \degree and \celsius on input line 106.
+LaTeX Info: Redefining \celsius on input line 108.
+Package gensymb Info: Faking symbols for \degree and \celsius on input line 108.
 
 Package gensymb Warning: Not defining \perthousand.
 
-LaTeX Info: Redefining \ohm on input line 106.
-Package gensymb Info: Using \Omega for \ohm on input line 106.
+LaTeX Info: Redefining \ohm on input line 108.
+Package gensymb Info: Using \Omega for \ohm on input line 108.
 
 Package gensymb Warning: Not defining \micro.
 
@@ -1181,11 +1181,11 @@ Overfull \hbox (14.3609pt too wide) in paragraph at lines 5--19
 \openout2 = `inhalt/erklaerung.aux'.
 
  (./inhalt/erklaerung.tex (d:/texlive/2023/texmf-dist/tex/latex/lm/ot1lmr.fd) (d:/texlive/2023/texmf-dist/tex/latex/lm/omllmm.fd) (d:/texlive/2023/texmf-dist/tex/latex/lm/omslmsy.fd) (d:/texlive/2023/texmf-dist/tex/latex/lm/omxlmex.fd) (d:/texlive/2023/texmf-dist/tex/latex/amsfonts/umsa.fd) (d:/texlive/2023/texmf-dist/tex/latex/amsfonts/umsb.fd))
-Underfull \hbox (badness 10000) in paragraph at lines 1--112
+Underfull \hbox (badness 10000) in paragraph at lines 1--114
 
  []
 
-LaTeX Font Info:    Trying to load font information for T1+lmss on input line 112.
+LaTeX Font Info:    Trying to load font information for T1+lmss on input line 114.
 (d:/texlive/2023/texmf-dist/tex/latex/lm/t1lmss.fd
 File: t1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) [1
@@ -1204,21 +1204,25 @@ File: t1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 
 ]) [4
 
-] (./Abschlussarbeit.toc)
+] (./Abschlussarbeit.toc [5
+
+
+
+
+{d:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{d:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}])
 \tf@toc=\write5
 \openout5 = `Abschlussarbeit.toc'.
 
- [5
-
-
-
-
-{d:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{d:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}]
+ [6]
 \openout2 = `inhalt/symbole.aux'.
 
  (./inhalt/symbole.tex
 chapter without number
-) [6
+) [7
+
+
+] [8
+
 
 
 ]
@@ -1227,9 +1231,6 @@ chapter without number
  (./inhalt/einleitung.tex
 chapter 1.
 ) [1
-
-
-
 
 
 
@@ -1252,7 +1253,7 @@ File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 
 
 {d:/texlive/2023/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}] (./bilder/grundlagen/parallelschwingkreis.tikz)
-<bilder/grundlagen/RX_Basisbandsignal_IQ_Diagramm.pdf, id=143, 402.91946pt x 295.90868pt>
+<bilder/grundlagen/RX_Basisbandsignal_IQ_Diagramm.pdf, id=167, 402.91946pt x 295.90868pt>
 File: bilder/grundlagen/RX_Basisbandsignal_IQ_Diagramm.pdf Graphic file (type pdf)
 <use bilder/grundlagen/RX_Basisbandsignal_IQ_Diagramm.pdf>
 Package pdftex.def Info: bilder/grundlagen/RX_Basisbandsignal_IQ_Diagramm.pdf  used on input line 50.
@@ -1267,24 +1268,24 @@ Overfull \hbox (13.12318pt too wide) in paragraph at lines 68--71
 
  (./inhalt/project.tex
 chapter 3.
-<bilder/project/setup.jpg, id=174, 470.0835pt x 264.4425pt>
+<bilder/project/setup.jpg, id=198, 470.0835pt x 264.4425pt>
 File: bilder/project/setup.jpg Graphic file (type jpg)
 <use bilder/project/setup.jpg>
 Package pdftex.def Info: bilder/project/setup.jpg  used on input line 15.
 (pdftex.def)             Requested size: 170.71652pt x 96.03448pt.
-<bilder/project/mirror_coordinates.png, id=176, 611.28375pt x 530.73282pt>
+<bilder/project/mirror_coordinates.png, id=200, 611.28375pt x 530.73282pt>
 File: bilder/project/mirror_coordinates.png Graphic file (type png)
 <use bilder/project/mirror_coordinates.png>
 Package pdftex.def Info: bilder/project/mirror_coordinates.png  used on input line 30.
 (pdftex.def)             Requested size: 170.71652pt x 148.21545pt.
-<bilder/project/mirror_rotation.png, id=179, 517.935pt x 319.94531pt>
+<bilder/project/mirror_rotation.png, id=203, 517.935pt x 319.94531pt>
 File: bilder/project/mirror_rotation.png Graphic file (type png)
 <use bilder/project/mirror_rotation.png>
 Package pdftex.def Info: bilder/project/mirror_rotation.png  used on input line 47.
 (pdftex.def)             Requested size: 170.71652pt x 105.45534pt.
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <10.95> on input line 49.
-<bilder/project/coordinate_systems.png, id=181, 573.342pt x 479.99326pt>
+<bilder/project/coordinate_systems.png, id=205, 573.342pt x 479.99326pt>
 File: bilder/project/coordinate_systems.png Graphic file (type png)
 <use bilder/project/coordinate_systems.png>
 Package pdftex.def Info: bilder/project/coordinate_systems.png  used on input line 56.
@@ -1327,13 +1328,13 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `math shift' on input line 136.
 
-<bilder/project/error_test_setup.jpg, id=211, 470.0835pt x 264.4425pt>
+<bilder/project/error_test_setup.jpg, id=235, 470.0835pt x 264.4425pt>
 File: bilder/project/error_test_setup.jpg Graphic file (type jpg)
 <use bilder/project/error_test_setup.jpg>
 Package pdftex.def Info: bilder/project/error_test_setup.jpg  used on input line 197.
 (pdftex.def)             Requested size: 284.52756pt x 160.06285pt.
 [9]
-<bilder/project/error_test_graph_1.png, id=217, 987.69pt x 237.88875pt>
+<bilder/project/error_test_graph_1.png, id=242, 987.69pt x 237.88875pt>
 File: bilder/project/error_test_graph_1.png Graphic file (type png)
 <use bilder/project/error_test_graph_1.png>
 Package pdftex.def Info: bilder/project/error_test_graph_1.png  used on input line 218.
@@ -1343,7 +1344,7 @@ Overfull \hbox (4.74203pt too wide) in paragraph at lines 218--219
  [][] 
  []
 
-<bilder/project/error_test_graph_2.png, id=219, 950.04938pt x 465.23813pt>
+<bilder/project/error_test_graph_2.png, id=244, 950.04938pt x 465.23813pt>
 File: bilder/project/error_test_graph_2.png Graphic file (type png)
 <use bilder/project/error_test_graph_2.png>
 Package pdftex.def Info: bilder/project/error_test_graph_2.png  used on input line 236.
@@ -1354,7 +1355,7 @@ Overfull \hbox (4.74203pt too wide) in paragraph at lines 236--237
  []
 
 [10 <./bilder/project/error_test_setup.jpg> <./bilder/project/error_test_graph_1.png>]
-<bilder/project/error_test_graph_3.png, id=230, 1390.44469pt x 680.5425pt>
+<bilder/project/error_test_graph_3.png, id=255, 1390.44469pt x 680.5425pt>
 File: bilder/project/error_test_graph_3.png Graphic file (type png)
 <use bilder/project/error_test_graph_3.png>
 Package pdftex.def Info: bilder/project/error_test_graph_3.png  used on input line 251.
@@ -1365,7 +1366,7 @@ Overfull \hbox (4.74203pt too wide) in paragraph at lines 251--252
  []
 
 [11 <./bilder/project/error_test_graph_2.png> <./bilder/project/error_test_graph_3.png>]
-<bilder/project/mapping1.png, id=243, 462.528pt x 346.896pt>
+<bilder/project/mapping1.png, id=267, 462.528pt x 346.896pt>
 File: bilder/project/mapping1.png Graphic file (type png)
 <use bilder/project/mapping1.png>
 Package pdftex.def Info: bilder/project/mapping1.png  used on input line 527.
@@ -1376,7 +1377,7 @@ Overfull \hbox (4.74203pt too wide) in paragraph at lines 527--528
  []
 
 [12]
-<bilder/project/mapping2.png, id=249, 462.528pt x 346.896pt>
+<bilder/project/mapping2.png, id=273, 462.528pt x 346.896pt>
 File: bilder/project/mapping2.png Graphic file (type png)
 <use bilder/project/mapping2.png>
 Package pdftex.def Info: bilder/project/mapping2.png  used on input line 565.
@@ -1387,23 +1388,23 @@ Overfull \hbox (4.74203pt too wide) in paragraph at lines 565--566
  []
 
 [13 <./bilder/project/mapping1.png>] [14 <./bilder/project/mapping2.png>]
-<bilder/project/sensor_im1.png, id=265, 462.528pt x 346.896pt>
+<bilder/project/sensor_im1.png, id=289, 462.528pt x 346.896pt>
 File: bilder/project/sensor_im1.png Graphic file (type png)
 <use bilder/project/sensor_im1.png>
 Package pdftex.def Info: bilder/project/sensor_im1.png  used on input line 636.
 (pdftex.def)             Requested size: 170.71652pt x 128.0372pt.
-<bilder/project/sensor_im2.png, id=267, 462.528pt x 346.896pt>
+<bilder/project/sensor_im2.png, id=291, 462.528pt x 346.896pt>
 File: bilder/project/sensor_im2.png Graphic file (type png)
 <use bilder/project/sensor_im2.png>
 Package pdftex.def Info: bilder/project/sensor_im2.png  used on input line 640.
 (pdftex.def)             Requested size: 170.71652pt x 128.0372pt.
  [15 <./bilder/project/sensor_im1.png> <./bilder/project/sensor_im2.png>]
-<bilder/project/sensor_setup_camera.png, id=278, 169.8345pt x 211.38976pt>
+<bilder/project/sensor_setup_camera.png, id=303, 169.8345pt x 211.38976pt>
 File: bilder/project/sensor_setup_camera.png Graphic file (type png)
 <use bilder/project/sensor_setup_camera.png>
 Package pdftex.def Info: bilder/project/sensor_setup_camera.png  used on input line 658.
 (pdftex.def)             Requested size: 170.71652pt x 212.49236pt.
-<bilder/project/sensor_setup_top.png, id=280, 414.95026pt x 319.79475pt>
+<bilder/project/sensor_setup_top.png, id=305, 414.95026pt x 319.79475pt>
 File: bilder/project/sensor_setup_top.png Graphic file (type png)
 <use bilder/project/sensor_setup_top.png>
 Package pdftex.def Info: bilder/project/sensor_setup_top.png  used on input line 662.
@@ -1413,19 +1414,89 @@ Overfull \hbox (4.74203pt too wide) in paragraph at lines 662--663
  [][] 
  []
 
-) [16]
+<bilder/project/localization_marker_1.png, id=307, 247.52475pt x 236.68425pt>
+File: bilder/project/localization_marker_1.png Graphic file (type png)
+<use bilder/project/localization_marker_1.png>
+Package pdftex.def Info: bilder/project/localization_marker_1.png  used on input line 703.
+(pdftex.def)             Requested size: 170.71652pt x 163.24368pt.
+
+Underfull \vbox (badness 1194) has occurred while \output is active []
+
+ [16]
 
 LaTeX Warning: Text page 17 contains only floats.
 
 
 Underfull \vbox (badness 2368) has occurred while \output is active []
 
- [17 <./bilder/project/sensor_setup_camera.png> <./bilder/project/sensor_setup_top.png>] [18] [19] [20] [21]
+ [17 <./bilder/project/sensor_setup_camera.png> <./bilder/project/sensor_setup_top.png>]
+<bilder/project/aruco_marker.png, id=320, 413.29407pt x 106.14656pt>
+File: bilder/project/aruco_marker.png Graphic file (type png)
+<use bilder/project/aruco_marker.png>
+Package pdftex.def Info: bilder/project/aruco_marker.png  used on input line 743.
+(pdftex.def)             Requested size: 455.24408pt x 116.92354pt.
+
+Overfull \hbox (4.74203pt too wide) in paragraph at lines 743--744
+ [][] 
+ []
+
+[18 <./bilder/project/localization_marker_1.png>]
+<bilder/project/whycon_marker.png, id=329, 406.51875pt x 441.14813pt>
+File: bilder/project/whycon_marker.png Graphic file (type png)
+<use bilder/project/whycon_marker.png>
+Package pdftex.def Info: bilder/project/whycon_marker.png  used on input line 765.
+(pdftex.def)             Requested size: 170.71652pt x 185.25401pt.
+ [19 <./bilder/project/aruco_marker.png> <./bilder/project/whycon_marker.png>]
+Overfull \hbox (12.05139pt too wide) in paragraph at lines 799--811
+ [][] 
+ []
+
+<bilder/project/720p400mm.png, id=341, 787.44188pt x 379.4175pt>
+File: bilder/project/720p400mm.png Graphic file (type png)
+<use bilder/project/720p400mm.png>
+Package pdftex.def Info: bilder/project/720p400mm.png  used on input line 824.
+(pdftex.def)             Requested size: 202.72453pt x 97.67938pt.
+<bilder/project/1080p400mm.png, id=342, 1287.30937pt x 611.28375pt>
+File: bilder/project/1080p400mm.png Graphic file (type png)
+<use bilder/project/1080p400mm.png>
+Package pdftex.def Info: bilder/project/1080p400mm.png  used on input line 828.
+(pdftex.def)             Requested size: 202.72453pt x 96.25903pt.
+<bilder/project/720p600mm.png, id=343, 511.9125pt x 290.58563pt>
+File: bilder/project/720p600mm.png Graphic file (type png)
+<use bilder/project/720p600mm.png>
+Package pdftex.def Info: bilder/project/720p600mm.png  used on input line 834.
+(pdftex.def)             Requested size: 202.72453pt x 115.07492pt.
+<bilder/project/1080p600mm.png, id=344, 762.59906pt x 403.5075pt>
+File: bilder/project/1080p600mm.png Graphic file (type png)
+<use bilder/project/1080p600mm.png>
+Package pdftex.def Info: bilder/project/1080p600mm.png  used on input line 838.
+(pdftex.def)             Requested size: 202.72453pt x 107.26146pt.
+<bilder/project/720p800mm.png, id=345, 376.40625pt x 198.7425pt>
+File: bilder/project/720p800mm.png Graphic file (type png)
+<use bilder/project/720p800mm.png>
+Package pdftex.def Info: bilder/project/720p800mm.png  used on input line 844.
+(pdftex.def)             Requested size: 202.72453pt x 107.04034pt.
+<bilder/project/1080p800mm.png, id=346, 585.68813pt x 310.91156pt>
+File: bilder/project/1080p800mm.png Graphic file (type png)
+<use bilder/project/1080p800mm.png>
+Package pdftex.def Info: bilder/project/1080p800mm.png  used on input line 848.
+(pdftex.def)             Requested size: 202.72453pt x 107.61566pt.
+<bilder/project/720p1000mm.png, id=347, 296.60812pt x 160.34906pt>
+File: bilder/project/720p1000mm.png Graphic file (type png)
+<use bilder/project/720p1000mm.png>
+Package pdftex.def Info: bilder/project/720p1000mm.png  used on input line 854.
+(pdftex.def)             Requested size: 202.72453pt x 109.59866pt.
+<bilder/project/1080p1000mm.png, id=348, 444.91219pt x 231.86626pt>
+File: bilder/project/1080p1000mm.png Graphic file (type png)
+<use bilder/project/1080p1000mm.png>
+Package pdftex.def Info: bilder/project/1080p1000mm.png  used on input line 858.
+(pdftex.def)             Requested size: 202.72453pt x 105.64789pt.
+) [20] [21 <./bilder/project/720p400mm.png> <./bilder/project/1080p400mm.png> <./bilder/project/720p600mm.png> <./bilder/project/1080p600mm.png> <./bilder/project/720p800mm.png> <./bilder/project/1080p800mm.png> <./bilder/project/720p1000mm.png> <./bilder/project/1080p1000mm.png>] [22] [23] [24] [25] [26]
 \openout2 = `inhalt/zusammenfassung.aux'.
 
  (./inhalt/zusammenfassung.tex
 chapter 4.
-) [22
+) [27
 
 
 
@@ -1435,21 +1506,21 @@ chapter 4.
 
  (./inhalt/anhang.tex
 chapter A.
-) [23
+) [28
 
 
 
 
-] [24
+] [29
 
 
 ] (./Abschlussarbeit.lof)
 \tf@lof=\write6
 \openout6 = `Abschlussarbeit.lof'.
 
- [25
+ [30
 
-] (./Abschlussarbeit.lot)
+] [31] (./Abschlussarbeit.lot)
 \tf@lot=\write7
 \openout7 = `Abschlussarbeit.lot'.
 
@@ -1464,11 +1535,11 @@ Package scrlayer-scrpage Warning: \footheight to low.
 (scrlayer-scrpage)                `footheight=21.74998pt'.
 (scrlayer-scrpage)                I'll also increase \footskip on input line 1.
 
-[26
+[32
 
 ]
 chapter without number
-) [27
+) [33
 
 ] (./Abschlussarbeit.aux (./inhalt/deckblatt.aux) (./inhalt/erklaerung.aux) (./inhalt/abstract.aux) (./inhalt/symbole.aux) (./inhalt/einleitung.aux) (./inhalt/grundlagen.aux) (./inhalt/project.aux) (./inhalt/zusammenfassung.aux) (./inhalt/anhang.aux))
  ***********
@@ -1483,18 +1554,18 @@ Package rerunfilecheck Info: File `Abschlussarbeit.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 61816 strings out of 475236
- 1584433 string characters out of 5768534
- 2473459 words of memory out of 5000000
- 82124 multiletter control sequences out of 15000+600000
- 660231 words of font info for 119 fonts, out of 8000000 for 9000
+ 61957 strings out of 475236
+ 1588264 string characters out of 5768534
+ 2476459 words of memory out of 5000000
+ 82243 multiletter control sequences out of 15000+600000
+ 666216 words of font info for 121 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 108i,20n,107p,10974b,1032s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 108i,20n,107p,10974b,1162s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <d:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmbx10.pfb><d:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmbx12.pfb><d:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmcsc10.pfb><d:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmex10.pfb><d:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><d:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmmi12.pfb><d:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmmi8.pfb><d:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr10.pfb><d:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr12.pfb><d:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr17.pfb><d:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr6.pfb><d:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmr8.pfb><d:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmri12.pfb><d:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmss12.pfb><d:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb><d:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><d:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmsy8.pfb><d:/texlive/2023/texmf-dist/fonts/type1/public/lm/lmtt12.pfb>
-Output written on Abschlussarbeit.pdf (35 pages, 4101553 bytes).
+Output written on Abschlussarbeit.pdf (43 pages, 5824720 bytes).
 PDF statistics:
- 564 PDF objects out of 1000 (max. 8388607)
- 436 compressed objects within 5 object streams
- 89 named destinations out of 1000 (max. 500000)
- 408 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 686 PDF objects out of 1000 (max. 8388607)
+ 525 compressed objects within 6 object streams
+ 111 named destinations out of 1000 (max. 500000)
+ 545 words of extra memory for PDF output out of 10000 (max. 10000000)
 
