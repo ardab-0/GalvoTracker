@@ -118,7 +118,7 @@ def main():
 
 
 
-    ######################################################################
+    
 
 
 
@@ -153,7 +153,7 @@ def main():
             pos3d_color = device.calibration.convert_2d_to_3d(pixels, rgb_depth, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_COLOR)
 
         
-            cv2.circle(color_image, center=(int(reference_pos2d_color[0]), int(reference_pos2d_color[1])), radius=circle[2], color=(0, 0, 255), thickness=2)   
+            cv2.circle(color_image, center=(pix_x, pix_y), radius=circle[2], color=(0, 0, 255), thickness=2)   
             cv2.imshow('Laser Detector', color_image)
             laser_in_camera_coordinates = np.array([pos3d_color.xyz.x, pos3d_color.xyz.y, pos3d_color.xyz.z])
             average_laser_pos_in_camera_coordinates_np += laser_in_camera_coordinates
@@ -163,21 +163,14 @@ def main():
 
 
     
-    average_laser_pos_in_camera_coordinates_np /= number_of_camera_coordinates_in_batch
-
-    average_laser_pos_in_laser_coordinates_np = R @ average_laser_pos_in_camera_coordinates_np.reshape((3, 1)) + t
-
-    rmse = np.sqrt(np.mean(np.square(average_laser_pos_in_laser_coordinates_np - reference_point_in_laser_coordinates)))
-    print("RMSE: ", rmse)
-    rmse_scores.append(rmse)
-
-    ######################################################################
-
-             
+        average_laser_pos_in_camera_coordinates_np /= number_of_camera_coordinates_in_batch
 
 
+        rmse = np.sqrt(np.mean(np.square(average_laser_pos_in_camera_coordinates_np - mouse_in_camera_coordinates)))
+        print("RMSE: ", rmse)
+        rmse_scores.append(rmse)
 
-        
+      
         # cv2.circle(color_image, center=(mouse_x, mouse_y), radius=10, color=(0, 255, 0), thickness=2)
         # Show detected target position
         cv2.imshow('Laser Detector',color_image)
