@@ -1,5 +1,5 @@
-\chapter{Project}
-\label{ch:project}
+\chapter{Work Done}
+\label{ch:work_done}
 
 \section{Mapping Steering Mirror Coordinates to Target Plane Coordinates}
 \label{sec:Mapping Steering Mirror Coordinates to Target Plane Coordinates}
@@ -129,8 +129,8 @@ Mirror normal vector is calculated with following steps:
     n^{I}_{OT}     & = A_{IT} \cdot r^{T}_{OT}         \\
     r^{I}_{TP_{2}} & = A_{IT} \cdot r^{T}_{TP_{2}}     \\
     r^{I}_{OP_{2}} & = r^{T}_{OT} \cdot r^{I}_{TP_{2}} \\
-    n^{I}_{1}      & = normalize(r^{I}_{OP_{2}})       \\
-    n^{I}_{m}      & = normalize(n_{1} - n_{0})
+    n^{I}_{1}      & = \text{normalize}(r^{I}_{OP_{2}})       \\
+    n^{I}_{m}      & = \text{normalize}(n_{1} - n_{0})
 \end{align*}
 
 \subsection{Computation of mirror coordinates $(x, y)$ }
@@ -716,8 +716,61 @@ Points $A$ and $B$ are formed into matrices with shape $3xN$. Finally, algorithm
 
 \subsection{Calibration Results}
 
+\begin{figure}
+    \begin{subfigure}[b]{.45\linewidth}
+        \includegraphics[width=\linewidth]{bilder/project/calibration_result_figures/calibration_accuracy_423mm_iter2.png}
+        \caption{Calibration with 2 positions}\label{fig:423mm_iter2}
+    \end{subfigure}
+    \begin{subfigure}[b]{.45\linewidth}
+        \includegraphics[width=\linewidth]{bilder/project/calibration_result_figures/calibration_accuracy_423mm_iter3.png}
+        \caption{Calibration with 3 positions}\label{fig:423mm_iter3}
+    \end{subfigure}
 
 
+    \begin{subfigure}[b]{.45\linewidth}
+        \includegraphics[width=\linewidth]{bilder/project/calibration_result_figures/calibration_accuracy_423mm_iter4.png}
+        \caption{Calibration with 4 positions}\label{fig:423mm_iter4}
+    \end{subfigure}
+    \begin{subfigure}[b]{.45\linewidth}
+        \includegraphics[width=\linewidth]{bilder/project/calibration_result_figures/calibration_accuracy_423mm_iter5.png}
+        \caption{Calibration with 5 positions}\label{fig:423mm_iter5}
+    \end{subfigure}
+
+
+    \begin{subfigure}[b]{.45\linewidth}
+        \includegraphics[width=\linewidth]{bilder/project/calibration_result_figures/calibration_accuracy_423mm_iter6.png}
+        \caption{Calibration with 6 positions}\label{fig:423mm_iter6}
+    \end{subfigure}
+    \begin{subfigure}[b]{.45\linewidth}
+        \includegraphics[width=\linewidth]{bilder/project/calibration_result_figures/calibration_accuracy_423mm_iter7.png}
+        \caption{Calibration with 7 positions}\label{fig:423mm_iter7}
+    \end{subfigure}
+
+
+    \begin{subfigure}[b]{.45\linewidth}
+        \includegraphics[width=\linewidth]{bilder/project/calibration_result_figures/calibration_accuracy_423mm_iter8.png}
+        \caption{Calibration with 8 positions}\label{fig:423mm_iter8}
+    \end{subfigure}
+    \begin{subfigure}[b]{.45\linewidth}
+        \includegraphics[width=\linewidth]{bilder/project/calibration_result_figures/calibration_accuracy_423mm_iter9.png}
+        \caption{Calibration with 9 positions}\label{fig:423mm_iter9}
+    \end{subfigure}
+
+    \begin{subfigure}[b]{.45\linewidth}
+        \includegraphics[width=\linewidth]{bilder/project/calibration_result_figures/calibration_accuracy_423mm_iter10.png}
+        \caption{Calibration with 10 positions}\label{fig:423mm_iter10}
+    \end{subfigure}
+    
+    \caption{Calibration plate positions and calibration error at each x-y position at a distance of z=423mm.}
+    \label{fig:calibration_results_423mm}
+\end{figure}
+
+
+\begin{figure}[!htb]\centering
+    \includegraphics*[width = 6cm]{bilder/project/calibration_result_figures/calibration_accuracy_423mm_rmse-iter.png}
+    \caption{Calibration RMSE scores with respect to number of calibration points (calibration iterations) used}
+    \label{fig:423mm_rmse}
+\end{figure}
 
 \section{Detection Algorithms}
 
@@ -864,3 +917,5 @@ for 720p and 1080p image resolutions.
 
 
 \section{Tracking Performance}
+
+-TODO

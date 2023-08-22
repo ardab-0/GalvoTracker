@@ -5,6 +5,7 @@ from matplotlib import cm
 
 MAX_CALIBRATION_ITER = 10
 MIN_CALIBRATION_ITER = 2
+FIGURE_SAVE_FOLDER = "calibration_result_figures/"
 
 ACCURACY_PATH = "calibration_accuracy_423mm"
 save_path = "ir_calibration_parameters_test"
@@ -45,7 +46,7 @@ for i in range(MIN_CALIBRATION_ITER, MAX_CALIBRATION_ITER+1):
     avg_rmse = np.mean(rmse)
 
 
-    fig = plt.figure(figsize=(10,8))
+    fig = plt.figure(figsize=(16,8))
 
     ax = fig.add_subplot(1,2,1)
     ax.scatter(camera_points[0, :3*i:3], camera_points[2, :3*i:3])
@@ -64,6 +65,7 @@ for i in range(MIN_CALIBRATION_ITER, MAX_CALIBRATION_ITER+1):
     
     accuracy.append(avg_rmse)
     calibration_iter.append(i)
+    plt.savefig(f"{FIGURE_SAVE_FOLDER}{ACCURACY_PATH}_iter{i}.png")
     plt.show()
 
 
@@ -73,6 +75,7 @@ plt.plot(calibration_iter, accuracy)
 plt.xlabel("Calibration iteration")
 plt.ylabel("Average RMSE (mm)")
 plt.grid()
+plt.savefig(f"{FIGURE_SAVE_FOLDER}{ACCURACY_PATH}_rmse-iter.png")
 plt.show()
 
 

@@ -20,9 +20,11 @@
 \contentsline {figure}{\numberline {3.13}{\ignorespaces Sensor positions (S1, S2, S3), detected sensor positions (M1, M2, M3) and steering mirror position (O) from camera view.\relax }}{17}{figure.caption.45}%
 \contentsline {figure}{\numberline {3.14}{\ignorespaces Sensor positions (S1, S2, S3), detected sensor positions (M1, M2, M3) and steering mirror position (O) from top view.\relax }}{17}{figure.caption.45}%
 \contentsline {figure}{\numberline {3.15}{\ignorespaces Localization marker pattern with WHYCon marker\relax }}{18}{figure.caption.46}%
-\contentsline {figure}{\numberline {3.16}{\ignorespaces ArUco marker with ids 0 up to 3 [6]\relax }}{19}{figure.caption.50}%
-\contentsline {figure}{\numberline {3.17}{\ignorespaces WHYCon marker [8]\relax }}{19}{figure.caption.53}%
-\contentsline {figure}{\numberline {3.18}{\ignorespaces Detection results of WHYCon marker at different distances and different resolutions\relax }}{21}{figure.caption.58}%
+\contentsline {figure}{\numberline {3.16}{\ignorespaces Calibration plate positions and calibration error at each x-y position at a distance of z=423mm.\relax }}{19}{figure.caption.48}%
+\contentsline {figure}{\numberline {3.17}{\ignorespaces Calibration RMSE scores with respect to number of calibration points (calibration iterations) used\relax }}{20}{figure.caption.49}%
+\contentsline {figure}{\numberline {3.18}{\ignorespaces ArUco marker with ids 0 up to 3 [6]\relax }}{20}{figure.caption.52}%
+\contentsline {figure}{\numberline {3.19}{\ignorespaces WHYCon marker [8]\relax }}{21}{figure.caption.55}%
+\contentsline {figure}{\numberline {3.20}{\ignorespaces Detection results of WHYCon marker at different distances and different resolutions\relax }}{22}{figure.caption.60}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
