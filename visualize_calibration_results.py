@@ -7,7 +7,7 @@ MAX_CALIBRATION_ITER = 10
 MIN_CALIBRATION_ITER = 2
 FIGURE_SAVE_FOLDER = "calibration_result_figures/"
 
-ACCURACY_PATH = "calibration_accuracy_423mm"
+ACCURACY_PATH = "calibration_accuracy_573mm"
 save_path = "ir_calibration_parameters_test"
 
 accuracy = []
