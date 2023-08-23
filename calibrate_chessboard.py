@@ -501,7 +501,7 @@ def get_sensor_pos_from_marker_pos(marker_positions, distance_of_sensor_from_mar
     center_pos_3d = np.mean(marker_positions, axis=1)
 
     r_vec, d_vec = extract_unit_vectors(marker_positions)
-
+    d_vec = np.array([0, 1, 0])
 
     sensor_pos_2 = center_pos_3d + r_vec * distance_of_sensor_from_marker_mm
     sensor_pos_1 = sensor_pos_2 - d_vec * distance_of_second_sensor_from_first_sensor_mm
