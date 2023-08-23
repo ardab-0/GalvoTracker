@@ -16,12 +16,11 @@ from utils import optimal_rotation_and_translation
 d = 0
 mirror_rotation_deg = 45
 save_path = "ir_calibration_parameters_test"
-num_iterations = 50
-accuracy_path = "calibration_accuracy_423mm_1080p"
+num_iterations = 10
+accuracy_path = "scanning_line/calibration_accuracy_423mm"
 CALIBRATION_ITER = 8
-sample_x = 5
-sample_y = 5
-z_t = 423 # mm
+sample_x = 10
+sample_y = 10
 lower_red = np.array([140,   10, 240]) 
 upper_red = np.array([180, 130, 256])
 RES_WIDTH = 1920
@@ -77,15 +76,16 @@ def main():
     cv2.namedWindow('Laser Detector',cv2.WINDOW_NORMAL)
 
 
-    a = np.linspace(int(RES_WIDTH/4), int(3*RES_WIDTH/4), sample_x)
-    b = np.linspace(int(RES_HEIGHT/4), int(3*RES_HEIGHT/4), sample_y)
+    a = np.linspace(int(3*RES_WIDTH/16), int(13*RES_WIDTH/16), sample_x)
+    b = np.linspace(int(2*RES_HEIGHT/8), int(5*RES_HEIGHT/8), sample_y)
 
     x = np.tile(a, sample_y)
     y = np.repeat(b, sample_x)
  
     rmse_scores = []
+    mouse3d_pos = []
 
-    for i in len(x):        
+    for i in range(len(x)):        
         
         
         
@@ -99,14 +99,15 @@ def main():
             ret_depth, transformed_depth_image = capture.get_transformed_depth_image()
 
         
-        pix_x = x[i]
-        pix_y = y[i]
+        pix_x = int(x[i])
+        pix_y = int(y[i])
         rgb_depth = transformed_depth_image[pix_y, pix_x]
         pixels = k4a_float2_t((pix_x, pix_y))
 
         pos3d_color = device.calibration.convert_2d_to_3d(pixels, rgb_depth, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_COLOR)  
 
-        mouse_in_camera_coordinates = np.array([pos3d_color.xyz.x, pos3d_color.xyz.y, pos3d_color.xyz.z]).reshape((3, 1))        
+        mouse_in_camera_coordinates = np.array([pos3d_color.xyz.x, pos3d_color.xyz.y, pos3d_color.xyz.z]).reshape((3, 1))     
+        mouse3d_pos.append(mouse_in_camera_coordinates.reshape((-1)) )   
         # rotate and translate
         camera_coordinates_in_laser_coordinates =  R @ mouse_in_camera_coordinates + t        
         coordinate_transform = CoordinateTransform(d=d, D=camera_coordinates_in_laser_coordinates[2], rotation_degree=mirror_rotation_deg)
@@ -119,20 +120,15 @@ def main():
 
 
     
-
-
-
+        time.sleep(0.5)
+        average_laser_pos_in_camera_coordinates_np = 0
+        number_of_camera_coordinates_in_batch = 0
         while  number_of_camera_coordinates_in_batch < num_iterations:
-            # Get capture
             capture = device.update()
-
-            # Get the color image from the capture
             ret_color, color_image = capture.get_color_image()
+            #ret_depth, transformed_depth_image = capture.get_transformed_depth_image()
 
-            # Get the colored depth
-            ret_depth, transformed_depth_image = capture.get_transformed_depth_image()
-
-            if not ret_color or not ret_depth:
+            if not ret_color:
                 continue
 
             circle = detect_circle_position(color_image, lower_range=lower_red, upper_range=upper_red)
@@ -143,6 +139,7 @@ def main():
 
             circle = np.round(circle).astype("int")
             cv2.circle(color_image, center=(circle[0], circle[1]), radius=circle[2], color=(0, 255, 0), thickness=2)
+            cv2.circle(color_image, center=(pix_x, pix_y), radius=circle[2], color=(255, 0, 0), thickness=2)
 
             pix_x = circle[0]
             pix_y = circle[1]
@@ -151,11 +148,10 @@ def main():
             pixels = k4a_float2_t((pix_x, pix_y))
 
             pos3d_color = device.calibration.convert_2d_to_3d(pixels, rgb_depth, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_COLOR)
+            laser_in_camera_coordinates = np.array([pos3d_color.xyz.x, pos3d_color.xyz.y, pos3d_color.xyz.z])
 
         
-            cv2.circle(color_image, center=(pix_x, pix_y), radius=circle[2], color=(0, 0, 255), thickness=2)   
             cv2.imshow('Laser Detector', color_image)
-            laser_in_camera_coordinates = np.array([pos3d_color.xyz.x, pos3d_color.xyz.y, pos3d_color.xyz.z])
             average_laser_pos_in_camera_coordinates_np += laser_in_camera_coordinates
             number_of_camera_coordinates_in_batch += 1
 
@@ -166,7 +162,7 @@ def main():
         average_laser_pos_in_camera_coordinates_np /= number_of_camera_coordinates_in_batch
 
 
-        rmse = np.sqrt(np.mean(np.square(average_laser_pos_in_camera_coordinates_np - mouse_in_camera_coordinates)))
+        rmse = np.sqrt(np.mean(np.square(average_laser_pos_in_camera_coordinates_np - mouse_in_camera_coordinates.reshape((-1)))))
         print("RMSE: ", rmse)
         rmse_scores.append(rmse)
 
@@ -179,6 +175,12 @@ def main():
             break
 
 
+    
+    accuracy_results = {"pointer_pos": np.array(mouse3d_pos),
+                        "rmse": rmse_scores}
+
+    with open('{}/iter_{}.pkl'.format(accuracy_path, CALIBRATION_ITER), 'wb') as f:
+        pickle.dump(accuracy_results, f)
 
     mre2.disconnect()
     print("done")

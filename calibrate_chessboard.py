@@ -23,7 +23,7 @@ import tkinter as tk
 d = 0
 mirror_rotation_deg = 45
 save_path = "ir_calibration_parameters_test"
-CAPTURE_COUNT = 6
+CAPTURE_COUNT = 5
 ITER_COUNT = 10
 PI_COM_PORT = "COM6"
 distance_of_sensor_from_marker_mm=-55
@@ -667,7 +667,10 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
             # Find the chess board corners
             ret, corners = cv2.findChessboardCorners(gray, (9,6), None)
             # If found, add object points, image points (after refining them)
-            
+            if not ret:
+                print("Chessboard not detected. Move the board and press enter.")
+                input()
+                continue  
             corners2 = cv2.cornerSubPix(gray,corners, (11,11), (-1,-1), criteria)
             # Draw and display the corners
             cv2.drawChessboardCorners(color_image, (9,6), corners2, ret)
@@ -748,7 +751,7 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
 
         
 
-        coarse_laser_pos = get_fine_laser_positions(coarse_laser_pos, search_length_mm=40, delta_mm=2)
+        coarse_laser_pos = get_fine_laser_positions(coarse_laser_pos, search_length_mm=30, delta_mm=2)
         fine_laser_coords = get_fine_laser_positions(coarse_laser_pos, search_length_mm=10, delta_mm=0.5)
 
         p1, p2, p3 = identify_points(fine_laser_coords[0], fine_laser_coords[1], fine_laser_coords[2])

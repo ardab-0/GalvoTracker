@@ -7,7 +7,7 @@ MAX_CALIBRATION_ITER = 10
 MIN_CALIBRATION_ITER = 2
 FIGURE_SAVE_FOLDER = "calibration_result_figures/"
 
-ACCURACY_PATH = "calibration_accuracy_573mm"
+ACCURACY_PATH = "scanning_line/calibration_accuracy_423mm"
 save_path = "ir_calibration_parameters_test"
 
 accuracy = []
@@ -28,10 +28,12 @@ for i in range(MIN_CALIBRATION_ITER, MAX_CALIBRATION_ITER+1):
     #                     "z_t": z_t,
     #                     "rmse": rmse_scores}
 
+    x_t = accuracy_results["pointer_pos"][:, 0]
+    y_t = accuracy_results["pointer_pos"][:, 1]
 
-    x_t = accuracy_results["x_t"]
-    y_t = accuracy_results["y_t"]
-    z_t = accuracy_results["z_t"]
+    # x_t = accuracy_results["x_t"]
+    # y_t = accuracy_results["y_t"]
+    # z_t = accuracy_results["z_t"]
     rmse = accuracy_results["rmse"]
     
 
@@ -42,9 +44,10 @@ for i in range(MIN_CALIBRATION_ITER, MAX_CALIBRATION_ITER+1):
     
     avg_rmse = np.mean(rmse)
 
-    rmse[rmse > (avg_rmse+10)] = avg_rmse
+    outlier = rmse > (avg_rmse+10)
+    avg_rmse = np.mean(rmse[np.logical_not(outlier)])
+    rmse[outlier] = avg_rmse
     avg_rmse = np.mean(rmse)
-
 
     fig = plt.figure(figsize=(16,8))
 
@@ -61,11 +64,11 @@ for i in range(MIN_CALIBRATION_ITER, MAX_CALIBRATION_ITER+1):
     ax.set_xlabel('x (mm)')
     ax.set_ylabel("y (mm)")
     ax.set_zlabel("RMSE (mm)")
-    ax.set_title(f"RMSE at z={z_t}mm with {i} calibration positions. Average RMSE: {avg_rmse:.2f}mm")
+    ax.set_title(f"RMSE with {i} calibration positions. Average RMSE: {avg_rmse:.2f}mm")
     
     accuracy.append(avg_rmse)
     calibration_iter.append(i)
-    plt.savefig(f"{FIGURE_SAVE_FOLDER}{ACCURACY_PATH}_iter{i}.png")
+    #plt.savefig(f"{FIGURE_SAVE_FOLDER}{ACCURACY_PATH}_iter{i}.png")
     plt.show()
 
 
@@ -75,7 +78,7 @@ plt.plot(calibration_iter, accuracy)
 plt.xlabel("Calibration iteration")
 plt.ylabel("Average RMSE (mm)")
 plt.grid()
-plt.savefig(f"{FIGURE_SAVE_FOLDER}{ACCURACY_PATH}_rmse-iter.png")
+#plt.savefig(f"{FIGURE_SAVE_FOLDER}{ACCURACY_PATH}_rmse-iter.png")
 plt.show()
 
 

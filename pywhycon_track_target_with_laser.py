@@ -53,7 +53,7 @@ def main():
     # Modify camera configuration
     device_config = pykinect.default_configuration
     device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_YUY2
-    device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_720P
+    device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_1080P
     device_config.depth_mode = pykinect.K4A_DEPTH_MODE_WFOV_2X2BINNED
     device_config.synchronized_images_only = False
     # print(device_config)
@@ -66,11 +66,11 @@ def main():
 
 
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter('output.avi', fourcc, 30.0, (1280,720))
+    out = cv2.VideoWriter('output.avi', fourcc, 30.0, (1920,1080))
 
     # gives undefined warning but works (pybind11 c++ module) change import *
     prevCircle = CircleClass()
-    circle_detector = CircleDetectorClass(1280, 720) # K4A_COLOR_RESOLUTION_720P
+    circle_detector = CircleDetectorClass(1920, 1080) # K4A_COLOR_RESOLUTION_720P
 
     prev_3d_coor = 0
     speed_timer = 1
@@ -144,14 +144,14 @@ def main():
         end = time.time()
         print("elapsed time: ", (end - start))    
         cv2.putText(color_image, f"fps: {1 / (end - start)}", (10, 20), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        cv2.putText(color_image, f"Target Coordinates w.r.t. mirror center:", (10, 40), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        cv2.putText(color_image, f"X (mm): {camera_coordinates_in_laser_coordinates[0]}", (10, 60), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        cv2.putText(color_image, f"Y (mm): {camera_coordinates_in_laser_coordinates[1]}", (10, 80), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        cv2.putText(color_image, f"Z (mm): {camera_coordinates_in_laser_coordinates[2]}", (10, 100), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+        # cv2.putText(color_image, f"Target Coordinates w.r.t. mirror center:", (10, 40), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+        # cv2.putText(color_image, f"X (mm): {camera_coordinates_in_laser_coordinates[0]}", (10, 60), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+        # cv2.putText(color_image, f"Y (mm): {camera_coordinates_in_laser_coordinates[1]}", (10, 80), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+        # cv2.putText(color_image, f"Z (mm): {camera_coordinates_in_laser_coordinates[2]}", (10, 100), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
 
-        cv2.putText(color_image, f"VX (mm/s): {speed[0]}", (10, 120), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        cv2.putText(color_image, f"VY (mm/s): {speed[1]}", (10, 140), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        cv2.putText(color_image, f"VZ (mm/s): {speed[2]}", (10, 160), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+        # cv2.putText(color_image, f"VX (mm/s): {speed[0]}", (10, 120), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+        # cv2.putText(color_image, f"VY (mm/s): {speed[1]}", (10, 140), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+        # cv2.putText(color_image, f"VZ (mm/s): {speed[2]}", (10, 160), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
 
         color_image = cv2.circle(color_image, (int(new_circle.x), int(new_circle.y)), radius=10, color=(0, 255, 0), thickness=2)
 
