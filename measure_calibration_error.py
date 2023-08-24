@@ -17,12 +17,12 @@ from image_processing.color_picker import Color_Picker
 d = 0 # mm
 mirror_rotation_deg = 45
 num_iterations = 50
-save_path = "ir_calibration_parameters_test"
-accuracy_path = "calibration_accuracy_423mm_1080p"
-CALIBRATION_ITER = 8
+save_path = "ir_calibration_parameters"
+accuracy_path = "calibration_accuracy_727mm"
+CALIBRATION_ITER = 9
 sample_x = 5
 sample_y = 5
-z_t = 423 # mm
+z_t = 727 # mm
 lower_red = np.array([140,   10, 240]) 
 upper_red = np.array([180, 130, 256])
 
@@ -59,9 +59,9 @@ pykinect.initialize_libraries()
 
 # Modify camera configuration
 device_config = pykinect.default_configuration
-device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_BGRA32
+device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_MJPG
 device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_1080P
-device_config.depth_mode = pykinect.K4A_DEPTH_MODE_WFOV_2X2BINNED
+device_config.depth_mode = pykinect.K4A_DEPTH_MODE_NFOV_2X2BINNED
 # print(device_config)
 
 # Start device
@@ -167,7 +167,6 @@ for i in range(len(x_m)):
     print("RMSE: ", rmse)
     rmse_scores.append(rmse)
 
-    #cv2.waitKey(0)
     
 
 accuracy_results = {"x_t": x_t,

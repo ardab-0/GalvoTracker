@@ -14,7 +14,7 @@ from pykinect_azure.k4a.transformation import Transformation
 # Constants 
 d = 0
 mirror_rotation_deg = 45
-save_path = "ir_calibration_parameters_test"
+save_path = "ir_calibration_parameters"
 # target coordinate offset (mm)
 
 
@@ -63,7 +63,7 @@ def main():
     device_config = pykinect.default_configuration
     device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_YUY2
     device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_720P
-    device_config.depth_mode = pykinect.K4A_DEPTH_MODE_WFOV_2X2BINNED
+    device_config.depth_mode = pykinect.K4A_DEPTH_MODE_NFOV_2X2BINNED
     # print(device_config)
 
     # Start device
@@ -118,15 +118,7 @@ def main():
         # rotate and translate
 
         camera_coordinates_in_laser_coordinates =  R @ camera_coordinates + t
-
-
-        # camera_coordinates_in_laser_coordinates = np.floor(camera_coordinates_in_laser_coordinates)
-
-        # print("camera_coordinates", camera_coordinates)
-
-        # print("camera_coordinates_in_laser_coordinates", camera_coordinates_in_laser_coordinates)
-
-
+       
         coordinate_transform = CoordinateTransform(d=d, D=camera_coordinates_in_laser_coordinates[2], rotation_degree=mirror_rotation_deg)
 
 

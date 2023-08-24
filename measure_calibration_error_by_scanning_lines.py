@@ -15,7 +15,7 @@ from utils import optimal_rotation_and_translation
 # Constants 
 d = 0
 mirror_rotation_deg = 45
-save_path = "ir_calibration_parameters_test"
+save_path = "ir_calibration_parameters"
 num_iterations = 10
 accuracy_path = "scanning_line/calibration_accuracy_423mm"
 CALIBRATION_ITER = 8

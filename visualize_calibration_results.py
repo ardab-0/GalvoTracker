@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 
 MAX_CALIBRATION_ITER = 10
-MIN_CALIBRATION_ITER = 2
+MIN_CALIBRATION_ITER = 10
 FIGURE_SAVE_FOLDER = "calibration_result_figures/"
 
-ACCURACY_PATH = "scanning_line/calibration_accuracy_423mm"
-save_path = "ir_calibration_parameters_test"
+ACCURACY_PATH = "calibration_accuracy_727mm"
+save_path = "ir_calibration_parameters"
 
 accuracy = []
 calibration_iter = []
@@ -28,12 +28,12 @@ for i in range(MIN_CALIBRATION_ITER, MAX_CALIBRATION_ITER+1):
     #                     "z_t": z_t,
     #                     "rmse": rmse_scores}
 
-    x_t = accuracy_results["pointer_pos"][:, 0]
-    y_t = accuracy_results["pointer_pos"][:, 1]
+    # x_t = accuracy_results["pointer_pos"][:, 0]
+    # y_t = accuracy_results["pointer_pos"][:, 1]
 
-    # x_t = accuracy_results["x_t"]
-    # y_t = accuracy_results["y_t"]
-    # z_t = accuracy_results["z_t"]
+    x_t = accuracy_results["x_t"]
+    y_t = accuracy_results["y_t"]
+    z_t = accuracy_results["z_t"]
     rmse = accuracy_results["rmse"]
     
 
@@ -44,7 +44,7 @@ for i in range(MIN_CALIBRATION_ITER, MAX_CALIBRATION_ITER+1):
     
     avg_rmse = np.mean(rmse)
 
-    outlier = rmse > (avg_rmse+10)
+    outlier = rmse > 8
     avg_rmse = np.mean(rmse[np.logical_not(outlier)])
     rmse[outlier] = avg_rmse
     avg_rmse = np.mean(rmse)

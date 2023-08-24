@@ -11,12 +11,12 @@ import time
 import os
 from circle_detector_library.circle_detector_module import *
 from utils import optimal_rotation_and_translation
-
+import matplotlib.pyplot as plt
 # Constants 
 
 d = 0
 mirror_rotation_deg = 45
-save_path = "ir_calibration_parameters_test"
+save_path = "ir_calibration_parameters"
 distance_of_sensor_from_marker_mm=-30
 PI_COM_PORT = "COM6"
 CALIBRATION_ITER = 10
@@ -134,7 +134,7 @@ pykinect.initialize_libraries()
 device_config = pykinect.default_configuration
 device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_MJPG
 device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_1080P
-device_config.depth_mode = pykinect.K4A_DEPTH_MODE_WFOV_2X2BINNED
+device_config.depth_mode = pykinect.K4A_DEPTH_MODE_NFOV_2X2BINNED
 device_config.synchronized_images_only = False
 # print(device_config)
 
@@ -205,8 +205,11 @@ def main():
         if cv2.waitKey(1) == ord("m"):
             sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=target_in_laser_coordinates.reshape((-1)), width_mm=10, height_mm=10, delta_mm=0.2, sensor_id=2)
             max_pos = np.array(max_pos).reshape(3,1)
-            rmse = np.sqrt(np.mean(np.square(max_pos - target_in_laser_coordinates)))
-            print(rmse)
+            l2norm = np.linalg.norm(max_pos - target_in_laser_coordinates)
+            plt.imshow(sensor_data, extent=[width_range[0], width_range[-1], height_range[-1], height_range[0]])
+            print(l2norm)
+            plt.show()
+
             cv2.waitKey(0)
 
 

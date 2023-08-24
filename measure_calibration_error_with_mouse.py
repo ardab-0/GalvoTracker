@@ -14,7 +14,7 @@ from pykinect_azure.k4a.transformation import Transformation
 # Constants 
 d = 0
 mirror_rotation_deg = 45
-save_path = "ir_calibration_parameters_test"
+save_path = "ir_calibration_parameters"
 # target coordinate offset (mm)
 lower_red = np.array([140,   10, 240]) 
 upper_red = np.array([180, 130, 256])
@@ -64,7 +64,7 @@ def main():
     device_config = pykinect.default_configuration
     device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_YUY2
     device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_720P
-    device_config.depth_mode = pykinect.K4A_DEPTH_MODE_WFOV_2X2BINNED
+    device_config.depth_mode = pykinect.K4A_DEPTH_MODE_NFOV_2X2BINNED
     # print(device_config)
 
     # Start device

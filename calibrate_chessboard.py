@@ -22,7 +22,7 @@ import tkinter as tk
 # Constants
 d = 0
 mirror_rotation_deg = 45
-save_path = "ir_calibration_parameters_test"
+save_path = "ir_calibration_parameters"
 CAPTURE_COUNT = 5
 ITER_COUNT = 10
 PI_COM_PORT = "COM6"
@@ -43,7 +43,7 @@ pykinect.initialize_libraries()
 device_config = pykinect.default_configuration
 device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_MJPG
 device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_1080P
-device_config.depth_mode = pykinect.K4A_DEPTH_MODE_WFOV_2X2BINNED
+device_config.depth_mode = pykinect.K4A_DEPTH_MODE_NFOV_2X2BINNED
 # print(device_config)
 
 # Start device
@@ -501,7 +501,7 @@ def get_sensor_pos_from_marker_pos(marker_positions, distance_of_sensor_from_mar
     center_pos_3d = np.mean(marker_positions, axis=1)
 
     r_vec, d_vec = extract_unit_vectors(marker_positions)
-    d_vec = np.array([0, 1, 0])
+    d_vec = np.array([0, 1, 0]) # due to geometry of calibration plate
 
     sensor_pos_2 = center_pos_3d + r_vec * distance_of_sensor_from_marker_mm
     sensor_pos_1 = sensor_pos_2 - d_vec * distance_of_second_sensor_from_first_sensor_mm
@@ -675,13 +675,13 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
             # Draw and display the corners
             cv2.drawChessboardCorners(color_image, (9,6), corners2, ret)
             
-            cv2.putText(color_image, f"Current Iteration: {num_iter+1}/{ITER_COUNT}", (10, 20), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+            cv2.putText(color_image, f"Current Iteration: {num_iter+1}/{ITER_COUNT}", (10, 40), font, 2, (0, 255, 0), 3, cv2.LINE_AA)
             
 
             
             print("\n\nPress (y) to include image. Press (n) to discard image.")
-            cv2.putText(color_image, "Press (y) to include image. Press (n) to discard image.", (10, 40), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-            cv2.imshow("image", color_image)
+            cv2.putText(color_image, "Press (y) to include image. Press (n) to discard image.", (10, 80), font, 2, (0, 255, 0), 3, cv2.LINE_AA)
+            cv2.imshow("image",  cv2.resize(color_image, (1280, 720)))
             if cv2.waitKey(0) == ord('y'):
                 num_color_img += 1
 
@@ -782,9 +782,11 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
         #     real_3d_coords.append(max_pos)
 
         print(f"Press (s) to save measurements. Press another character to discard measurements in current iteration." )
-        cv2.putText(color_image_orig, f"Current Iteration: {num_iter+1}/{ITER_COUNT}", (10, 20), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        cv2.putText(color_image_orig, "Press (s) to save measurements, another character to discard measurements in current iteration.", (10, 40), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        cv2.imshow("image", color_image_orig)
+        cv2.putText(color_image_orig, f"Current Iteration: {num_iter+1}/{ITER_COUNT}", (10, 40), font, 2, (0, 255, 0),3, cv2.LINE_AA)
+        cv2.putText(color_image_orig, "Press (s) to save measurements, another character to discard measurements in current iteration.", (10, 80), font, 2, (0, 255, 0), 3, cv2.LINE_AA)
+        
+        
+        cv2.imshow("image", cv2.resize(color_image_orig, (1280, 720)))
         key = cv2.waitKey(0)
         if  key== ord('s'):
             camera_points.append(sensor_pos_cam_1.reshape((-1)))
@@ -836,7 +838,7 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
                             "laser_points": laser_points_np,
                             "camera_points": camera_points_np}
 
-        with open('{}/parameters_{}_iter.pkl'.format(save_path, ITER_COUNT), 'wb') as f:
+        with open('{}/parameters.pkl'.format(save_path, ITER_COUNT), 'wb') as f:
             pickle.dump(calibration_dict, f)
 
 
@@ -858,7 +860,9 @@ def test_identify_points():
 
 
 def test_search_laser_positon():
-    sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=[0, 0, 400], width_mm=50, height_mm=100, delta_mm=2, sensor_id=2)
+
+    sensor_id = 2
+    sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=[0, 0, 400], width_mm=50, height_mm=100, delta_mm=2, sensor_id=sensor_id)
 
 
     print(max_pos)
@@ -868,7 +872,7 @@ def test_search_laser_positon():
 
 
 
-    sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=max_pos, width_mm=10, height_mm=10, delta_mm=0.2, sensor_id=2)
+    sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=max_pos, width_mm=10, height_mm=10, delta_mm=0.2, sensor_id=sensor_id)
     print(max_pos)
 
     plt.imshow(sensor_data, extent=[width_range[0], width_range[-1], height_range[-1], height_range[0]])
@@ -925,17 +929,21 @@ def test_sensor_reading():
         time.sleep(1)
 
 
+if __name__ == "__main__":
+    calibrate(width_mm=60, height_mm=240, delta_mm=3, sensor_ids=[1, 2, 3])
+
+
+
 #test_detect_multiple_circles()
 
 #test_identify_points()
 
 #test_search_for_multiple_laser_position()
 
-
+#test_sensor_reading()
 
 #test_search_laser_positon()
 
-calibrate(width_mm=60, height_mm=240, delta_mm=3, sensor_ids=[1, 2, 3])
 
 #test_detect_multiple_circles()
         
