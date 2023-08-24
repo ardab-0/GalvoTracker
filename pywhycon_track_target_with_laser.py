@@ -54,7 +54,7 @@ def main():
     device_config = pykinect.default_configuration
     device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_MJPG
     device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_1080P
-    device_config.depth_mode = pykinect.K4A_DEPTH_MODE_WFOV_2X2BINNED
+    device_config.depth_mode = pykinect.K4A_DEPTH_MODE_NFOV_2X2BINNED
     device_config.synchronized_images_only = False
     # print(device_config)
 
