@@ -38,5 +38,10 @@ def fit_circle(image):
 
 
 def test_fit_circle():
-    image = io.imread('image_processing/laser3.png')
+    image = io.imread('image_processing/laser2.png')
     fit_circle(image)
+
+
+
+if __name__ == "__main__":
+    test_fit_circle()
