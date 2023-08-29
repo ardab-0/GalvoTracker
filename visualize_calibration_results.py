@@ -57,26 +57,17 @@ for i in range(MIN_CALIBRATION_ITER, MAX_CALIBRATION_ITER+1):
 
     
     
-    fig = plt.figure(figsize=(16,8))
-
-    ax = fig.add_subplot(1,2,1)
-    ax.scatter(camera_points[0, :3*i:3], camera_points[2, :3*i:3])
-    ax.set_xlabel('x (mm)')
-    ax.set_ylabel("z (mm)")
-    ax.set_title("Calibration Plate Positions")
     
-    ax = fig.add_subplot(1,2,2, projection='3d')
-    surf = ax.plot_surface(X, Y, distance_mm, cmap=cm.coolwarm,
-                        linewidth=0, antialiased=False)
 
-    ax.set_xlabel('x (mm)')
-    ax.set_ylabel("y (mm)")
-    ax.set_zlabel("RMSE (mm)")
-    ax.set_title(f"RMSE with {i} calibration positions. Average Error Distance: {avg_distance_mm:.2f}mm")
     
-    distance_error_mm.append(avg_distance_mm)
-    calibration_iter.append(i)
-    plt.savefig(f"{FIGURE_SAVE_FOLDER}{ACCURACY_PATH}_iter{i}.png")
+    plt.scatter(camera_points[0, :3*i:3], camera_points[2, :3*i:3])
+    plt.xlabel('x (mm)')
+    plt.ylabel("z (mm)")
+    plt.title("Calibration Plate Positions")
+    
+    
+    
+    plt.savefig(f"{FIGURE_SAVE_FOLDER}_iter{i}.png")
     plt.show()
 
 
