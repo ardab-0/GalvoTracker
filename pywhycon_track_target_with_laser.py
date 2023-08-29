@@ -16,7 +16,7 @@ from circle_detector_library.circle_detector_module import *
 
 d = 0
 mirror_rotation_deg = 45
-save_path = "calibration_parameters"
+save_path = "ir_calibration_parameters"
 save_video = False
 
 
