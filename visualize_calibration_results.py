@@ -4,14 +4,22 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 
 MAX_CALIBRATION_ITER = 10
-MIN_CALIBRATION_ITER = 10
+MIN_CALIBRATION_ITER = 2
 FIGURE_SAVE_FOLDER = "calibration_result_figures/"
 
 ACCURACY_PATH = "calibration_accuracy_727mm"
 save_path = "ir_calibration_parameters"
 
-accuracy = []
+distance_error_mm = []
 calibration_iter = []
+
+def reject_outliers(data, m = 2.):
+    d = np.abs(data - np.median(data))
+    mdev = np.median(d)
+    s = d/mdev if mdev else np.zeros(len(d))
+    data[s>=m] = mdev
+    return data
+
 
 for i in range(MIN_CALIBRATION_ITER, MAX_CALIBRATION_ITER+1):
     with open('{}/iter_{}.pkl'.format(ACCURACY_PATH, i), 'rb') as f:
@@ -41,14 +49,14 @@ for i in range(MIN_CALIBRATION_ITER, MAX_CALIBRATION_ITER+1):
 
     X, Y =np.array(x_t).reshape((w, w)), np.array(y_t).reshape((w, w))
     rmse = np.array(rmse).reshape((w, w))
+    distance_mm = rmse * np.sqrt(3)
     
-    avg_rmse = np.mean(rmse)
+    distance_mm = reject_outliers(distance_mm)
 
-    outlier = rmse > 8
-    avg_rmse = np.mean(rmse[np.logical_not(outlier)])
-    rmse[outlier] = avg_rmse
-    avg_rmse = np.mean(rmse)
+    avg_distance_mm = np.mean(distance_mm)
 
+    
+    
     fig = plt.figure(figsize=(16,8))
 
     ax = fig.add_subplot(1,2,1)
@@ -58,27 +66,27 @@ for i in range(MIN_CALIBRATION_ITER, MAX_CALIBRATION_ITER+1):
     ax.set_title("Calibration Plate Positions")
     
     ax = fig.add_subplot(1,2,2, projection='3d')
-    surf = ax.plot_surface(X, Y, rmse, cmap=cm.coolwarm,
+    surf = ax.plot_surface(X, Y, distance_mm, cmap=cm.coolwarm,
                         linewidth=0, antialiased=False)
 
     ax.set_xlabel('x (mm)')
     ax.set_ylabel("y (mm)")
     ax.set_zlabel("RMSE (mm)")
-    ax.set_title(f"RMSE with {i} calibration positions. Average RMSE: {avg_rmse:.2f}mm")
+    ax.set_title(f"RMSE with {i} calibration positions. Average Error Distance: {avg_distance_mm:.2f}mm")
     
-    accuracy.append(avg_rmse)
+    distance_error_mm.append(avg_distance_mm)
     calibration_iter.append(i)
-    #plt.savefig(f"{FIGURE_SAVE_FOLDER}{ACCURACY_PATH}_iter{i}.png")
+    plt.savefig(f"{FIGURE_SAVE_FOLDER}{ACCURACY_PATH}_iter{i}.png")
     plt.show()
 
 
 
 
-plt.plot(calibration_iter, accuracy)
+plt.plot(calibration_iter, distance_error_mm)
 plt.xlabel("Calibration iteration")
-plt.ylabel("Average RMSE (mm)")
+plt.ylabel("Average Error Distance (mm)")
 plt.grid()
-#plt.savefig(f"{FIGURE_SAVE_FOLDER}{ACCURACY_PATH}_rmse-iter.png")
+plt.savefig(f"{FIGURE_SAVE_FOLDER}{ACCURACY_PATH}_rmse-iter.png")
 plt.show()
 
 
