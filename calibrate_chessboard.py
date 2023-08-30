@@ -718,14 +718,7 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
 
             R, t = optimal_rotation_and_translation(previous_camera_points_np, current_camera_points_np)
 
-            calibration_dict = {"R": R,
-                                "t": t,
-                                "laser_points": current_camera_points_np,
-                                "camera_points": previous_camera_points_np}
-
-            with open('mid_parameters.pkl'.format(save_path), 'wb') as f:
-                pickle.dump(calibration_dict, f)
-
+            
             previous_p2_pos_in_camera_coords = R_temp.T @ (previous_p2_pos.reshape((3, 1)) - t_temp)
             initial_search_point_in_camera_coords = R @ previous_p2_pos_in_camera_coords + t
             initial_search_point = R_temp @ initial_search_point_in_camera_coords + t_temp
@@ -799,15 +792,7 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
             laser_points_temp_np = np.array(laser_points).T
             camera_points_temp_np = np.array(camera_points).T
 
-            R_temp, t_temp = optimal_rotation_and_translation(camera_points_temp_np, laser_points_temp_np)
-
-            calibration_dict = {"R": R_temp,
-                                "t": t_temp,
-                                "laser_points": laser_points_temp_np,
-                                "camera_points": camera_points_temp_np}
-
-            with open('temp_parameters.pkl'.format(save_path), 'wb') as f:
-                pickle.dump(calibration_dict, f)
+            R_temp, t_temp = optimal_rotation_and_translation(camera_points_temp_np, laser_points_temp_np)            
 
             num_iter+=1
         
