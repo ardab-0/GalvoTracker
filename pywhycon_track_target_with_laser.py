@@ -13,10 +13,10 @@ from circle_detector_library.circle_detector_module import *
 
 
 # Parameters 
-d = 0
+d = 0 # distance between mirror surface and rotation center
 MIRROR_ROTATION_DEG = 45 # incidence angle of incoming laser ray (degree)
-CALIBRATION_SAVE_PATH = "calibration_parameters"
-CAPTURE_VIDEO = False
+CALIBRATION_SAVE_PATH = "calibration_parameters" # calibration result save path
+CAPTURE_VIDEO = False # select whether video recording is active or not
 # Parameters 
 
 
