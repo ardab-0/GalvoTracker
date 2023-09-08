@@ -14,7 +14,7 @@ from image_processing.color_picker import Color_Picker
 
 
 # Constants 
-d = 0
+d = 0 
 mirror_rotation_deg = 45
 num_iterations = 50
 save_path = "calibration_parameters"

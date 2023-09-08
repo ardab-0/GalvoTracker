@@ -120,7 +120,3 @@ def argsort(seq):
     return sorted(range(len(seq)), key=seq.__getitem__)
 
 
-if __name__ == "__main__":
-	
-	remove_outliers(np.ones((10, 3)), 3)
-	test_optimal_rotation_and_translation()

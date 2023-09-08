@@ -20,14 +20,14 @@ import tkinter as tk
 
 
 # Constants
-d = 0
-mirror_rotation_deg = 45
-save_path = "ir_calibration_parameters"
-CAPTURE_COUNT = 5
-ITER_COUNT = 10
-PI_COM_PORT = "COM6"
-distance_of_sensor_from_marker_mm=-55
-distance_of_second_sensor_from_first_sensor_mm=75
+d = 0  # distance between mirror surface and rotation center
+MIRROR_ROTATION_DEG = 45 # incidence angle of incoming laser ray (degree)
+CALIBRATION_SAVE_PATH = "ir_calibration_parameters"  # calibration result save path
+CAPTURE_COUNT = 5 # number of chessboard images captured for averaging
+ITER_COUNT = 10 # number of calibration iterations / number of calibration positions
+PI_COM_PORT = "COM6" # COM port used by raspberry pi pico
+SENSOR_POS_WRT_MARKER = -55 # location of middle sensor with respect to center of chessboard calibration pattern (mm)
+SENSOR_DISTANCE = 75 # distance between sensors (mm)
 
 
 
@@ -102,7 +102,7 @@ def search_for_laser_position(initial_position_mm, width_mm, height_mm, delta_mm
     z_t = initial_position_mm[2]
 
     coordinate_transform = CoordinateTransform(
-        d=d, D=z_t, rotation_degree=mirror_rotation_deg
+        d=d, D=z_t, rotation_degree=MIRROR_ROTATION_DEG
     )
     y_m, x_m = coordinate_transform.target_to_mirror(
         y_t, x_t
@@ -150,7 +150,7 @@ def search_for_multiple_laser_position(initial_position_mm, width_mm, height_mm,
     z_t = initial_position_mm[2]
 
     coordinate_transform = CoordinateTransform(
-        d=d, D=z_t, rotation_degree=mirror_rotation_deg
+        d=d, D=z_t, rotation_degree=MIRROR_ROTATION_DEG
     )
     y_m, x_m = coordinate_transform.target_to_mirror(
         y_t, x_t
@@ -701,7 +701,7 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
         avg_points_cam_3d /= CAPTURE_COUNT               
 
 
-        sensor_pos_cam_1, sensor_pos_cam_2, sensor_pos_cam_3, r_vec, d_vec = get_sensor_pos_from_marker_pos(avg_points_cam_3d, distance_of_sensor_from_marker_mm=distance_of_sensor_from_marker_mm, distance_of_second_sensor_from_first_sensor_mm=distance_of_second_sensor_from_first_sensor_mm)
+        sensor_pos_cam_1, sensor_pos_cam_2, sensor_pos_cam_3, r_vec, d_vec = get_sensor_pos_from_marker_pos(avg_points_cam_3d, distance_of_sensor_from_marker_mm=SENSOR_POS_WRT_MARKER, distance_of_second_sensor_from_first_sensor_mm=SENSOR_DISTANCE)
 
         
         # deduce new position by using marker pattern if it is possible
@@ -727,8 +727,8 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
 
             p2_sensor_estimate = np.array([x_init, y_init, z_init])
 
-            p1_sensor_estimate = p2_sensor_estimate - d_vec.reshape((-1)) * distance_of_second_sensor_from_first_sensor_mm
-            p3_sensor_estimate = p2_sensor_estimate + d_vec.reshape((-1)) * distance_of_second_sensor_from_first_sensor_mm         
+            p1_sensor_estimate = p2_sensor_estimate - d_vec.reshape((-1)) * SENSOR_DISTANCE
+            p3_sensor_estimate = p2_sensor_estimate + d_vec.reshape((-1)) * SENSOR_DISTANCE         
 
             coarse_laser_pos = [p1_sensor_estimate, p2_sensor_estimate, p3_sensor_estimate] 
            
@@ -823,7 +823,7 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
                             "laser_points": laser_points_np,
                             "camera_points": camera_points_np}
 
-        with open('{}/parameters.pkl'.format(save_path, ITER_COUNT), 'wb') as f:
+        with open('{}/parameters.pkl'.format(CALIBRATION_SAVE_PATH, ITER_COUNT), 'wb') as f:
             pickle.dump(calibration_dict, f)
 
 
@@ -918,20 +918,3 @@ if __name__ == "__main__":
     calibrate(width_mm=60, height_mm=240, delta_mm=3, sensor_ids=[1, 2, 3])
 
 
-
-#test_detect_multiple_circles()
-
-#test_identify_points()
-
-#test_search_for_multiple_laser_position()
-
-#test_sensor_reading()
-
-#test_search_laser_positon()
-
-
-#test_detect_multiple_circles()
-        
-
-
-#record_color_and_depth_image()
