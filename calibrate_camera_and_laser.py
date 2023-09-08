@@ -24,11 +24,6 @@ lower_red = np.array([140,   10, 240])
 upper_red = np.array([180, 130, 256])
 
 
-# x_t = np.array([0, 25, 50, 75, 100, 0, 25, 50, 75, 100, 0, 25, 50, 75, 100, 0, 25, 50, 75, 100, 0, 25, 50, 75, 100])
-# y_t = np.array([0, 0, 0, 0, 0, 25, 25, 25, 25, 25, 50, 50, 50, 50, 50, 75, 75, 75, 75, 75, 100, 100, 100, 100, 100])
-
-# x_t = np.array([0, 20, 40, 60, 80, 100, 0, 20, 40, 60, 80, 100, 0, 20, 40, 60, 80, 100, 0, 20, 40, 60, 80, 100, 0, 20, 40, 60, 80, 100])
-# y_t = np.array([0, 0, 0, 0, 0, 0, 20, 20, 20, 20, 20, 20, 40, 40, 40, 40, 40, 40, 60, 60, 60, 60, 60, 60, 80, 80, 80, 80, 80, 80, 100, 100, 100, 100, 100, 100])
 
 sample_x = 5
 sample_y = 3
@@ -36,10 +31,6 @@ a = np.linspace(-150, 300, sample_x)
 b = np.linspace(-150, 100, sample_y)
 x_t = np.tile(a, sample_y)
 y_t = np.repeat(b, sample_x)
-
-
-# x_t = np.array([0, 25, 50, 75, 100])
-# y_t = np.array([0, 0, 0, 0, 0])
 z_t = [ 560 ]
 
 laser_points = []
@@ -77,24 +68,6 @@ ch_1.StaticInput.SetAsInput()                        # (1) here we tell the Mana
 ch_1.SetControlMode(optoMDC.Units.XY)           
 ch_1.Manager.CheckSignalFlow()                       # This is a useful method to make sure the signal flow is configured correctly.
 si_1 = mre2.Mirror.Channel_1.StaticInput
-
-# ret_color = False
-#  # Get capture
-# while not ret_color:
-#     capture = device.update()
-
-#     # Get the color image from the capture
-#     ret_color, color_image = capture.get_color_image()
-#     if not ret_color:
-#         continue
-
-#     cp = Color_Picker(color_image)
-#     color = cp.choose_pixel()
-#     hsv_color = cv2.cvtColor(np.array(color), cv2.COLOR_RGB2HSV)
-#     print(color)
-#     print(hsv_color)
-
-
 
 
 

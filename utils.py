@@ -113,19 +113,6 @@ def test_optimal_rotation_and_translation():
 
 
 
-def remove_outliers(A, r):
-	"""
-		A: points (N x 3)
-		r: radius
-		removes points outside the given radius (r)
-	"""
-	mean = np.mean(A, axis=1)
-
-	squared_distance = np.sum(np.square(A - mean), axis=1)
-
-	#squared_distance[squ]
-
-
 def argsort(seq):
     """
 		sort smallest to largest
