@@ -1,19 +1,17 @@
-1.1) To install optomdc:
-    pip install optoKummenberg-0.15.3755-py3-none-any.whl
-    pip install optoMDC-1.1.3755-py3-none-any.whl
-
-
-1.2) To install dependencies run in root folder:
+1.1) To install dependencies run in root folder run with Anaconda prompt:
 conda create --name <env> --file requirements.txt
 
+1.2) To install optomdc:
+    pip install optoKummenberg-0.15.3755-py3-none-any.whl
+    pip install optoMDC-1.1.3755-py3-none-any.whl
 
 1.3) Install libusb-win32 with Zadig (url: https://zadig.akeo.ie/) to use USBTMC.
 
 
-1.4) To profile the python script use
+1.4) To profile the python script use (optional)
 python -m cProfile -s tottime script.py
 
-1.5) WHYCON Python binding generation
+1.5) WHYCON Python binding generation (Optional)
 
   To setup pybind:
     git clone https://github.com/pybind/pybind11.git

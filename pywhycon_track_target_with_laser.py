@@ -53,7 +53,7 @@ def main():
     # Modify camera configuration
     device_config = pykinect.default_configuration
     device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_MJPG
-    device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_1080P
+    device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_720P
     device_config.depth_mode = pykinect.K4A_DEPTH_MODE_NFOV_2X2BINNED
     device_config.synchronized_images_only = False
     # print(device_config)
@@ -66,11 +66,11 @@ def main():
 
 
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter('output.avi', fourcc, 30.0, (1920,1080))
+    out = cv2.VideoWriter('output.avi', fourcc, 30.0, (1280,720))
 
     # gives undefined warning but works (pybind11 c++ module) change import *
     prevCircle = CircleClass()
-    circle_detector = CircleDetectorClass(1920, 1080) # K4A_COLOR_RESOLUTION_720P
+    circle_detector = CircleDetectorClass(1280, 720) # K4A_COLOR_RESOLUTION_720P
 
     prev_3d_coor = 0
     speed_timer = 1
@@ -123,7 +123,7 @@ def main():
         camera_coordinates_in_laser_coordinates =  R @ camera_coordinates + t
     
 
-        coordinate_transform = CoordinateTransform(d=d, D=camera_coordinates_in_laser_coordinates[2], rotation_degree=MIRROR_ROTATION_DEG)
+        coordinate_transform = CoordinateTransform(d=d, D=camera_coordinates_in_laser_coordinates[2].item(), rotation_degree=MIRROR_ROTATION_DEG)
         y_m, x_m = coordinate_transform.target_to_mirror(camera_coordinates_in_laser_coordinates[1], camera_coordinates_in_laser_coordinates[0]) # order is changed in order to change x and y axis
         print("Time until completing calculations (s): ", time.time() - start)
 
