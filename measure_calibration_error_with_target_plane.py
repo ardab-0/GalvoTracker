@@ -187,7 +187,7 @@ def main():
         target_in_laser_coordinates =  R @ target_in_camera_coordinates + t
     
 
-        coordinate_transform = CoordinateTransform(d=d, D=target_in_laser_coordinates[2], rotation_degree=MIRROR_ROTATION_DEG)
+        coordinate_transform = CoordinateTransform(d=d, D=target_in_laser_coordinates[2].item(), rotation_degree=MIRROR_ROTATION_DEG)
         y_m, x_m = coordinate_transform.target_to_mirror(target_in_laser_coordinates[1], target_in_laser_coordinates[0]) # order is changed in order to change x and y axis
 
         

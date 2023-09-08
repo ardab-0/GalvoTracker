@@ -22,12 +22,9 @@ mirror_rotation_deg = 45 # mirror rotation degree
 initial_x_pos_mm = 15 # initial position of motor x
 initial_y_pos_mm = 9 # initial position of motor y
 scanline_x_mm =  15 # length of scan line in x direction
+current_y_pos = 5 # position of current test y position in mm
 
-
-# position of current test y position in mm
-current_y_pos = 5
-
-measurement_foldername = "power_measurements/measurements_horizontal"
+measurement_foldername = "power_measurements/measurements_horizontal"  #measurement save location
 
 
 # Functions

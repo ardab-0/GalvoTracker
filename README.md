@@ -1,17 +1,31 @@
 1.1) To install dependencies run in root folder run with Anaconda prompt:
-conda create --name <env> --file requirements.txt
+- conda create --name <env_name> 
+- conda activate <env_name>
+- conda install python=3.8
+- pip install opencv-python
+- pip install pyserial
+- pip install pykinect_azure
+- pip install matplotlib
+- pip install sympy
+- pip install scipy
+- pip install scikit-image
+- pip install python-usbtmc
+- pip install thorlabs-apt-protocol
+- pip install keyboard
 
-1.2) To install optomdc:
-    pip install optoKummenberg-0.15.3755-py3-none-any.whl
-    pip install optoMDC-1.1.3755-py3-none-any.whl
+cd into optomdc_install_files
 
-1.3) Install libusb-win32 with Zadig (url: https://zadig.akeo.ie/) to use USBTMC.
+- pip install optoKummenberg-0.15.3755-py3-none-any.whl
+- pip install optoMDC-1.1.3755-py3-none-any.whl
 
 
-1.4) To profile the python script use (optional)
+1.2) Install libusb-win32 with Zadig (url: https://zadig.akeo.ie/) to use USBTMC.
+
+
+1.3) To profile the python script use (optional)
 python -m cProfile -s tottime script.py
 
-1.5) WHYCON Python binding generation (Optional)
+1.4) WHYCON Python binding generation (Optional)
 
   To setup pybind:
     git clone https://github.com/pybind/pybind11.git
@@ -33,7 +47,7 @@ python -m cProfile -s tottime script.py
 
 2.1) Scripts
 
-- calibrate_chessboard.py : It is the main calibration program. Used with chessboard calibration pattern.
+- calibrate.py : It is the main calibration program. Used together with chessboard calibration pattern on top of the calibration pattern.
 - visualize_calibration_points.py : It displays the recorded calibration points in 3D 
 - measure_calibration_error_with_target_plane.py : It measures the calibration error by scanning around the detector and finding its cente location. Measurement is done by pressing "m" key. 
 - point_laser_to_mouse_position.py : Test script to check depth camera and mirror controller integration. It points the laser to mouse location.

@@ -140,7 +140,7 @@ def main():
 
         
 
-        coordinate_transform = CoordinateTransform(d=d, D=prediction_coor[2], rotation_degree=mirror_rotation_deg)
+        coordinate_transform = CoordinateTransform(d=d, D=prediction_coor[2].item(), rotation_degree=mirror_rotation_deg)
 
 
 

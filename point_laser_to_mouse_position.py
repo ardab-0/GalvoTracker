@@ -119,7 +119,7 @@ def main():
 
         camera_coordinates_in_laser_coordinates =  R @ camera_coordinates + t
        
-        coordinate_transform = CoordinateTransform(d=d, D=camera_coordinates_in_laser_coordinates[2], rotation_degree=MIRROR_ROTATION_DEG)
+        coordinate_transform = CoordinateTransform(d=d, D=camera_coordinates_in_laser_coordinates[2].item(), rotation_degree=MIRROR_ROTATION_DEG)
 
 
 

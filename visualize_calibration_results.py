@@ -5,9 +5,9 @@ from matplotlib import cm
 
 MAX_CALIBRATION_ITER = 10
 MIN_CALIBRATION_ITER = 2
-FIGURE_SAVE_FOLDER = "calibration_result_figures/"
+FIGURE_SAVE_FOLDER = "Figures/calibration_result_figures/"
 
-ACCURACY_PATH = "calibration_accuracy_727mm"
+ACCURACY_PATH = "calibration_accuracy_results/calibration_accuracy_727mm"
 save_path = "calibration_parameters"
 
 distance_error_mm = []

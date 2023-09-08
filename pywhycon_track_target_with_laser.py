@@ -64,9 +64,9 @@ def main():
     cv2.namedWindow('Laser Detector',cv2.WINDOW_NORMAL)
     font = cv2.FONT_HERSHEY_SIMPLEX
 
-
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter('output.avi', fourcc, 30.0, (1280,720))
+    if CAPTURE_VIDEO:
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        out = cv2.VideoWriter('output.avi', fourcc, 30.0, (1280,720))
 
     # gives undefined warning but works (pybind11 c++ module) change import *
     prevCircle = CircleClass()

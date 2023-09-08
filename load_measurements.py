@@ -92,8 +92,9 @@ def plot_measurements(filename, distance_to_plane, distance_to_mirror_center, po
 
     plt.show()
 
+
+
+
 # plot_measurements("power_measurements/measurements_horizontal", "425mm", "d0", "3.0x-5.0", T=0.01, N=100)
-
-
 
 print_difference("power_measurements/measurements_horizontal", "425mm", "d0", T=0.01, N=100, measurement_count=13, y_pos="5.0")
