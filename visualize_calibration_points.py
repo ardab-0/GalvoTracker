@@ -4,7 +4,10 @@ import matplotlib.pyplot as plt
 import pickle
 from utils import optimal_rotation_and_translation
 
+
+# Parameters
 CALIBRATION_ITER = 10
+# Parameters
 
 def main():
     save_path = "calibration_parameters"

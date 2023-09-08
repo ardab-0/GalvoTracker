@@ -13,24 +13,28 @@ from image_processing.black_white import black_and_white_threshold
 from image_processing.color_picker import Color_Picker
 
 
-# Constants 
+# Parameters
 d = 0 
-mirror_rotation_deg = 45
-num_iterations = 50
-save_path = "calibration_parameters"
+MIRROR_ROTATION_DEG = 45 # incidence angle of incoming laser ray (degree)
+NUM_ITERATIONS = 50 # number captured images to detect laser position. Laser positions are averaged.
+CALIBRATION_SAVE_PATH = "calibration_parameters" # calibration result save path
+LOWER_RED = np.array([140,   10, 240])  # lower range of the laser color in HSV
+UPPER_RED = np.array([180, 130, 256]) # upper range of the laser color in HSV
+SAMPLE_X = 5 # number of calibration points in x-direction
+SAMPLE_Y = 3 # number of calibration points in y-direction
+TARGET_PLANE_DISTNCE = 560 # distance of target plane in mm
+
+# Parameters
 
 
-lower_red = np.array([140,   10, 240]) 
-upper_red = np.array([180, 130, 256])
 
 
 
-sample_x = 5
-sample_y = 3
-a = np.linspace(-150, 300, sample_x)
-b = np.linspace(-150, 100, sample_y)
-x_t = np.tile(a, sample_y)
-y_t = np.repeat(b, sample_x)
+
+a = np.linspace(-150, 300, SAMPLE_X)
+b = np.linspace(-150, 100, SAMPLE_Y)
+x_t = np.tile(a, SAMPLE_Y)
+y_t = np.repeat(b, SAMPLE_X)
 z_t = [ 560 ]
 
 laser_points = []
@@ -72,7 +76,7 @@ si_1 = mre2.Mirror.Channel_1.StaticInput
 
 
 for z in z_t:
-    coordinate_transform = CoordinateTransform(d=d, D=z, rotation_degree=mirror_rotation_deg)
+    coordinate_transform = CoordinateTransform(d=d, D=z, rotation_degree=MIRROR_ROTATION_DEG)
 
 
 
@@ -92,7 +96,7 @@ for z in z_t:
         average_camera_coordinates_np = np.zeros((3), dtype=float)
         number_of_camera_coordimnates_in_batch = 0
 
-        for  iter in range(num_iterations):
+        for  iter in range(NUM_ITERATIONS):
             # Get capture
             capture = device.update()
 
@@ -106,7 +110,7 @@ for z in z_t:
                 continue
 
             #thresholded_image = black_and_white_threshold(color_image)    
-            circle = detect_circle_position(color_image, lower_range=lower_red, upper_range=upper_red)
+            circle = detect_circle_position(color_image, lower_range=LOWER_RED, upper_range=UPPER_RED)
 
             if circle is  None:
                 print("Laser is not detected")                
@@ -171,7 +175,7 @@ else:
                         "laser_points": laser_points_np,
                         "camera_points": camera_points_np}
 
-    with open('{}/parameters.pkl'.format(save_path), 'wb') as f:
+    with open('{}/parameters.pkl'.format(CALIBRATION_SAVE_PATH), 'wb') as f:
         pickle.dump(calibration_dict, f)
 
    

@@ -12,18 +12,20 @@ import os
 from circle_detector_library.circle_detector_module import *
 from utils import optimal_rotation_and_translation
 import matplotlib.pyplot as plt
-# Constants 
-
-d = 0
-mirror_rotation_deg = 45
-save_path = "ir_calibration_parameters"
-distance_of_sensor_from_marker_mm=-30
-PI_COM_PORT = "COM6"
-CALIBRATION_ITER = 10
 
 
+# Parameters
+d = 0 # distance between mirror surface and rotation center
+MIRROR_ROTATION_DEG = 45 # incidence angle of incoming laser ray (degree)
+CALIBRATION_SAVE_PATH = "calibration_parameters" # calibration result save path
+SENSOR_POS_WRT_MARKER=-30 # position of middle sensor with respect to marker position (mm)
+PI_COM_PORT = "COM6" # COM port used by raspberry pi pico
+CALIBRATION_ITER = 10 # number of calibration points used during tests
+# Parameters
 
-with open('{}/parameters.pkl'.format(save_path), 'rb') as f:
+
+
+with open('{}/parameters.pkl'.format(CALIBRATION_SAVE_PATH), 'rb') as f:
     loaded_dict = pickle.load(f)
     R = loaded_dict["R"]
     t = loaded_dict["t"]
@@ -71,7 +73,7 @@ def search_for_laser_position(initial_position_mm, width_mm, height_mm, delta_mm
     z_t = initial_position_mm[2]
 
     coordinate_transform = CoordinateTransform(
-        d=d, D=z_t, rotation_degree=mirror_rotation_deg
+        d=d, D=z_t, rotation_degree=MIRROR_ROTATION_DEG
     )
     y_m, x_m = coordinate_transform.target_to_mirror(
         y_t, x_t
@@ -179,13 +181,13 @@ def main():
 
 
         # point to target 
-        target_in_camera_coordinates += np.array([0,distance_of_sensor_from_marker_mm ,0]).reshape((3, 1))
+        target_in_camera_coordinates += np.array([0,SENSOR_POS_WRT_MARKER ,0]).reshape((3, 1))
 
         # rotate and translate  
         target_in_laser_coordinates =  R @ target_in_camera_coordinates + t
     
 
-        coordinate_transform = CoordinateTransform(d=d, D=target_in_laser_coordinates[2], rotation_degree=mirror_rotation_deg)
+        coordinate_transform = CoordinateTransform(d=d, D=target_in_laser_coordinates[2], rotation_degree=MIRROR_ROTATION_DEG)
         y_m, x_m = coordinate_transform.target_to_mirror(target_in_laser_coordinates[1], target_in_laser_coordinates[0]) # order is changed in order to change x and y axis
 
         

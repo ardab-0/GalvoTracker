@@ -7,15 +7,14 @@ import optoMDC
 from mirror.coordinate_transformation import CoordinateTransform
 import pickle
 import time
-from pykinect_azure.k4a.transformation import Transformation
 
 
 
-# Constants 
+# Parameters
 d = 0
 mirror_rotation_deg = 45
 save_path = "calibration_parameters"
-# target coordinate offset (mm)
+# Parameters
 
 
 with open('{}/parameters.pkl'.format(save_path), 'rb') as f:
@@ -75,7 +74,6 @@ def main():
     # Start device
     device = pykinect.start_device(config=device_config)
 
-    transformation = Transformation(device.get_calibration(device_config.depth_mode, device_config.color_resolution))
 
 
     cv2.namedWindow('Laser Detector',cv2.WINDOW_NORMAL)
@@ -114,14 +112,12 @@ def main():
 
 
         pos3d_color = device.calibration.convert_2d_to_3d(pixels, rgb_depth, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_COLOR)
-        # pos3d_depth = device.calibration.convert_2d_to_3d(pixels, rgb_depth, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_DEPTH)
-        # print(f"RGB depth: {rgb_depth}, RGB pos3D: {pos3d_color}, Depth pos3D: {pos3d_depth}")
+       
 
         camera_coordinates = np.array([pos3d_color.xyz.x, pos3d_color.xyz.y, pos3d_color.xyz.z]).reshape((3, 1))
 
     
-        # Test point cloud 
-        # point_cloud_image = transformation.depth_image_to_point_cloud(transformed_depth_image, K4A_CALIBRATION_TYPE_COLOR)
+        
         
 
         
@@ -142,12 +138,7 @@ def main():
 
         prediction_coor = camera_coordinates_in_laser_coordinates + v_avg*next_t
 
-        # camera_coordinates_in_laser_coordinates = np.floor(camera_coordinates_in_laser_coordinates)
-
-        # print("camera_coordinates", camera_coordinates)
-
-        # print("camera_coordinates_in_laser_coordinates", camera_coordinates_in_laser_coordinates)
-
+        
 
         coordinate_transform = CoordinateTransform(d=d, D=prediction_coor[2], rotation_degree=mirror_rotation_deg)
 

@@ -19,7 +19,7 @@ from image_processing.local_maxima_finding import find_local_maxima
 import tkinter as tk
 
 
-# Constants
+# Parameters
 d = 0  # distance between mirror surface and rotation center
 MIRROR_ROTATION_DEG = 45 # incidence angle of incoming laser ray (degree)
 CALIBRATION_SAVE_PATH = "calibration_parameters"  # calibration result save path
@@ -28,7 +28,7 @@ ITER_COUNT = 10 # number of calibration iterations / number of calibration posit
 PI_COM_PORT = "COM6" # COM port used by raspberry pi pico
 SENSOR_POS_WRT_MARKER = -55 # location of middle sensor with respect to center of chessboard calibration pattern (mm)
 SENSOR_DISTANCE = 75 # distance between sensors (mm)
-
+# Parameters
 
 
 # global variables

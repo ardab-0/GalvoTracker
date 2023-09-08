@@ -13,7 +13,7 @@ from image_processing.black_white import black_and_white_threshold
 from image_processing.color_picker import Color_Picker
 
 
-######################### Constants 7
+# Parameters
 d = 0 # mm
 mirror_rotation_deg = 45
 num_iterations = 50
@@ -26,7 +26,7 @@ z_t = 727 # mm
 lower_red = np.array([140,   10, 240]) 
 upper_red = np.array([180, 130, 256])
 
-####################### Constants 
+# Parameters
 
 
 

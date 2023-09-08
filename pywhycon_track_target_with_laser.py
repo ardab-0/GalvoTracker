@@ -12,15 +12,15 @@ import os
 from circle_detector_library.circle_detector_module import *
 
 
-# Constants 
-
+# Parameters 
 d = 0
-mirror_rotation_deg = 45
-save_path = "calibration_parameters"
-save_video = False
+MIRROR_ROTATION_DEG = 45 # incidence angle of incoming laser ray (degree)
+CALIBRATION_SAVE_PATH = "calibration_parameters"
+CAPTURE_VIDEO = False
+# Parameters 
 
 
-with open('{}/parameters.pkl'.format(save_path), 'rb') as f:
+with open('{}/parameters.pkl'.format(CALIBRATION_SAVE_PATH), 'rb') as f:
     loaded_dict = pickle.load(f)
     R = loaded_dict["R"]
     t = loaded_dict["t"]
@@ -123,7 +123,7 @@ def main():
         camera_coordinates_in_laser_coordinates =  R @ camera_coordinates + t
     
 
-        coordinate_transform = CoordinateTransform(d=d, D=camera_coordinates_in_laser_coordinates[2], rotation_degree=mirror_rotation_deg)
+        coordinate_transform = CoordinateTransform(d=d, D=camera_coordinates_in_laser_coordinates[2], rotation_degree=MIRROR_ROTATION_DEG)
         y_m, x_m = coordinate_transform.target_to_mirror(camera_coordinates_in_laser_coordinates[1], camera_coordinates_in_laser_coordinates[0]) # order is changed in order to change x and y axis
         print("Time until completing calculations (s): ", time.time() - start)
 
@@ -155,7 +155,7 @@ def main():
 
         color_image = cv2.circle(color_image, (int(new_circle.x), int(new_circle.y)), radius=10, color=(0, 255, 0), thickness=2)
 
-        if save_video:
+        if CAPTURE_VIDEO:
             out.write(color_image)
             
         # Show detected target position

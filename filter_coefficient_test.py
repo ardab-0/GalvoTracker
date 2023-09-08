@@ -3,11 +3,14 @@ import pickle
 import utils as utils
 import matplotlib.pyplot as plt
 
+
+# Parameters
 D = 410
 d = 0
 measurement_foldername = "power_measurements/measurements_horizontal"
 T=0.01
 N=100
+# Parameters
 
 
 distance_to_plane = "{}mm".format(D) 

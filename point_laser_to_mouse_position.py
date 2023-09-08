@@ -11,14 +11,14 @@ from pykinect_azure.k4a.transformation import Transformation
 
 
 
-# Constants 
-d = 0
-mirror_rotation_deg = 45
-save_path = "calibration_parameters"
-# target coordinate offset (mm)
+# Parameters
+d = 0 # distance between mirror surface and rotation center
+MIRROR_ROTATION_DEG = 45 # incidence angle of incoming laser ray (degree)
+CALIBRATION_SAVE_PATH = "calibration_parameters" # calibration result save path
+# Parameters
 
 
-with open('{}/parameters.pkl'.format(save_path), 'rb') as f:
+with open('{}/parameters.pkl'.format(CALIBRATION_SAVE_PATH), 'rb') as f:
     loaded_dict = pickle.load(f)
     R = loaded_dict["R"]
     t = loaded_dict["t"]
@@ -119,7 +119,7 @@ def main():
 
         camera_coordinates_in_laser_coordinates =  R @ camera_coordinates + t
        
-        coordinate_transform = CoordinateTransform(d=d, D=camera_coordinates_in_laser_coordinates[2], rotation_degree=mirror_rotation_deg)
+        coordinate_transform = CoordinateTransform(d=d, D=camera_coordinates_in_laser_coordinates[2], rotation_degree=MIRROR_ROTATION_DEG)
 
 
 
@@ -134,16 +134,8 @@ def main():
 
         
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(color_image, f"fps: {1 / (time.time() - start)}", (10, 20), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-
-        cv2.putText(color_image, f"Target Coordinates w.r.t. mirror center:", (10, 40), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        cv2.putText(color_image, f"X: {camera_coordinates_in_laser_coordinates[0]}", (10, 60), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        cv2.putText(color_image, f"Y: {camera_coordinates_in_laser_coordinates[1]}", (10, 80), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        cv2.putText(color_image, f"Z: {camera_coordinates_in_laser_coordinates[2]}", (10, 100), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-
-
+        cv2.putText(color_image, f"fps: {1 / (time.time() - start)}", (10, 20), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)     
         
-        # cv2.circle(color_image, center=(mouse_x, mouse_y), radius=10, color=(0, 255, 0), thickness=2)
         # Show detected target position
         cv2.imshow('Laser Detector',color_image)
         # Press q key to stop
