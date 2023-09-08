@@ -22,7 +22,7 @@ import tkinter as tk
 # Constants
 d = 0  # distance between mirror surface and rotation center
 MIRROR_ROTATION_DEG = 45 # incidence angle of incoming laser ray (degree)
-CALIBRATION_SAVE_PATH = "ir_calibration_parameters"  # calibration result save path
+CALIBRATION_SAVE_PATH = "calibration_parameters"  # calibration result save path
 CAPTURE_COUNT = 5 # number of chessboard images captured for averaging
 ITER_COUNT = 10 # number of calibration iterations / number of calibration positions
 PI_COM_PORT = "COM6" # COM port used by raspberry pi pico

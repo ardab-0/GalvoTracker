@@ -8,7 +8,7 @@ MIN_CALIBRATION_ITER = 2
 FIGURE_SAVE_FOLDER = "calibration_result_figures/"
 
 ACCURACY_PATH = "calibration_accuracy_727mm"
-save_path = "ir_calibration_parameters"
+save_path = "calibration_parameters"
 
 distance_error_mm = []
 calibration_iter = []

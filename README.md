@@ -33,3 +33,10 @@ python -m cProfile -s tottime script.py
 
 
 
+2.1) Scripts
+
+- calibrate_chessboard.py : It is the main calibration program. Used with chessboard calibration pattern.
+- visualize_calibration_points.py : It displays the recorded calibration points in 3D 
+- measure_calibration_error_with_target_plane.py : It measures the calibration error by scanning around the detector and finding its cente location. Measurement is done by pressing "m" key.
+- point_laser_to_mouse_position.py : Test script to check depth camera and mirror controller integration. It points the laser to mouse location.
+- pywhycon_track_target_with_laser.py : System points the laser to marker position. It is the combination of all parts of the system.

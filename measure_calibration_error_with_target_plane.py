@@ -207,11 +207,8 @@ def main():
             max_pos = np.array(max_pos).reshape(3,1)
             l2norm = np.linalg.norm(max_pos - target_in_laser_coordinates)
             plt.imshow(sensor_data, extent=[width_range[0], width_range[-1], height_range[-1], height_range[0]])
-            print(l2norm)
-            plt.show()
-
-            cv2.waitKey(0)
-
+            print("Error distance (mm): ", l2norm)
+            
 
 
         if cv2.waitKey(1) == ord('q'):

@@ -17,7 +17,7 @@ from image_processing.color_picker import Color_Picker
 d = 0 # mm
 mirror_rotation_deg = 45
 num_iterations = 50
-save_path = "ir_calibration_parameters"
+save_path = "calibration_parameters"
 accuracy_path = "calibration_accuracy_727mm"
 CALIBRATION_ITER = 9
 sample_x = 5

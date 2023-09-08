@@ -3,6 +3,8 @@
 Created on Wed Apr 12 09:40:39 2023
 
 @author: ki52soho
+
+Based on MR-E-2 Development Kit Operation Manual sample script
 """
 
 import numpy as np

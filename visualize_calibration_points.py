@@ -7,7 +7,7 @@ from utils import optimal_rotation_and_translation
 CALIBRATION_ITER = 10
 
 def main():
-    save_path = "ir_calibration_parameters"
+    save_path = "calibration_parameters"
 
 
     fig = plt.figure()
