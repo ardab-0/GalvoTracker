@@ -36,7 +36,7 @@ python -m cProfile -s tottime script.py
   cd build
   cmake ..
   make
-  The module file is generated in build folder inside the Release or Debug directory
+  The module file is generated in build folder inside the Release or Debug directory based on the compile mode. (Example module file: circle_detector_module.cp38-win_amd64.pyd)
 
   - Circle detection library must have the same python version with the environment python version
   - You must place opencv dll files next to circle detection module file

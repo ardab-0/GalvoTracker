@@ -81,15 +81,15 @@ def main():
         # Get capture
         
         capture = device.update()
-        print("Time until capture (s): ", time.time() - start)
+        #print("Time until capture (s): ", time.time() - start)
 
         # Get the color image from the capture
         ret_color, color_image = capture.get_color_image()
-        print("Time until color image (s): ", time.time() - start)
+        #print("Time until color image (s): ", time.time() - start)
 
         # Get the colored depth
         ret_depth, transformed_depth_image = capture.get_transformed_depth_image()
-        print("Time until depth image (s): ", time.time() - start)
+        #print("Time until depth image (s): ", time.time() - start)
 
         if not ret_color or not ret_depth:
             continue  
@@ -101,27 +101,16 @@ def main():
 
         pixels = k4a_float2_t((pix_x, pix_y))
 
-
-
         pos3d_color = device.calibration.convert_2d_to_3d(pixels, rgb_depth, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_COLOR)
-        # pos3d_depth = device.calibration.convert_2d_to_3d(pixels, rgb_depth, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_DEPTH)
-        # print(f"RGB depth: {rgb_depth}, RGB pos3D: {pos3d_color}, Depth pos3D: {pos3d_depth}")
-
-        camera_coordinates = np.array([pos3d_color.xyz.x, pos3d_color.xyz.y, pos3d_color.xyz.z]).reshape((3, 1))
-
-    
-        # Test point cloud 
-        # point_cloud_image = transformation.depth_image_to_point_cloud(transformed_depth_image, K4A_CALIBRATION_TYPE_COLOR)
         
 
+        camera_coordinates = np.array([pos3d_color.xyz.x, pos3d_color.xyz.y, pos3d_color.xyz.z]).reshape((3, 1))  
         
         # rotate and translate
 
         camera_coordinates_in_laser_coordinates =  R @ camera_coordinates + t
        
         coordinate_transform = CoordinateTransform(d=d, D=camera_coordinates_in_laser_coordinates[2].item(), rotation_degree=MIRROR_ROTATION_DEG)
-
-
 
         y_m, x_m = coordinate_transform.target_to_mirror(camera_coordinates_in_laser_coordinates[1], camera_coordinates_in_laser_coordinates[0]) # order is changed in order to change x and y axis
         print("Time until completing calculations (s): ", time.time() - start)
