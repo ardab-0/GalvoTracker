@@ -53,7 +53,7 @@ def main():
     # Modify camera configuration
     device_config = pykinect.default_configuration
     device_config.color_format = pykinect.K4A_IMAGE_FORMAT_COLOR_MJPG
-    device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_720P
+    device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_720P # 1280 x 720
     device_config.depth_mode = pykinect.K4A_DEPTH_MODE_NFOV_2X2BINNED
     device_config.synchronized_images_only = False
     # print(device_config)
@@ -99,14 +99,6 @@ def main():
         if not ret_depth:
             continue  
         
-        
-        #color_image_3channel = color_image[:, :, :3]
-        # returns 0, 0 if target is not detected
-        
-       
-
-    
-        
         pix_x = int(new_circle.x)
         pix_y = int(new_circle.y)
         rgb_depth = transformed_depth_image[pix_y, pix_x]
@@ -114,8 +106,7 @@ def main():
         pixels = k4a_float2_t((pix_x, pix_y))
 
         pos3d_color = device.calibration.convert_2d_to_3d(pixels, rgb_depth, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_COLOR)
-        # pos3d_depth = device.calibration.convert_2d_to_3d(pixels, rgb_depth, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_DEPTH)
-        # print(f"RGB depth: {rgb_depth}, RGB pos3D: {pos3d_color}, Depth pos3D: {pos3d_depth}")
+        
 
         camera_coordinates = np.array([pos3d_color.xyz.x, pos3d_color.xyz.y, pos3d_color.xyz.z]).reshape((3, 1))
 
@@ -143,15 +134,7 @@ def main():
 
         end = time.time()
         print("elapsed time: ", (end - start))    
-        cv2.putText(color_image, f"fps: {1 / (end - start)}", (10, 20), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        cv2.putText(color_image, f"Target Coordinates w.r.t. mirror center:", (10, 40), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        cv2.putText(color_image, f"X (mm): {camera_coordinates_in_laser_coordinates[0]}", (10, 60), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        cv2.putText(color_image, f"Y (mm): {camera_coordinates_in_laser_coordinates[1]}", (10, 80), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        cv2.putText(color_image, f"Z (mm): {camera_coordinates_in_laser_coordinates[2]}", (10, 100), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-
-        # cv2.putText(color_image, f"VX (mm/s): {speed[0]}", (10, 120), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        # cv2.putText(color_image, f"VY (mm/s): {speed[1]}", (10, 140), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        # cv2.putText(color_image, f"VZ (mm/s): {speed[2]}", (10, 160), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+        cv2.putText(color_image, f"fps: {1 / (end - start)}", (10, 20), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)       
 
         color_image = cv2.circle(color_image, (int(new_circle.x), int(new_circle.y)), radius=10, color=(0, 255, 0), thickness=2)
 

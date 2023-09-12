@@ -109,17 +109,10 @@ def main():
 
         pixels = k4a_float2_t((pix_x, pix_y))
 
-
-
         pos3d_color = device.calibration.convert_2d_to_3d(pixels, rgb_depth, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_COLOR)
        
 
-        camera_coordinates = np.array([pos3d_color.xyz.x, pos3d_color.xyz.y, pos3d_color.xyz.z]).reshape((3, 1))
-
-    
-        
-        
-
+        camera_coordinates = np.array([pos3d_color.xyz.x, pos3d_color.xyz.y, pos3d_color.xyz.z]).reshape((3, 1))  
         
         # rotate and translate
 
@@ -136,9 +129,7 @@ def main():
         prev_v = v_avg
         prev_point = camera_coordinates_in_laser_coordinates
 
-        prediction_coor = camera_coordinates_in_laser_coordinates + v_avg*next_t
-
-        
+        prediction_coor = camera_coordinates_in_laser_coordinates + v_avg*next_t        
 
         coordinate_transform = CoordinateTransform(d=d, D=prediction_coor[2].item(), rotation_degree=mirror_rotation_deg)
 
@@ -150,21 +141,8 @@ def main():
         
         if(len(y_m) > 0 and len(x_m) > 0):
             si_0.SetXY(y_m[0])        
-            si_1.SetXY(x_m[0]) 
-
-
+            si_1.SetXY(x_m[0])         
         
-        # font = cv2.FONT_HERSHEY_SIMPLEX
-        # cv2.putText(color_image, f"fps: {1 / (time.time() - start)}", (10, 20), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-
-        # cv2.putText(color_image, f"Target Coordinates w.r.t. mirror center:", (10, 40), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        # cv2.putText(color_image, f"X: {camera_coordinates_in_laser_coordinates[0]}", (10, 60), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        # cv2.putText(color_image, f"Y: {camera_coordinates_in_laser_coordinates[1]}", (10, 80), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-        # cv2.putText(color_image, f"Z: {camera_coordinates_in_laser_coordinates[2]}", (10, 100), font, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-
-
-        
-        # cv2.circle(color_image, center=(mouse_x, mouse_y), radius=10, color=(0, 255, 0), thickness=2)
         # Show detected target position
         cv2.imshow('Laser Detector',color_image)
         # Press q key to stop
