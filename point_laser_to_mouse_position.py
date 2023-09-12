@@ -69,9 +69,6 @@ def main():
     # Start device
     device = pykinect.start_device(config=device_config)
 
-    transformation = Transformation(device.get_calibration(device_config.depth_mode, device_config.color_resolution))
-
-
     cv2.namedWindow('Laser Detector',cv2.WINDOW_NORMAL)
     cv2.setMouseCallback('Laser Detector', onMousemove)
 
