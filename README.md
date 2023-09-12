@@ -21,11 +21,12 @@ cd into optomdc_install_files
 
 1.2) Install libusb-win32 with Zadig (url: https://zadig.akeo.ie/) to use USBTMC.
 
+1.3) Install Azure Kinect SDK (url: https://github.com/microsoft/Azure-Kinect-Sensor-SDK/blob/develop/docs/usage.md)
 
-1.3) To profile the python script use (optional)
+1.4) To profile the python script use (optional)
 python -m cProfile -s tottime script.py
 
-1.4) WHYCON Python binding generation (Optional)
+1.5) WHYCON Python binding generation (Optional)
 
   To setup pybind:
     git clone https://github.com/pybind/pybind11.git
@@ -38,9 +39,9 @@ python -m cProfile -s tottime script.py
   make
   The module file is generated in build folder inside the Release or Debug directory based on the compile mode. (Example module file: circle_detector_module.cp38-win_amd64.pyd)
 
-  - Circle detection library must have the same python version with the environment python version
-  - You must place opencv dll files next to circle detection module file
-  - You must give execution rigts to dll and module files in circle detection library, otherwise you get access denied error during load dll operation
+  - Circle detection library must have the same python version with the environment python version.
+  - You must place opencv dll files next to circle detection module file.
+  - You must give execution rigts to dll and module files in circle detection library, otherwise you get access denied error during load dll operation.
 
 
 
