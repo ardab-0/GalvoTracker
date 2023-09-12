@@ -1,4 +1,4 @@
-1.1) To install dependencies run in root folder run with Anaconda prompt:
+1.1) To install dependencies run in root folder (run with Anaconda prompt):
 - conda create --name <env_name> 
 - conda activate <env_name>
 - conda install python=3.8
@@ -38,9 +38,9 @@ python -m cProfile -s tottime script.py
   make
   The module file is generated in build folder inside the Release or Debug directory
 
-  -circle detection library must have the same python version with the environment python version
-  -you must place opencv dll files next to circle detection module file
-  -Must give execution rigts to dll and module files in circle detection library, otherwise you get access denied error during load dll operation
+  - Circle detection library must have the same python version with the environment python version
+  - You must place opencv dll files next to circle detection module file
+  - You must give execution rigts to dll and module files in circle detection library, otherwise you get access denied error during load dll operation
 
 
 

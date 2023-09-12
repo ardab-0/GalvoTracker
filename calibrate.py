@@ -106,7 +106,7 @@ def search_for_laser_position(initial_position_mm, width_mm, height_mm, delta_mm
     )
     y_m, x_m = coordinate_transform.target_to_mirror(
         y_t, x_t
-    )  # order is changed in order to change x and y axis
+    )  
 
     sensor_readings = []
 
@@ -154,7 +154,7 @@ def search_for_multiple_laser_position(initial_position_mm, width_mm, height_mm,
     )
     y_m, x_m = coordinate_transform.target_to_mirror(
         y_t, x_t
-    )  # order is changed in order to change x and y axis
+    )  
 
     multiple_sensor_readings = []
     
@@ -761,18 +761,7 @@ def calibrate(width_mm, height_mm, delta_mm, sensor_ids):
         real_3d_coords = []
         real_3d_coords.append(p1_updated.reshape((-1)))
         real_3d_coords.append(p2_updated.reshape((-1)))
-        real_3d_coords.append(p3_updated.reshape((-1)))
-
-
-
-        # laser detector positions in laser mirror coordinate system
-        # real_3d_coords = []
-
-        # for i in range(len(updated_points)):
-        #     sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=[updated_points[i][0], updated_points[i][1], updated_points[i][2]], width_mm=50, height_mm=50, delta_mm=2, sensor_id=i+1)
-        #     sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=max_pos, width_mm=10, height_mm=10, delta_mm=0.2, sensor_id=i+1)
-
-        #     real_3d_coords.append(max_pos)
+        real_3d_coords.append(p3_updated.reshape((-1)))        
 
         print(f"Press (s) to save measurements. Press another character to discard measurements in current iteration." )
         cv2.putText(color_image_orig, f"Current Iteration: {num_iter+1}/{ITER_COUNT}", (10, 40), font, 2, (0, 255, 0),3, cv2.LINE_AA)

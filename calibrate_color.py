@@ -109,7 +109,6 @@ for z in z_t:
             if not ret_color or not ret_depth:
                 continue
 
-            #thresholded_image = black_and_white_threshold(color_image)    
             circle = detect_circle_position(color_image, lower_range=LOWER_RED, upper_range=UPPER_RED)
 
             if circle is  None:
@@ -126,8 +125,7 @@ for z in z_t:
             pixels = k4a_float2_t((pix_x, pix_y))
 
             pos3d_color = device.calibration.convert_2d_to_3d(pixels, rgb_depth, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_COLOR)
-            # pos3d_depth = device.calibration.convert_2d_to_3d(pixels, rgb_depth, K4A_CALIBRATION_TYPE_COLOR, K4A_CALIBRATION_TYPE_DEPTH)
-            # print(f"RGB depth: {rgb_depth}, RGB pos3D: {pos3d_color}, Depth pos3D: {pos3d_depth}")
+           
 
             # Show detected laser position
             cv2.imshow('Laser Detector', color_image)
