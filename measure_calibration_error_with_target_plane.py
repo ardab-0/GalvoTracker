@@ -207,10 +207,15 @@ def main():
         if cv2.waitKey(1) == ord("m"):
             sensor_data, (width_range, height_range), max_pos, _ = search_for_laser_position(initial_position_mm=target_in_laser_coordinates.reshape((-1)), width_mm=10, height_mm=10, delta_mm=0.2, sensor_id=2)
             max_pos = np.array(max_pos).reshape(3,1)
-            l2norm = np.linalg.norm(max_pos - target_in_laser_coordinates)
-            plt.imshow(sensor_data, extent=[width_range[0], width_range[-1], height_range[-1], height_range[0]])
+            l2norm = np.linalg.norm(max_pos - target_in_laser_coordinates) 
+
+            width = width_range[1] - width_range[0]    
+            height = height_range[0] - height_range[1]
+            plt.imshow(sensor_data, extent=[-width/2, width/2, -height/2, height/2])
+            plt.xlabel("x (mm)")
+            plt.ylabel("y (mm)")
             print("Error distance (mm): ", l2norm)
-            
+            plt.plot()
 
 
         if cv2.waitKey(1) == ord('q'):
