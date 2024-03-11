@@ -1,9 +1,15 @@
 from mpl_toolkits import mplot3d
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
 import pickle
 from utils import optimal_rotation_and_translation
 
+
+font = {       
+        'size'   : 14}
+
+matplotlib.rc('font', **font)
 
 # Parameters
 CALIBRATION_ITER = 10
@@ -39,9 +45,14 @@ def main():
 
     ax.scatter3D(cam_wrt_laser[0], cam_wrt_laser[1], cam_wrt_laser[2], color="blue")
     
+    
+    ax.set_xlabel('X (mm)')
+    ax.set_ylabel('Y (mm)')
+    ax.set_zlabel('Z (mm)')
+    
     print("Error: ", np.sqrt(np.mean(np.square(cam_wrt_laser-laser_points))))
 
-    plt.legend(("laser points", "camera points", "camera points after transform"))
+    plt.legend(("points in galvanometer coordinate system", "points in depth camera coordinate system", "points in depth camera coordinate system after transform"))
     plt.show()
 
 

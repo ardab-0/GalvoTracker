@@ -25,7 +25,7 @@ MIRROR_ROTATION_DEG = 45 # incidence angle of incoming laser ray (degree)
 CALIBRATION_SAVE_PATH = "calibration_parameters"  # calibration result save path
 CAPTURE_COUNT = 5 # number of chessboard images captured for averaging
 ITER_COUNT = 10 # number of calibration iterations / number of calibration positions
-PI_COM_PORT = "COM6" # COM port used by raspberry pi pico
+PI_COM_PORT = "COM7" # COM  port used by raspberry pi pico
 SENSOR_POS_WRT_MARKER = -55 # location of middle sensor with respect to center of chessboard calibration pattern (mm)
 SENSOR_DISTANCE = 75 # distance between sensors (mm)
 # Parameters
