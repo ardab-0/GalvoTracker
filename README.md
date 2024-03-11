@@ -1,3 +1,5 @@
+![SystemSetup](fig1a_new.png)
+
 1.1) To install dependencies run in root folder (run with Anaconda prompt):
 - conda create --name <env_name> 
 - conda activate <env_name>
