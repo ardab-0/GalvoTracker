@@ -1,25 +1,29 @@
+<h1>Galvo Tracker</h1>
 ![SystemSetup](fig1a_new.png)
 
+![Project report](arda_buglagil_project_report.pdf)
+
+<h2>Installation</h2>
+
 1.1) To install dependencies run in root folder (run with Anaconda prompt):
-- conda create --name <env_name> 
-- conda activate <env_name>
-- conda install python=3.8
-- pip install opencv-python
-- pip install pyserial
-- pip install pykinect_azure
-- pip install matplotlib
-- pip install sympy
-- pip install scipy
-- pip install scikit-image
-- pip install python-usbtmc
-- pip install thorlabs-apt-protocol
-- pip install keyboard
-
-cd into optomdc_install_files
-
-- pip install optoKummenberg-0.15.3755-py3-none-any.whl
-- pip install optoMDC-1.1.3755-py3-none-any.whl
-
+```
+conda create --name <env_name> 
+conda activate <env_name>
+conda install python=3.8
+pip install opencv-python
+pip install pyserial
+pip install pykinect_azure
+pip install matplotlib
+pip install sympy
+pip install scipy
+pip install scikit-image
+pip install python-usbtmc
+pip install thorlabs-apt-protocol
+pip install keyboard
+cd optomdc_install_files
+pip install optoKummenberg-0.15.3755-py3-none-any.whl
+pip install optoMDC-1.1.3755-py3-none-any.whl
+```
 
 1.2) Install libusb-win32 with Zadig (url: https://zadig.akeo.ie/) to use USBTMC.
 
@@ -35,10 +39,15 @@ python -m cProfile -s tottime script.py
 
 
   To compile the circle detection module run in pywhycon folder(Opencv and CMake should be installed on the system):
+  ```
   mkdir build
   cd build
   cmake ..
   make
+  ```
+    
+  
+
   The module file is generated in build folder inside the Release or Debug directory based on the compile mode. (Example module file: circle_detector_module.cp38-win_amd64.pyd)
 
   - Circle detection library must have the same python version with the environment python version.
@@ -47,10 +56,14 @@ python -m cProfile -s tottime script.py
 
 
 
+<h2>Scripts</h2>
+2.1) 
+All scripts can be run with command: 
 
-2.1) Scripts
+```
+python script_name.py
+```
 
-All scripts can be run with command: **python script_name.py**
 - calibrate.py : It is the main calibration program. Used together with chessboard calibration pattern on top of the calibration pattern. Sensor plate is used to detect the position of the laser. 
 - calibrate_color.py : Calibration is done by placing a target plane in front of the direction mirror. Laser color is used to detect laser position.
 - visualize_calibration_points.py : It displays the recorded calibration points in 3D.
