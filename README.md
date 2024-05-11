@@ -70,5 +70,5 @@ python script_name.py
 - visualize_calibration_points.py : It displays the recorded calibration points in 3D.
 - measure_calibration_error_with_target_plane.py : It measures the calibration error by scanning around the detector and finding its center location. Measurement is done by pressing "m" key. 
 - point_laser_to_mouse_position.py : Test script to check depth camera and mirror controller integration. Color camera output is displayed and mouse is used to point the laser to specified point.
-- pywhycon_track_target_with_laser.py : WHYCon marker is used to detect the target. Target position is extracted in §D and deflection mirror is used to point the laser to target position. It is the combination of all parts of the system.
+- pywhycon_track_target_with_laser.py : WHYCon marker is used to detect the target. Target position is extracted and deflection mirror is used to point the laser to target position. It is the combination of all parts of the system.
 - mirror_gui.py : Simple GUI program to control mirror. 3D coordinates are entered with sliders and laser is pointed to entered position. 
